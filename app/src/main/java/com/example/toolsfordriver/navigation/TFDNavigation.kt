@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.toolsfordriver.screens.home.HomeScreen
 import com.example.toolsfordriver.screens.SplashScreen
 import com.example.toolsfordriver.screens.auth.AuthScreen
+import com.example.toolsfordriver.screens.trip.TripScreen
 
 @Composable
 fun TFDNavigation() {
@@ -23,6 +24,9 @@ fun TFDNavigation() {
         }
         composable(TFDScreens.HomeScreen.name) {
             HomeScreen(navController = navController)
+        }
+        composable(TFDScreens.TripScreen.name) {
+            TripScreen(navController = navController)
         }
     }
 }

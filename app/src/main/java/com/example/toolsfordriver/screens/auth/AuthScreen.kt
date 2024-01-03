@@ -41,6 +41,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.components.InputField
@@ -49,7 +50,7 @@ import com.example.toolsfordriver.navigation.TFDScreens
 @Composable
 fun AuthScreen(
     navController: NavController,
-    viewModel: AuthScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: AuthScreenViewModel = viewModel()
 ) {
     val showLoginForm = rememberSaveable { mutableStateOf(true) }
     val context = LocalContext.current

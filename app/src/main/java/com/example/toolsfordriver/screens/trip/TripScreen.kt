@@ -1,4 +1,4 @@
-package com.example.toolsfordriver.screens.home
+package com.example.toolsfordriver.screens.trip
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,12 +13,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.toolsfordriver.data.TripDBModel
 import com.example.toolsfordriver.navigation.TFDScreens
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun HomeScreen(navController: NavController) {
-    Surface(modifier = Modifier.fillMaxSize()) {
+fun TripScreen(
+    navController: NavController,
+    viewModel: TripScreenViewModel = hiltViewModel()
+) {
+    Surface (modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -26,9 +32,20 @@ fun HomeScreen(navController: NavController) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(text = "Trip Screen")
             Button(
-                onClick = { navController.navigate(TFDScreens.TripScreen.name) },
-                modifier = Modifier.fillMaxWidth()
+                onClick = {
+                    viewModel.addTrip(
+                        TripDBModel(
+                            userId = FirebaseAuth.getInstance().currentUser!!.uid,
+                            startTime = "2024-01-01-21",
+                            endTime = ""
+                        )
+                    )
+                    navController.navigate(TFDScreens.HomeScreen.name)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 10.dp, vertical = 30.dp),
                 shape = CircleShape
             ) {
