@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "730316550484",
+    "project_id": "tfdapp-6cc64",
+    "storage_bucket": "tfdapp-6cc64.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:730316550484:android:b5460965ab1d8a03fc58c1",
+        "android_client_info": {
+          "package_name": "com.example.toolsfordriver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPt35maBZ4Ky4lTncFy0EqRxE7M40UMV0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
