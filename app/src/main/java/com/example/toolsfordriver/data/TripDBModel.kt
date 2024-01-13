@@ -3,11 +3,12 @@ package com.example.toolsfordriver.data
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.UUID
 
 @Entity(tableName = "trips_table")
 data class TripDBModel(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    @PrimaryKey
+    val id: UUID = UUID.randomUUID(),
 
     @ColumnInfo(name = "user_id")
     val userId: String,

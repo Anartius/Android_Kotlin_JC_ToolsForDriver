@@ -1,7 +1,6 @@
 package com.example.toolsfordriver.screens.auth
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,12 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -29,6 +27,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -41,9 +40,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.toolsfordriver.R
+import com.example.toolsfordriver.components.AppButton
 import com.example.toolsfordriver.components.InputField
 import com.example.toolsfordriver.navigation.TFDScreens
 
@@ -74,26 +75,36 @@ fun AuthScreen(
                 }
             }
 
-            Row(
+            Button(
+                onClick = { showLoginForm.value = !showLoginForm.value },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 20.dp, horizontal = 50.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(vertical = 20.dp, horizontal = 30.dp),
+                shape = RoundedCornerShape(45.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
             ) {
-                val text = if (showLoginForm.value) "New User?" else "Have account?"
-                val actionText = if (showLoginForm.value) "Sign Up" else "Login "
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val text = if (showLoginForm.value) "New User?" else "Have account?"
+                    val actionText = if (showLoginForm.value) "Sign Up" else "Login "
 
-                Text(text = text)
+                    Text(
+                        text = text,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
 
-                Text(
-                    text = actionText,
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .clickable { showLoginForm.value = !showLoginForm.value },
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(id = R.color.light_blue)
-                )
+                    Text(
+                        text = actionText,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = colorResource(id = R.color.light_blue)
+                    )
+                }
             }
         }
     }
@@ -157,14 +168,14 @@ fun UserForm(
         }
     )
 
-    SubmitButton(
-        validInputs = valid,
-        loading = loading,
-        textId = if (isCreateAccount) "Create Account" else "Login"
+    AppButton(
+        buttonText = if (isCreateAccount) "Create Account" else "Login",
+        enabled = !loading && valid
     ) {
         onDone(email.value.trim(), password.value.trim())
         keyboardController?.hide()
     }
+
 }
 
 @Composable
@@ -213,27 +224,4 @@ fun PasswordInput(
         visualTransformation = visualTransformation,
         onAction = onAction
     )
-}
-
-@Composable
-fun SubmitButton(
-    validInputs: Boolean,
-    loading: Boolean,
-    textId: String,
-    onClick: () -> Unit
-) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .padding(5.dp)
-            .fillMaxWidth(),
-        enabled = !loading && validInputs,
-        shape = CircleShape
-    ) {
-        if (loading) {
-            CircularProgressIndicator(modifier = Modifier.size(25.dp))
-        } else {
-            Text(text = textId, modifier = Modifier.padding(5.dp))
-        }
-    }
 }

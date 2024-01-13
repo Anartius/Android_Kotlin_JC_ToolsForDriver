@@ -14,6 +14,8 @@ class Repository @Inject constructor(
     fun getAllTrips(): Flow<List<TripDBModel>> =
         tfdRoomDAO.getTrips().flowOn(Dispatchers.IO).conflate()
 
+    suspend fun getTripById(tripId: String) = tfdRoomDAO.getTripById(tripId)
+
     suspend fun addTrip(trip: TripDBModel) = tfdRoomDAO.insertTrip(trip)
 
     suspend fun updateTrip(trip: TripDBModel) = tfdRoomDAO.updateTrip(trip)
