@@ -26,4 +26,11 @@ class TripScreenViewModel @Inject constructor(
         }
     }
 
+    fun addTrip(trip: TripDBModel) {
+        viewModelScope.launch { repository.addTrip(trip) }
+    }
+
+    fun updateTrip(trip: TripDBModel) {
+        viewModelScope.launch { repository.updateTrip(trip) }
+    }
 }

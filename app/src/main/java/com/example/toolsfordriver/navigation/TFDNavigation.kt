@@ -10,8 +10,12 @@ import androidx.navigation.navArgument
 import com.example.toolsfordriver.screens.home.HomeScreen
 import com.example.toolsfordriver.screens.SplashScreen
 import com.example.toolsfordriver.screens.auth.AuthScreen
-import com.example.toolsfordriver.screens.list.ListScreen
-import com.example.toolsfordriver.screens.list.ListScreenViewModel
+import com.example.toolsfordriver.screens.freight.FreightScreen
+import com.example.toolsfordriver.screens.freight.FreightScreenViewModel
+import com.example.toolsfordriver.screens.freightlist.FreightListScreen
+import com.example.toolsfordriver.screens.freightlist.FreightListScreenViewModel
+import com.example.toolsfordriver.screens.triplist.TripListScreen
+import com.example.toolsfordriver.screens.triplist.TripListScreenViewModel
 import com.example.toolsfordriver.screens.trip.TripScreen
 import com.example.toolsfordriver.screens.trip.TripScreenViewModel
 
@@ -32,21 +36,12 @@ fun TFDNavigation() {
             HomeScreen(navController = navController)
         }
 
-        val listScreenName = TFDScreens.ListScreen.name
-        composable(
-            route = "$listScreenName/{listItemName}",
-            arguments = listOf(
-                navArgument("listItemName") { type = NavType.StringType }
+        composable(TFDScreens.TripListScreen.name) {
+            val tripListScreenViewModel = hiltViewModel<TripListScreenViewModel>()
+            TripListScreen(
+                navController = navController,
+                viewModel = tripListScreenViewModel
             )
-        ) { navBackStackEntry ->
-            val listScreenViewModel = hiltViewModel<ListScreenViewModel>()
-            navBackStackEntry.arguments?.getString("listItemName").let { itemName ->
-                ListScreen(
-                    navController = navController,
-                    viewModel = listScreenViewModel,
-                    itemName = itemName.toString()
-                )
-            }
         }
 
         val tripScreenName = TFDScreens.TripScreen.name
@@ -66,5 +61,29 @@ fun TFDNavigation() {
             }
         }
 
+        composable(TFDScreens.FreightListScreen.name) {
+            val freightListScreenViewModel = hiltViewModel<FreightListScreenViewModel>()
+            FreightListScreen(
+                navController = navController,
+                viewModel = freightListScreenViewModel
+            )
+        }
+
+        val freightScreenName = TFDScreens.FreightScreen.name
+        composable(
+            route = "$freightScreenName/{freightId}",
+            arguments = listOf(
+                navArgument("freightId") { type = NavType.StringType }
+            )
+        ) { navBackStackEntry ->
+            val freightScreenViewModel = hiltViewModel<FreightScreenViewModel>()
+            navBackStackEntry.arguments?.getString("freightId").let { freightId ->
+                FreightScreen(
+                    navController = navController,
+                    viewModel = freightScreenViewModel,
+                    freightId = freightId.toString()
+                )
+            }
+        }
     }
 }

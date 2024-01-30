@@ -47,6 +47,7 @@ import com.example.toolsfordriver.R
 import com.example.toolsfordriver.components.AppButton
 import com.example.toolsfordriver.components.InputField
 import com.example.toolsfordriver.navigation.TFDScreens
+import com.example.toolsfordriver.utils.isValidEmail
 
 @Composable
 fun AuthScreen(
@@ -123,7 +124,9 @@ fun UserForm(
     val passwordFocusRequest = FocusRequester.Default
     val keyboardController = LocalSoftwareKeyboardController.current
     val valid = remember(email.value, password.value) {
-        email.value.trim().isNotEmpty() && password.value.isNotEmpty()
+        email.value.trim().isValidEmail() &&
+                password.value.isNotEmpty() &&
+                password.value.length > 5
     }
 
     Column(
@@ -141,9 +144,7 @@ fun UserForm(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = if (!isCreateAccount) {
-                    stringResource(R.string.create_account)
-                } else "",
+                text = stringResource(R.string.create_account),
                 modifier = Modifier.padding(vertical = 30.dp, horizontal = 50.dp),
                 textAlign = TextAlign.Center
             )
@@ -187,7 +188,7 @@ fun EmailInput(
 ) {
     InputField(
         valueState = emailState,
-        labelId = labelId,
+        label = labelId,
         enabled = enabled,
         keyboardType = KeyboardType.Email,
         imeAction = ImeAction.Next,
@@ -215,7 +216,7 @@ fun PasswordInput(
     InputField(
         modifier = modifier,
         valueState = passwordState,
-        labelId = labelId,
+        label = labelId,
         enabled = enabled,
         textVisibility = passwordVisibility,
         trailingIconVisibility = trailingIconVisibility,

@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TFDRoomDAO {
+
+    // trips_table
     @Query("SELECT * FROM trips_table")
     fun getTrips(): Flow<List<TripDBModel>>
 
@@ -27,4 +29,24 @@ interface TFDRoomDAO {
 
     @Query("DELETE FROM trips_table")
     suspend fun deleteAllTrips()
+
+
+    // freights_table
+    @Query("SELECT * FROM freights_table")
+    fun getFreights(): Flow<List<FreightDBModel>>
+
+    @Query("SELECT * FROM freights_table WHERE id = :freightId LIMIT 1")
+    suspend fun getFreightById(freightId: String): FreightDBModel
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertFreight(freight: FreightDBModel)
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateFreight(freight: FreightDBModel)
+
+    @Delete
+    suspend fun deleteFreight(freight: FreightDBModel)
+
+    @Query("DELETE FROM freights_table")
+    suspend fun deleteAllFreights()
 }

@@ -14,8 +14,8 @@ data class TripDBModel(
     val userId: String,
 
     @ColumnInfo(name = "start_time")
-    val startTime: String,
+    val startTime: Long? = null,
 
     @ColumnInfo(name = "end_time")
-    val endTime: String
+    val endTime: Long? = null
 )

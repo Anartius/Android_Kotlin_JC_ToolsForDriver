@@ -2,36 +2,41 @@ package com.example.toolsfordriver.screens.trip
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.toolsfordriver.R
+import com.example.toolsfordriver.components.AppButton
+import com.example.toolsfordriver.components.DateTimeDialog
 import com.example.toolsfordriver.components.TFDAppBar
+import com.example.toolsfordriver.components.TextRow
+import com.example.toolsfordriver.data.TripDBModel
 import com.example.toolsfordriver.navigation.TFDScreens
+import com.example.toolsfordriver.utils.calcEarnings
+import com.example.toolsfordriver.utils.calcPeriod
+import com.example.toolsfordriver.utils.dateAsString
+import com.example.toolsfordriver.utils.timeAsString
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 
 @Composable
 fun TripScreen(
@@ -39,24 +44,28 @@ fun TripScreen(
     viewModel: TripScreenViewModel,
     tripId: String
 ) {
-    var startTime by remember { mutableStateOf("") }
-    var endTime by remember { mutableStateOf("") }
+    val isCreateTrip = remember(tripId) { mutableStateOf(tripId == "new" ) }
+
+    val tripList = if (!isCreateTrip.value) {
+        viewModel.tripList.collectAsState().value
+    } else emptyList()
 
     Scaffold(
         topBar = {
             TFDAppBar(
                 title = "Trip",
-                navIcon = Icons.Default.KeyboardArrowLeft,
+                navIcon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 navIconDescription = "Back",
                 onNavIconClicked = {
-                    navController.navigate(TFDScreens.ListScreen.name + "/Trip")
+                    navController.navigate(TFDScreens.TripListScreen.name)
                 }
             )
         }
     ) { paddingValue ->
         Surface(modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValue)) {
+            .padding(paddingValue)
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -64,39 +73,16 @@ fun TripScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
-                val tripList = if (tripId != "new") {
-                    viewModel.tripList.collectAsState().value
-                } else emptyList()
 
-                if (tripList.isEmpty() && tripId != "new") {
+                if (tripList.isEmpty() && !isCreateTrip.value) {
                     CircularProgressIndicator()
                 } else {
-                    if (tripList.isNotEmpty()) {
-                        startTime = tripList.first().startTime
-                        endTime = tripList.first().endTime
-                    }
-                    TextRpw(description = "Start:", value = startTime)
-                    TextRpw(description = "Finish:", value = endTime)
-                    TextRpw(description = "Duration:", value = "5d. 15h.")
-                    TextRpw(description = "Earnings:", value = "3450 zł.")
-
-                    Spacer(modifier = Modifier.height(40.dp))
-
-                    Button(
-                        onClick = {
-                            navController.navigate(TFDScreens.HomeScreen.name)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 50.dp, vertical = 20.dp),
-                        shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.DarkGray,
-                            contentColor = colorResource(id = R.color.light_blue)
-                        )
-                    ) {
-                        Text(text = "Edit Trip")
-                    }
+                    TripScreenContent(
+                        tripList = tripList,
+                        isCreateTrip = isCreateTrip,
+                        navController = navController,
+                        viewModel = viewModel
+                    )
                 }
             }
         }
@@ -104,15 +90,102 @@ fun TripScreen(
 }
 
 @Composable
-fun TextRpw(description: String, value: String) {
-    Row (
-        modifier = Modifier
-            .padding(5.dp)
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(text = description)
-        Text(text = value)
+fun TripScreenContent(
+    tripList: List<TripDBModel>,
+    isCreateTrip: MutableState<Boolean>,
+    navController: NavController,
+    viewModel: TripScreenViewModel
+) {
+    val showDatePickerDialog = rememberSaveable { mutableStateOf(false) }
+    val isStartDatePickerDialog = remember { mutableStateOf(true) }
+
+    val trip = if (tripList.isNotEmpty()) {
+        tripList.first()
+    } else TripDBModel(userId = FirebaseAuth.getInstance().currentUser!!.uid)
+
+    val startDateTime = remember { mutableStateOf(
+        if (trip.startTime != null) {
+            LocalDateTime(
+                LocalDate.parse(dateAsString(trip.startTime)),
+                LocalTime.parse(timeAsString(trip.startTime))
+            )
+        } else null
+    )}
+    val endDateTime = remember { mutableStateOf(
+        if (trip.endTime != null) {
+            LocalDateTime(
+                LocalDate.parse(dateAsString(trip.endTime)),
+                LocalTime.parse(timeAsString(trip.endTime))
+            )
+        } else null
+    )}
+
+    val tripDuration = remember(startDateTime.value, endDateTime.value) {
+        mutableStateOf(calcPeriod(startDateTime.value, endDateTime.value))
     }
+
+    val earnings = remember(startDateTime.value, endDateTime.value) {
+        mutableStateOf(
+            calcEarnings(startDateTime.value, endDateTime.value, (400.0 / 24))
+        )
+    }
+
+    TextRow(
+        description = "Start:",
+        value = "${startDateTime.value?.date ?: ""} ${startDateTime.value?.time ?: ""}",
+        clickable = true
+    ) {
+        isStartDatePickerDialog.value = true
+        showDatePickerDialog.value = true
+    }
+    TextRow(
+        description = "Finish:",
+        value = "${endDateTime.value?.date ?: ""} ${endDateTime.value?.time ?: ""}",
+        clickable = true
+    ) {
+        isStartDatePickerDialog.value = false
+        showDatePickerDialog.value = true
+    }
+
+    TextRow(
+        description = "Duration:",
+        value = if (tripDuration.value != null) {
+            if (tripDuration.value!!.months > 0) {
+                "${tripDuration.value!!.months}.M "
+            } else {
+                ""
+            } + "${tripDuration.value!!.days}.d ${tripDuration.value!!.hours}.h"
+        } else ""
+    )
+    TextRow(
+        description = "Earnings:",
+        value = if (earnings.value != null) {
+            "${earnings.value}zł."
+        } else "You should work more"
+    )
+
+    Spacer(modifier = Modifier.height(40.dp))
+
+    AppButton(
+        buttonText = if (isCreateTrip.value) "Add Trip" else "Update Trip",
+        enabled = ((startDateTime.value != null) xor (endDateTime.value != null)) ||
+                startDateTime.value != null && endDateTime.value != null &&
+                (startDateTime.value!! < endDateTime.value!!),
+    ) {
+        val tripUpdated = trip.copy(
+            startTime = startDateTime
+                .value?.toInstant(TimeZone.currentSystemDefault())?.toEpochMilliseconds(),
+            endTime = endDateTime
+                .value?.toInstant(TimeZone.currentSystemDefault())?.toEpochMilliseconds()
+        )
+        if (isCreateTrip.value) {
+            viewModel.addTrip(tripUpdated)
+        } else viewModel.updateTrip(tripUpdated)
+        navController.popBackStack()
+    }
+
+    DateTimeDialog(
+        showDialog = showDatePickerDialog,
+        dateTime = if (isStartDatePickerDialog.value) startDateTime else endDateTime
+    )
 }
