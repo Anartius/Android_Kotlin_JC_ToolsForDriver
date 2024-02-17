@@ -2,6 +2,7 @@ package com.example.toolsfordriver.components
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,8 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,8 +27,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.toolsfordriver.utils.dateAsString
@@ -98,7 +104,10 @@ fun LocationDateTimeDialog(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    DialogTitle(title = "Select location, date and time")
+                    DialogTitle(
+                        modifier = Modifier.padding(top = 10.dp, bottom = 15.dp),
+                        title = "Select location, date and time"
+                    )
 
                     LocationContent(
                         countryCode = countryCode,
@@ -128,7 +137,7 @@ fun LocationDateTimeDialog(
                         } else {
                             Toast.makeText(
                                 context,
-                                "There doesn't seem to be enough data.",
+                                "Not enough data",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -142,40 +151,58 @@ fun LocationDateTimeDialog(
 @Composable
 fun LocationContent(
     countryCode: MutableState<String>,
-    city: MutableState<String>,
+    city: MutableState<String>
 ) {
     Column(
         modifier = Modifier.padding(start = 20.dp, top = 0.dp, end = 10.dp, bottom = 0.dp)
     ) {
+
+        val focusManager = LocalFocusManager.current
+        val keyboardController = LocalSoftwareKeyboardController.current
+        val cityNameFocusRequester = remember { FocusRequester() }
+
         LocationPickerRow(
             description = "Country",
-            label = "Code",
+            placeholderText = "Code",
             inputText = countryCode,
             modifier = Modifier.width(150.dp),
-            keyboardOptions =
-            KeyboardOptions(capitalization = KeyboardCapitalization.Characters)
-        )
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Characters,
+                imeAction = ImeAction.Next
+            )
+        ) {
+            keyboardController?.hide()
+            cityNameFocusRequester.requestFocus()
+        }
+
         LocationPickerRow(
             description = "City",
-            label = "Name",
+            placeholderText = "Name",
             inputText = city,
-            modifier = Modifier,
             isSingleLine = false,
-            maxLines = 2
-        )
+            maxLines = 2,
+            modifier = Modifier.focusable(true).focusRequester(cityNameFocusRequester),
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                imeAction = ImeAction.Done
+            )
+        ) {
+            keyboardController?.hide()
+            focusManager.clearFocus()
+        }
     }
 }
 
 @Composable
 fun LocationPickerRow(
     description: String,
-    label: String,
+    placeholderText: String,
     inputText: MutableState<String>,
     isSingleLine: Boolean = true,
     maxLines: Int = 1,
-    keyboardOptions: KeyboardOptions =
-        KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-    modifier: Modifier
+    keyboardOptions: KeyboardOptions,
+    modifier: Modifier,
+    onAction: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -190,11 +217,19 @@ fun LocationPickerRow(
         LocationInputText(
             text = inputText,
             modifier = modifier,
-            label = label,
+            placeholder = {
+                Text(
+                    text = placeholderText,
+                    modifier = modifier.fillMaxWidth(),
+                    textAlign = TextAlign.End
+                )
+            },
             isSingleLine = isSingleLine,
             maxLines = maxLines,
             keyboardOptions = keyboardOptions
-        )
+        ) {
+            onAction.invoke()
+        }
     }
 }
 
@@ -202,30 +237,26 @@ fun LocationPickerRow(
 fun LocationInputText(
     text: MutableState<String>,
     modifier: Modifier = Modifier,
-    label: String,
+    placeholder: @Composable () -> Unit,
     isSingleLine: Boolean,
     maxLines: Int,
     keyboardOptions: KeyboardOptions,
-    onImeAction: () -> Unit = {}
+    onAction: () -> Unit
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current
+
     val trailingIconVisibility = remember { mutableStateOf(true) }
 
     InputField(
-        modifier = modifier,
-        valueState = text,
-        label = label,
+        modifier = modifier.wrapContentWidth(align = Alignment.End),
+        textValueState = text,
+        placeholder = placeholder,
         isOutlined = false,
         enabled = true,
         isSingleLine = isSingleLine,
         maxLines = maxLines,
+        inputTextAlign = TextAlign.End,
         trailingIconVisibility = trailingIconVisibility,
         keyboardOptions = keyboardOptions,
-        onAction =  KeyboardActions(
-            onDone = {
-                onImeAction()
-                keyboardController?.hide()
-            }
-        )
+        onAction = onAction
     )
 }

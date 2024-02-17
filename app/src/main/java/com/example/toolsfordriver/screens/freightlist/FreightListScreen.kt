@@ -133,8 +133,8 @@ fun FreightRow(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = dateAsString(freight.loadings.keys.first()) + " -> " +
-                            dateAsString(freight.unloading.keys.last())
+                    text = dateAsString(freight.loads.keys.first()) + " -> " +
+                            dateAsString(freight.unloads.keys.last())
                 )
             }
 
@@ -147,10 +147,10 @@ fun FreightRow(
             ) {
                 Text(
                     text = (
-                            "${freight.loadings[freight.loadings.keys.first()]
+                            "${freight.loads[freight.loads.keys.first()]
                                 ?.replace("#", ", ") ?: ""} " +
                                     "->" +
-                                    " ${freight.unloading[freight.unloading.keys.last()]
+                                    " ${freight.unloads[freight.unloads.keys.last()]
                                         ?.replace("#", ", ") ?: ""}"
                             )
                 )

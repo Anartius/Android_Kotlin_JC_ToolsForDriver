@@ -16,11 +16,11 @@ data class FreightDBModel(
     @ColumnInfo(name = "user_id")
     val userId: String,
 
-    @ColumnInfo(name = "loadings")
-    val loadings: Map<Long, String> = emptyMap(),
+    @ColumnInfo(name = "loads")
+    val loads: Map<Long, String> = emptyMap(),
 
-    @ColumnInfo(name = "unloading")
-    val unloading: Map<Long, String> = emptyMap(),
+    @ColumnInfo(name = "unloads")
+    val unloads: Map<Long, String> = emptyMap(),
 
     @ColumnInfo(name = "distance")
     val distance: Int? = null,

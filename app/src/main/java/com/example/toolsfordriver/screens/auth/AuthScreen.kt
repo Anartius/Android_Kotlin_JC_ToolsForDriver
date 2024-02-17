@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LocalTextStyle
@@ -23,7 +23,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -63,13 +62,13 @@ fun AuthScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (showLoginForm.value) {
-                UserForm(loading = false, isCreateAccount = false) { email, password ->
+                UserForm(load = false, isCreateAccount = false) { email, password ->
                     viewModel.signUserWithEmailAndPassword(email, password, context) {
                         navController.navigate(TFDScreens.HomeScreen.name)
                     }
                 }
             } else {
-                UserForm(loading = false, isCreateAccount = true) { email, password ->
+                UserForm(load = false, isCreateAccount = true) { email, password ->
                     viewModel.createUserWithEmailAndPassword(email, password) {
                         navController.navigate(TFDScreens.HomeScreen.name)
                     }
@@ -111,17 +110,16 @@ fun AuthScreen(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun UserForm(
-    loading: Boolean = false,
+    load: Boolean = false,
     isCreateAccount: Boolean = false,
     onDone: (String, String) -> Unit
 ) {
     val email = rememberSaveable { mutableStateOf("") }
     val password = rememberSaveable { mutableStateOf("") }
     val passwordVisibility = rememberSaveable { mutableStateOf(false) }
-    val passwordFocusRequest = FocusRequester.Default
+    val passwordFocusRequester = FocusRequester()
     val keyboardController = LocalSoftwareKeyboardController.current
     val valid = remember(email.value, password.value) {
         email.value.trim().isValidEmail() &&
@@ -153,25 +151,25 @@ fun UserForm(
 
     EmailInput(
         emailState = email,
-        enabled = !loading,
-        onAction = KeyboardActions { passwordFocusRequest.requestFocus() }
-    )
+        enabled = !load
+    ) {
+        passwordFocusRequester.requestFocus()
+    }
 
     PasswordInput(
-        modifier = Modifier.focusRequester(passwordFocusRequest),
+        modifier = Modifier.focusRequester(passwordFocusRequester),
         passwordState = password,
         labelId = "Password",
-        enabled = !loading,
-        passwordVisibility = passwordVisibility,
-        onAction = KeyboardActions {
-            if (!valid) return@KeyboardActions
-            onDone(email.value.trim(), password.value.trim())
-        }
-    )
+        enabled = !load,
+        passwordVisibility = passwordVisibility
+    ) {
+        if (valid) onDone(email.value.trim(), password.value.trim())
+        passwordFocusRequester.freeFocus()
+    }
 
     AppButton(
         buttonText = if (isCreateAccount) "Create Account" else "Login",
-        enabled = !loading && valid
+        enabled = !load && valid
     ) {
         onDone(email.value.trim(), password.value.trim())
         keyboardController?.hide()
@@ -184,14 +182,14 @@ fun EmailInput(
     emailState: MutableState<String>,
     labelId: String = "Email",
     enabled: Boolean = true,
-    onAction: KeyboardActions = KeyboardActions.Default
+    onAction: () -> Unit = {}
 ) {
     InputField(
-        valueState = emailState,
+        textValueState = emailState,
         label = labelId,
         enabled = enabled,
         keyboardType = KeyboardType.Email,
-        imeAction = ImeAction.Next,
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
         onAction = onAction
     )
 }
@@ -203,7 +201,7 @@ fun PasswordInput(
     labelId: String = "Password",
     enabled: Boolean = true,
     passwordVisibility: MutableState<Boolean>,
-    onAction: KeyboardActions = KeyboardActions.Default
+    onAction: () -> Unit = {}
 ) {
     val trailingIconVisibility = remember {
         mutableStateOf(true)
@@ -215,13 +213,13 @@ fun PasswordInput(
 
     InputField(
         modifier = modifier,
-        valueState = passwordState,
+        textValueState = passwordState,
         label = labelId,
         enabled = enabled,
         textVisibility = passwordVisibility,
         trailingIconVisibility = trailingIconVisibility,
         keyboardType = KeyboardType.Password,
-        imeAction = ImeAction.Done,
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
         visualTransformation = visualTransformation,
         onAction = onAction
     )

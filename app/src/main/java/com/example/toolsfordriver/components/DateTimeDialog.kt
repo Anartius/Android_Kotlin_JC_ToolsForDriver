@@ -28,7 +28,7 @@ import kotlinx.datetime.toLocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateTimeDialog(
+fun DateTimeDialog (
     showDialog: MutableState<Boolean>,
     dateTime: MutableState<LocalDateTime?>
 ) {
@@ -38,10 +38,11 @@ fun DateTimeDialog(
             dateTime.value!!.toInstant(TimeZone.currentSystemDefault())
                 .toEpochMilliseconds()
         } else null
+
+        val currentDate = Clock.System.now().toEpochMilliseconds()
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = initDate ?: 0L,
-            initialDisplayedMonthMillis =
-            initDate ?: Clock.System.now().toEpochMilliseconds()
+            initialSelectedDateMillis = initDate ?: currentDate,
+            initialDisplayedMonthMillis = initDate ?: currentDate
         )
 
         val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
@@ -63,7 +64,10 @@ fun DateTimeDialog(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    DialogTitle(title = "Select date and time")
+                    DialogTitle(
+                        modifier = Modifier.padding(top = 10.dp, bottom = 15.dp),
+                        title = "Select date and time"
+                    )
 
                     DateTimePickersContent(
                         showDialog = showDialog,

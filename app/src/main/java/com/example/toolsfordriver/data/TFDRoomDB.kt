@@ -9,7 +9,7 @@ import com.example.toolsfordriver.utils.UUIDConverter
 
 @Database(
     entities = [TripDBModel::class, FreightDBModel::class],
-    version = 8,
+    version = 9,
     exportSchema = false
 )
 @TypeConverters(

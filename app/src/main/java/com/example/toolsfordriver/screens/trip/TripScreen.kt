@@ -131,36 +131,41 @@ fun TripScreenContent(
     }
 
     TextRow(
-        description = "Start:",
+        valueDescription = "Start:",
         value = "${startDateTime.value?.date ?: ""} ${startDateTime.value?.time ?: ""}",
-        clickable = true
+        clickable = true,
+        showIcon = true
     ) {
         isStartDatePickerDialog.value = true
         showDatePickerDialog.value = true
     }
     TextRow(
-        description = "Finish:",
+        valueDescription = "Finish:",
         value = "${endDateTime.value?.date ?: ""} ${endDateTime.value?.time ?: ""}",
-        clickable = true
+        clickable = true,
+        showIcon = true
     ) {
         isStartDatePickerDialog.value = false
         showDatePickerDialog.value = true
     }
 
     TextRow(
-        description = "Duration:",
+        valueDescription = "Duration:",
         value = if (tripDuration.value != null) {
             if (tripDuration.value!!.months > 0) {
-                "${tripDuration.value!!.months}.M "
+                "${tripDuration.value!!.months}M "
             } else {
                 ""
-            } + "${tripDuration.value!!.days}.d ${tripDuration.value!!.hours}.h"
+            } +
+                    "${tripDuration.value!!.days}d " +
+                    "${tripDuration.value!!.hours}h " +
+                    "${tripDuration.value!!.minutes}m"
         } else ""
     )
     TextRow(
-        description = "Earnings:",
+        valueDescription = "Earnings:",
         value = if (earnings.value != null) {
-            "${earnings.value}zł."
+            "${earnings.value} PLN"
         } else "You should work more"
     )
 

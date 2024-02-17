@@ -16,8 +16,8 @@ import kotlinx.coroutines.launch
 class AuthScreenViewModel: ViewModel() {
     private val auth = Firebase.auth
 
-    private val _loading = MutableLiveData(false)
-    val loading: LiveData<Boolean> = _loading
+    private val _load = MutableLiveData(false)
+    val load: LiveData<Boolean> = _load
 
     fun signUserWithEmailAndPassword(
         email: String,
@@ -56,8 +56,8 @@ class AuthScreenViewModel: ViewModel() {
         password: String,
         toHomeScreen: () -> Unit
     ) {
-        if (_loading.value == false) {
-            _loading.value = true
+        if (_load.value == false) {
+            _load.value = true
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
@@ -72,7 +72,7 @@ class AuthScreenViewModel: ViewModel() {
                         )
                     }
                     
-                    _loading.value = false
+                    _load.value = false
                 }
         }
     }

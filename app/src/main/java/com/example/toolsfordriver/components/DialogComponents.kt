@@ -29,18 +29,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.utils.dateAsString
 
 @Composable
-fun DialogTitle(title: String) {
+fun DialogTitle(
+    modifier: Modifier,
+    title: String
+) {
     Row(
         horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(top = 10.dp, bottom = 15.dp)
+        modifier = modifier
     ) {
-        Text(text = title, color = colorResource(id = R.color.light_blue))
+        Text(
+            text = title,
+            color = colorResource(id = R.color.light_blue),
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
@@ -76,7 +84,9 @@ fun DatePickerRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        var dateRowText by rememberSaveable { mutableStateOf("Select Date") }
+        var dateRowText by rememberSaveable {
+            mutableStateOf(dateAsString(datePickerState.selectedDateMillis!!))
+        }
 
         Text(text = "Date:")
         Row {
@@ -124,7 +134,11 @@ fun TimePickerRow(timePickerState: TimePickerState) {
             .clickable { showTimePickerDialog.value = true },
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        val timeRowText = rememberSaveable { mutableStateOf("Select Time") }
+        val timeRowText = rememberSaveable {
+            val hour = timePickerState.hour
+            val minute = timePickerState.minute
+            mutableStateOf(String.format("%02d:%02d", hour, minute))
+        }
 
         Text(text = "Time:")
         Row {
