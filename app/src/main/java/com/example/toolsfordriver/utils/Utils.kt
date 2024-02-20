@@ -36,6 +36,20 @@ fun calcPeriod(startDateTime: LocalDateTime?, endDateTime: LocalDateTime?): Date
     } else null
 }
 
+fun formatPeriod(period: DateTimePeriod): String {
+    val years = period.years
+    val months = period.months
+    val days = period.days
+    val hours = period.hours
+    val minutes = period.minutes
+
+    return (if (years != 0) "$years y " else "") +
+            (if (months != 0) "$months m " else "") +
+            (if (days != 0) "$days d " else "") +
+            "$hours h" +
+            (if (minutes != 0) " $minutes min" else "")
+}
+
 fun calcEarnings(
     startDateTime: LocalDateTime?,
     endDateTime: LocalDateTime?,

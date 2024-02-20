@@ -3,6 +3,7 @@ package com.example.toolsfordriver.screens.home
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
@@ -42,14 +43,20 @@ fun HomeScreen(navController: NavController) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(10.dp),
+                    .padding(30.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AppButton(buttonText = "Show Trips") {
+                AppButton(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 8.dp),
+                    buttonText = "Trips"
+                ) {
                     navController.navigate(TFDScreens.TripListScreen.name)
                 }
-                AppButton(buttonText = "Show Freights") {
+                AppButton(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 8.dp),
+                    buttonText = "Freights"
+                ) {
                     navController.navigate(TFDScreens.FreightListScreen.name)
                 }
             }

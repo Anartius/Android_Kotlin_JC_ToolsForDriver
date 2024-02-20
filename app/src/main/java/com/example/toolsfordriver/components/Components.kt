@@ -109,7 +109,7 @@ fun TextRow(
 ) {
     Row (
         modifier = Modifier
-            .padding(horizontal = 25.dp, vertical = 5.dp)
+            .padding(horizontal = 25.dp, vertical = 10.dp)
             .fillMaxWidth()
             .clickable(
                 enabled = clickable,

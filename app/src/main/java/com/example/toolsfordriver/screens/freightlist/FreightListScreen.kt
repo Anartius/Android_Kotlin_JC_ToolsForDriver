@@ -13,7 +13,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,7 +26,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.toolsfordriver.R
@@ -47,7 +51,7 @@ fun FreightListScreen(
     Scaffold(
         topBar = {
             TFDAppBar(
-                title = "Freight List",
+                title = "Freights",
                 navIcon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 navIconDescription = "Back",
                 onNavIconClicked = {
@@ -61,9 +65,10 @@ fun FreightListScreen(
             }
         }
     ) { paddingValue ->
-        Surface (modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValue)
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValue)
         ) {
             LazyColumn {
                 items(items = freightList) { item ->
@@ -127,33 +132,34 @@ fun FreightRow(
         ) {
             Row(
                 modifier = Modifier
-                    .padding(vertical = 5.dp, horizontal = 10.dp)
+                    .padding(vertical = 10.dp, horizontal = 30.dp)
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = dateAsString(freight.loads.keys.first()) + " -> " +
-                            dateAsString(freight.unloads.keys.last())
-                )
-            }
+                val startDate = dateAsString(freight.loads.keys.first())
+                val endDate = dateAsString(freight.unloads.keys.last())
 
-            Row(
-                modifier = Modifier
-                    .padding(vertical = 5.dp, horizontal = 10.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = (
-                            "${freight.loads[freight.loads.keys.first()]
-                                ?.replace("#", ", ") ?: ""} " +
-                                    "->" +
-                                    " ${freight.unloads[freight.unloads.keys.last()]
-                                        ?.replace("#", ", ") ?: ""}"
-                            )
+                Column {
+                    Text(text = startDate)
+                    Text(
+                        text = freight.loads[freight.loads.keys.first()]?.replace("#", ", ") ?: "",
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "Arrow Forward",
+                    tint = Color.Gray,
                 )
+                Column {
+                    Text(text = endDate)
+                    Text(
+                        text = freight.unloads[freight.unloads.keys.last()]
+                            ?.replace("#", ", ") ?: "",
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
     }

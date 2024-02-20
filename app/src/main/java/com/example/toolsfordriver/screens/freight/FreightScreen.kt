@@ -1,5 +1,6 @@
 package com.example.toolsfordriver.screens.freight
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,21 +22,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -43,6 +38,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -70,11 +66,28 @@ fun FreightScreen(
     viewModel: FreightScreenViewModel,
     freightId: String
 ) {
-    val isCreateFreight = remember(freightId) { mutableStateOf(freightId == "new" ) }
+    val isCreateFreight = remember(freightId) { mutableStateOf(freightId == "new") }
+    val context = LocalContext.current
 
-    val freightList = if (!isCreateFreight.value) {
-        viewModel.freightList.collectAsState().value
-    } else emptyList()
+    val freightState = rememberSaveable {
+        mutableStateOf(FreightDBModel(userId = FirebaseAuth.getInstance().currentUser!!.uid))
+    }
+
+    val loadLocationState = rememberSaveable { mutableStateOf("") }
+    val loadLocation = remember(loadLocationState.value) {
+        mutableStateOf(loadLocationState.value)
+    }
+
+    val unloadLocationState = rememberSaveable { mutableStateOf("") }
+    val unloadLocation = remember(unloadLocationState.value) {
+        mutableStateOf(unloadLocationState.value)
+    }
+
+    val loadDateTime = remember { mutableStateOf<LocalDateTime?>(null) }
+    val unloadDateTime = remember { mutableStateOf<LocalDateTime?>(null) }
+
+    val distanceState = rememberSaveable { mutableStateOf("") }
+    val noteState = rememberSaveable { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -86,26 +99,39 @@ fun FreightScreen(
                     navController.navigate(TFDScreens.FreightListScreen.name)
                 }
             )
+        },
+        floatingActionButton = {
+            FABContent(
+                isCreateFreight = isCreateFreight,
+                freight = freightState.value,
+                loadLocation = loadLocation,
+                loadDateTime = loadDateTime,
+                unloadLocation = unloadLocation,
+                unloadDateTime = unloadDateTime,
+                distanceState = distanceState,
+                noteState = noteState,
+                navController = navController,
+                viewModel = viewModel,
+                context = context
+            )
         }
     ) { paddingValue ->
 
-        Surface(modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValue)
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValue)
         ) {
-
-            val position = remember { mutableStateOf(0) }
             val scrollState = rememberScrollState()
 
-            LaunchedEffect(scrollState.maxValue) {
-                scrollState.scrollTo(
-                    scrollState.maxValue
-                )
-            }
+            val freightList = if (!isCreateFreight.value) {
+                viewModel.freightList.collectAsState().value
+            } else emptyList()
 
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(top = 15.dp, bottom = 100.dp)
                     .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
@@ -116,10 +142,14 @@ fun FreightScreen(
                 } else {
                     FreightScreenContent(
                         freightList = freightList,
-                        isCreateFreight = isCreateFreight,
-                        navController = navController,
-                        viewModel = viewModel,
-                        position = position
+                        freightState = freightState,
+                        loadLocationState = loadLocationState,
+                        loadDateTime = loadDateTime,
+                        unloadLocationState = unloadLocationState,
+                        unloadDateTime = unloadDateTime,
+                        distanceState = distanceState,
+                        noteState = noteState,
+                        context = context
                     )
                 }
             }
@@ -130,83 +160,45 @@ fun FreightScreen(
 @Composable
 fun FreightScreenContent(
     freightList: List<FreightDBModel>,
-    isCreateFreight: MutableState<Boolean>,
-    navController: NavController,
-    viewModel: FreightScreenViewModel,
-    position: MutableState<Int>
+    freightState: MutableState<FreightDBModel>,
+    loadLocationState: MutableState<String>,
+    loadDateTime: MutableState<LocalDateTime?>,
+    unloadLocationState: MutableState<String>,
+    unloadDateTime: MutableState<LocalDateTime?>,
+    distanceState: MutableState<String>,
+    noteState: MutableState<String>,
+    context: Context
 ) {
-    val context = LocalContext.current
 
     val showDialog = rememberSaveable { mutableStateOf(false) }
     val showNoteDialog = rememberSaveable { mutableStateOf(false) }
     val showDateTimeDialog = rememberSaveable { mutableStateOf(false) }
     val isLoadDialog = rememberSaveable { mutableStateOf(true) }
 
-    val freight = if (freightList.isNotEmpty()) {
-        freightList.first()
-    } else FreightDBModel(userId = FirebaseAuth.getInstance().currentUser!!.uid)
+    if (freightList.isNotEmpty()) freightState.value = freightList.first()
+    val freight = freightState.value
 
-    val loadLocationState = rememberSaveable {
-        mutableStateOf(
-            if (freightList.isNotEmpty()) {
-                freight.loads[freight.loads.keys.first()].toString()
-            } else ""
+    if (freightList.isNotEmpty()) {
+        loadLocationState.value = freight.loads[freight.loads.keys.first()].toString()
+        unloadLocationState.value = freight.unloads[freight.unloads.keys.last()].toString()
+
+        loadDateTime.value = LocalDateTime(
+            LocalDate.parse(dateAsString(freight.loads.keys.first())),
+            LocalTime.parse(timeAsString(freight.loads.keys.first()))
         )
-    }
-    val loadLocation = remember(loadLocationState.value) {
-        mutableStateOf(loadLocationState.value)
-    }
 
-    val unloadLocationState = rememberSaveable { mutableStateOf(
-        if (freightList.isNotEmpty()) {
-            freight.unloads[freight.unloads.keys.last()].toString()
-        } else ""
-    ) }
-    val unloadLocation = remember(unloadLocationState.value) {
-        mutableStateOf(unloadLocationState.value)
-    }
-
-    val loadDateTimeState = remember { mutableStateOf(
-        if (freight.loads.isNotEmpty()) {
-            LocalDateTime(
-                LocalDate.parse(dateAsString(freight.loads.keys.first())),
-                LocalTime.parse(timeAsString(freight.loads.keys.first()))
-            )
-        } else null
-    )}
-    val loadDateTime = remember(loadDateTimeState.value) {
-        mutableStateOf(loadDateTimeState.value)
-    }
-
-    val unloadDateTimeState = remember { mutableStateOf(
-        if (freight.unloads.isNotEmpty()) {
-            LocalDateTime(
-                LocalDate.parse(dateAsString(freight.unloads.keys.last())),
-                LocalTime.parse(timeAsString(freight.unloads.keys.last()))
-            )
-        } else null
-    )}
-    val unloadDateTime = remember(unloadDateTimeState.value) {
-        mutableStateOf(unloadDateTimeState.value)
-    }
-
-    val distanceState = rememberSaveable {
-        mutableStateOf(
-            if (freightList.isNotEmpty()) freight.distance.toString() else ""
+        unloadDateTime.value = LocalDateTime(
+            LocalDate.parse(dateAsString(freight.unloads.keys.last())),
+            LocalTime.parse(timeAsString(freight.unloads.keys.last()))
         )
-    }
-    val distance = remember(distanceState.value) { mutableStateOf(distanceState.value) }
 
-    val noteState = rememberSaveable {
-        mutableStateOf(
-            if (freightList.isNotEmpty() && freight.notes != null) freight.notes else ""
-        )
+        distanceState.value = freight.distance.toString()
+        if (freight.notes != null) noteState.value = freight.notes
     }
-    val note = remember(noteState.value) { mutableStateOf(noteState.value) }
 
     LoadsUnloadsContent(
         isLoadsContent = true,
-        location = loadLocation,
+        location = loadLocationState,
         dateTime = loadDateTime,
         isLoadDialog = isLoadDialog,
         showDialog = showDialog
@@ -216,16 +208,15 @@ fun FreightScreenContent(
         isLoadsContent = false,
         isLoadDialog = isLoadDialog,
         showDialog = showDialog,
-        location = unloadLocation,
+        location = unloadLocationState,
         dateTime = unloadDateTime
     )
 
-    DistanceContent(distanceState = distanceState,
-        position = position)
+    DistanceContent(distanceState = distanceState)
 
     TitleRow(
         modifier = Modifier.padding(bottom = 12.dp),
-        title = "Pictures:",
+        title = "Pictures",
         icon = Icons.Filled.Add,
         showIcon = true,
         iconDescription = "add picture"
@@ -237,6 +228,168 @@ fun FreightScreenContent(
         noteState = noteState,
         showNoteDialog = showNoteDialog
     )
+
+    LocationDateTimeDialog(
+        showDialog = showDialog,
+        showDateTimeDialog = showDateTimeDialog,
+        dateTime = if (isLoadDialog.value) loadDateTime else unloadDateTime,
+        location = if (isLoadDialog.value) loadLocationState else unloadLocationState,
+        context = context
+    )
+
+    TextInputDialog(
+        showDialog = showNoteDialog,
+        textValue = noteState
+    )
+}
+
+@Composable
+fun LoadsUnloadsContent(
+    isLoadsContent: Boolean,
+    isLoadDialog: MutableState<Boolean>,
+    showDialog: MutableState<Boolean>,
+    location: MutableState<String>,
+    dateTime: MutableState<LocalDateTime?>
+) {
+    TitleRow(
+        modifier = Modifier.padding(bottom = 12.dp),
+        title = if (isLoadsContent) "Loads" else "Unloads",
+        icon = Icons.Filled.Add,
+        showIcon = true,
+        iconDescription = "add place and time"
+    ) {
+        isLoadDialog.value = isLoadsContent
+        showDialog.value = true
+    }
+
+    TextRow(
+        valueDescription = location.value.replace("#", ", "),
+        value = "${dateTime.value?.date ?: ""} ${dateTime.value?.time ?: ""}",
+        clickable = true
+    ) {
+        isLoadDialog.value = isLoadsContent
+        showDialog.value = true
+    }
+}
+
+@Composable
+fun DistanceContent(distanceState: MutableState<String>) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    TitleRow(
+        title = "Distance",
+        modifier = Modifier.padding(
+            start = 0.dp, top = 12.dp, end = 0.dp, bottom = 0.dp
+        )
+    )
+
+    Row(
+        modifier = Modifier
+            .height(70.dp)
+            .padding(vertical = 0.dp, horizontal = 10.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val focusManager = LocalFocusManager.current
+
+        DigitInputField(
+            textValue = distanceState,
+            placeholder = "0 km",
+            suffix = " km",
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Done
+        ) {
+            focusManager.clearFocus()
+            keyboardController?.hide()
+        }
+    }
+}
+
+@Composable
+fun NoteContent(
+    noteState: MutableState<String>,
+    showNoteDialog: MutableState<Boolean>
+) {
+
+    TitleRow(
+        title = "Note",
+        modifier = Modifier.padding(
+            start = 0.dp, top = 12.dp, end = 0.dp, bottom = 0.dp
+        )
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 15.dp, horizontal = 25.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { showNoteDialog.value = true },
+            text = noteState.value.ifEmpty { "Add note" },
+            color = if (noteState.value.isEmpty()) Color.Gray else Color.LightGray,
+            maxLines = 5,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+fun TitleRow(
+    modifier: Modifier = Modifier,
+    title: String,
+    icon: ImageVector = Icons.Filled.Edit,
+    showIcon: Boolean = false,
+    iconDescription: String = "icon",
+    onIconClick: () -> Unit = {}
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 25.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = title,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = colorResource(id = R.color.light_blue)
+        )
+        if (showIcon) {
+            Icon(
+                imageVector = icon,
+                contentDescription = iconDescription,
+                modifier = modifier
+                    .padding(0.dp)
+                    .clickable { onIconClick.invoke() },
+                tint = colorResource(id = R.color.light_blue)
+            )
+        }
+    }
+}
+
+
+@Composable
+fun FABContent(
+    isCreateFreight: MutableState<Boolean>,
+    loadLocation: MutableState<String>,
+    loadDateTime: MutableState<LocalDateTime?>,
+    unloadLocation: MutableState<String>,
+    unloadDateTime: MutableState<LocalDateTime?>,
+    distanceState: MutableState<String>,
+    noteState: MutableState<String>,
+    freight: FreightDBModel,
+    navController: NavController,
+    viewModel: FreightScreenViewModel,
+    context: Context
+) {
+
+    val distance = remember(distanceState.value) { mutableStateOf(distanceState.value) }
+    val note = remember(noteState.value) { mutableStateOf(noteState.value) }
 
     AppButton(
         buttonText = if (isCreateFreight.value) "Add Freight" else "Update Freight",
@@ -271,156 +424,9 @@ fun FreightScreenContent(
         } else {
             Toast.makeText(
                 context,
-                "Unload cannot be before load or in the same time.",
+                "Unload before load or in the same time",
                 Toast.LENGTH_SHORT
             ).show()
-        }
-    }
-
-    LocationDateTimeDialog(
-        showDialog = showDialog,
-        showDateTimeDialog = showDateTimeDialog,
-        dateTime = if (isLoadDialog.value) loadDateTimeState else unloadDateTimeState,
-        location = if (isLoadDialog.value) loadLocationState else unloadLocationState,
-        context = context
-    )
-
-    TextInputDialog(
-        showDialog = showNoteDialog,
-        textValue = noteState
-    )
-}
-
-@Composable
-fun LoadsUnloadsContent(
-    isLoadsContent: Boolean,
-    isLoadDialog: MutableState<Boolean>,
-    showDialog: MutableState<Boolean>,
-    location: MutableState<String>,
-    dateTime: MutableState<LocalDateTime?>
-) {
-    TitleRow(
-        modifier = Modifier.padding(vertical = 12.dp),
-        title = if (isLoadsContent) "Loads:" else "Unloads:",
-        icon = Icons.Filled.Add,
-        showIcon = true,
-        iconDescription = "add place and time"
-    ) {
-        isLoadDialog.value = isLoadsContent
-        showDialog.value = true
-    }
-
-    TextRow(
-        valueDescription = location.value.replace("#", ", "),
-        value = "${dateTime.value?.date ?: ""} ${dateTime.value?.time ?: ""}",
-        clickable = true
-    ) {
-        isLoadDialog.value = isLoadsContent
-        showDialog.value = true
-    }
-}
-
-@Composable
-fun DistanceContent(
-    distanceState: MutableState<String>,
-    position: MutableState<Int>
-) {
-    val keyboardController = LocalSoftwareKeyboardController.current
-    var distancePosition by remember { mutableStateOf(0f) }
-
-    TitleRow(
-        title = "Distance:",
-        modifier = Modifier.padding(
-            start = 0.dp, top = 12.dp, end = 0.dp, bottom = 0.dp
-        )
-    )
-
-    Row(
-        modifier = Modifier
-            .height(70.dp)
-            .padding(vertical = 0.dp, horizontal = 10.dp)
-            .onGloballyPositioned { distancePosition = it.positionInRoot().y }
-            .pointerInput(distancePosition) {
-                position.value = distancePosition.toInt()
-            },
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val focusManager = LocalFocusManager.current
-
-        DigitInputField(
-            textValue = distanceState,
-            placeholder = "0 km",
-            suffix = " km",
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Done
-        ) {
-            focusManager.clearFocus()
-            keyboardController?.hide()
-        }
-    }
-}
-
-@Composable
-fun NoteContent(
-    noteState: MutableState<String>,
-    showNoteDialog: MutableState<Boolean>
-) {
-
-    TitleRow(
-        title = "Note:",
-        modifier = Modifier.padding(
-            start = 0.dp, top = 12.dp, end = 0.dp, bottom = 0.dp
-        )
-    )
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 15.dp, horizontal = 25.dp),
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { showNoteDialog.value = true },
-            text = noteState.value.ifEmpty { "Add note..." },
-            color = if (noteState.value.isEmpty()) Color.Gray else Color.LightGray
-        )
-    }
-}
-
-@Composable
-fun TitleRow(
-    modifier: Modifier = Modifier,
-    title: String,
-    icon: ImageVector = Icons.Filled.Edit,
-    showIcon: Boolean = false,
-    iconDescription: String = "icon",
-    onIconClick: () -> Unit = {}
-) {
-    Row(modifier = modifier
-        .fillMaxWidth()
-        .padding(horizontal = 25.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = title,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = colorResource(id = R.color.light_blue)
-        )
-        if (showIcon) {
-            Icon(
-                imageVector = icon,
-                contentDescription = iconDescription,
-                modifier = modifier
-                    .padding(0.dp)
-                    .clickable { onIconClick.invoke() },
-                tint = colorResource(id = R.color.light_blue)
-            )
         }
     }
 }

@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.toolsfordriver.R
 
 @Composable
@@ -51,7 +52,10 @@ fun AppButton(
         if (load) {
             CircularProgressIndicator(modifier = Modifier.size(25.dp))
         } else {
-            Text(text = buttonText)
+            Text(
+                text = buttonText,
+                fontSize = 18.sp
+            )
         }
     }
 }

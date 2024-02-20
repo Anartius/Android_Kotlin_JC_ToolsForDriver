@@ -30,6 +30,7 @@ import com.example.toolsfordriver.navigation.TFDScreens
 import com.example.toolsfordriver.utils.calcEarnings
 import com.example.toolsfordriver.utils.calcPeriod
 import com.example.toolsfordriver.utils.dateAsString
+import com.example.toolsfordriver.utils.formatPeriod
 import com.example.toolsfordriver.utils.timeAsString
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.datetime.LocalDate
@@ -69,7 +70,7 @@ fun TripScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(25.dp),
+                    .padding(horizontal = 5.dp, vertical = 25.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
@@ -131,7 +132,7 @@ fun TripScreenContent(
     }
 
     TextRow(
-        valueDescription = "Start:",
+        valueDescription = "Start",
         value = "${startDateTime.value?.date ?: ""} ${startDateTime.value?.time ?: ""}",
         clickable = true,
         showIcon = true
@@ -140,7 +141,7 @@ fun TripScreenContent(
         showDatePickerDialog.value = true
     }
     TextRow(
-        valueDescription = "Finish:",
+        valueDescription = "Finish",
         value = "${endDateTime.value?.date ?: ""} ${endDateTime.value?.time ?: ""}",
         clickable = true,
         showIcon = true
@@ -150,20 +151,13 @@ fun TripScreenContent(
     }
 
     TextRow(
-        valueDescription = "Duration:",
+        valueDescription = "Duration",
         value = if (tripDuration.value != null) {
-            if (tripDuration.value!!.months > 0) {
-                "${tripDuration.value!!.months}M "
-            } else {
-                ""
-            } +
-                    "${tripDuration.value!!.days}d " +
-                    "${tripDuration.value!!.hours}h " +
-                    "${tripDuration.value!!.minutes}m"
+            formatPeriod(tripDuration.value!!)
         } else ""
     )
     TextRow(
-        valueDescription = "Earnings:",
+        valueDescription = "Earnings",
         value = if (earnings.value != null) {
             "${earnings.value} PLN"
         } else "You should work more"

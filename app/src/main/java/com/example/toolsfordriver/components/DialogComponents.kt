@@ -228,7 +228,7 @@ fun DialogButtons(
             showDialog.value = false
         }
         AppButton(
-            buttonText = "Save",
+            buttonText = "Ok",
             modifier = Modifier.padding(10.dp)
         ) { onConfirm.invoke() }
     }
