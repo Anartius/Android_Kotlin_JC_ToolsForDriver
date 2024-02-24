@@ -195,7 +195,7 @@ fun DigitInputField(
             value = textFieldValueState,
             onValueChange = {
                 textFieldValueState = TextFieldValue(
-                    text = if (it.text.length > 1 && it.text.first() == '0') {
+                    text = if (it.text.isNotEmpty() && it.text.first() == '0') {
                         it.text.drop(1).filter { symbol -> symbol.isDigit() }
                     } else {
                         it.text.filter { symbol -> symbol.isDigit() }

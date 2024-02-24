@@ -82,17 +82,15 @@ fun FreightListScreen(
             }
         }
 
-        if (showDeletePopup.value) {
-            DeleteItemPopup(
-                showDeletePopup = showDeletePopup,
-                itemName = "freight"
-            ) {
-                freightToDelete.value?.let {
-                    viewModel.deleteFreight(it)
-                }
-                freightToDelete.value = null
-                showDeletePopup.value = false
+        DeleteItemPopup(
+            showDeletePopup = showDeletePopup,
+            itemName = "freight"
+        ) {
+            freightToDelete.value?.let {
+                viewModel.deleteFreight(it)
             }
+            freightToDelete.value = null
+            showDeletePopup.value = false
         }
     }
 }
@@ -132,7 +130,7 @@ fun FreightRow(
         ) {
             Row(
                 modifier = Modifier
-                    .padding(vertical = 10.dp, horizontal = 30.dp)
+                    .padding(horizontal = 30.dp, vertical = 10.dp)
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -140,23 +138,43 @@ fun FreightRow(
                 val startDate = dateAsString(freight.loads.keys.first())
                 val endDate = dateAsString(freight.unloads.keys.last())
 
-                Column {
-                    Text(text = startDate)
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
-                        text = freight.loads[freight.loads.keys.first()]?.replace("#", ", ") ?: "",
+                        text = startDate,
+                        maxLines = 1
+                    )
+                    Text(
+                        text = freight.loads[freight.loads.keys.first()]
+                            ?.replace("#", ", ")?.trimEnd() ?: "",
+                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
+
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Arrow Forward",
+                    modifier = Modifier.weight(0.5f),
                     tint = Color.Gray,
                 )
-                Column {
-                    Text(text = endDate)
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = endDate,
+                        maxLines = 1
+                    )
                     Text(
                         text = freight.unloads[freight.unloads.keys.last()]
-                            ?.replace("#", ", ") ?: "",
+                            ?.replace("#", ", ")?.trimEnd() ?: "",
+                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 }

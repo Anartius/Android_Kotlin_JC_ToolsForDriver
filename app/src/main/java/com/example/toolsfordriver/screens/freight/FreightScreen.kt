@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.components.AppButton
+import com.example.toolsfordriver.components.DeleteItemPopup
 import com.example.toolsfordriver.components.DigitInputField
 import com.example.toolsfordriver.components.LocationDateTimeDialog
 import com.example.toolsfordriver.components.TFDAppBar
@@ -57,8 +58,6 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
 
 @Composable
 fun FreightScreen(
@@ -69,25 +68,9 @@ fun FreightScreen(
     val isCreateFreight = remember(freightId) { mutableStateOf(freightId == "new") }
     val context = LocalContext.current
 
-    val freightState = rememberSaveable {
+    val freight = rememberSaveable {
         mutableStateOf(FreightDBModel(userId = FirebaseAuth.getInstance().currentUser!!.uid))
     }
-
-    val loadLocationState = rememberSaveable { mutableStateOf("") }
-    val loadLocation = remember(loadLocationState.value) {
-        mutableStateOf(loadLocationState.value)
-    }
-
-    val unloadLocationState = rememberSaveable { mutableStateOf("") }
-    val unloadLocation = remember(unloadLocationState.value) {
-        mutableStateOf(unloadLocationState.value)
-    }
-
-    val loadDateTime = remember { mutableStateOf<LocalDateTime?>(null) }
-    val unloadDateTime = remember { mutableStateOf<LocalDateTime?>(null) }
-
-    val distanceState = rememberSaveable { mutableStateOf("") }
-    val noteState = rememberSaveable { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -103,13 +86,7 @@ fun FreightScreen(
         floatingActionButton = {
             FABContent(
                 isCreateFreight = isCreateFreight,
-                freight = freightState.value,
-                loadLocation = loadLocation,
-                loadDateTime = loadDateTime,
-                unloadLocation = unloadLocation,
-                unloadDateTime = unloadDateTime,
-                distanceState = distanceState,
-                noteState = noteState,
+                freight = freight,
                 navController = navController,
                 viewModel = viewModel,
                 context = context
@@ -130,7 +107,7 @@ fun FreightScreen(
 
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(top = 15.dp, bottom = 100.dp)
                     .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.Top,
@@ -142,14 +119,7 @@ fun FreightScreen(
                 } else {
                     FreightScreenContent(
                         freightList = freightList,
-                        freightState = freightState,
-                        loadLocationState = loadLocationState,
-                        loadDateTime = loadDateTime,
-                        unloadLocationState = unloadLocationState,
-                        unloadDateTime = unloadDateTime,
-                        distanceState = distanceState,
-                        noteState = noteState,
-                        context = context
+                        freight = freight
                     )
                 }
             }
@@ -160,59 +130,24 @@ fun FreightScreen(
 @Composable
 fun FreightScreenContent(
     freightList: List<FreightDBModel>,
-    freightState: MutableState<FreightDBModel>,
-    loadLocationState: MutableState<String>,
-    loadDateTime: MutableState<LocalDateTime?>,
-    unloadLocationState: MutableState<String>,
-    unloadDateTime: MutableState<LocalDateTime?>,
-    distanceState: MutableState<String>,
-    noteState: MutableState<String>,
-    context: Context
+    freight: MutableState<FreightDBModel>
 ) {
 
-    val showDialog = rememberSaveable { mutableStateOf(false) }
     val showNoteDialog = rememberSaveable { mutableStateOf(false) }
-    val showDateTimeDialog = rememberSaveable { mutableStateOf(false) }
-    val isLoadDialog = rememberSaveable { mutableStateOf(true) }
 
-    if (freightList.isNotEmpty()) freightState.value = freightList.first()
-    val freight = freightState.value
-
-    if (freightList.isNotEmpty()) {
-        loadLocationState.value = freight.loads[freight.loads.keys.first()].toString()
-        unloadLocationState.value = freight.unloads[freight.unloads.keys.last()].toString()
-
-        loadDateTime.value = LocalDateTime(
-            LocalDate.parse(dateAsString(freight.loads.keys.first())),
-            LocalTime.parse(timeAsString(freight.loads.keys.first()))
-        )
-
-        unloadDateTime.value = LocalDateTime(
-            LocalDate.parse(dateAsString(freight.unloads.keys.last())),
-            LocalTime.parse(timeAsString(freight.unloads.keys.last()))
-        )
-
-        distanceState.value = freight.distance.toString()
-        if (freight.notes != null) noteState.value = freight.notes
-    }
+    if (freightList.isNotEmpty()) freight.value = freightList.first()
 
     LoadsUnloadsContent(
         isLoadsContent = true,
-        location = loadLocationState,
-        dateTime = loadDateTime,
-        isLoadDialog = isLoadDialog,
-        showDialog = showDialog
+        freight = freight
     )
 
     LoadsUnloadsContent(
         isLoadsContent = false,
-        isLoadDialog = isLoadDialog,
-        showDialog = showDialog,
-        location = unloadLocationState,
-        dateTime = unloadDateTime
+        freight = freight
     )
 
-    DistanceContent(distanceState = distanceState)
+    DistanceContent(freight = freight)
 
     TitleRow(
         modifier = Modifier.padding(bottom = 12.dp),
@@ -225,32 +160,30 @@ fun FreightScreenContent(
     }
 
     NoteContent(
-        noteState = noteState,
+        freight = freight,
         showNoteDialog = showNoteDialog
     )
 
-    LocationDateTimeDialog(
-        showDialog = showDialog,
-        showDateTimeDialog = showDateTimeDialog,
-        dateTime = if (isLoadDialog.value) loadDateTime else unloadDateTime,
-        location = if (isLoadDialog.value) loadLocationState else unloadLocationState,
-        context = context
-    )
-
     TextInputDialog(
-        showDialog = showNoteDialog,
-        textValue = noteState
+        freight = freight,
+        showDialog = showNoteDialog
     )
 }
 
 @Composable
 fun LoadsUnloadsContent(
     isLoadsContent: Boolean,
-    isLoadDialog: MutableState<Boolean>,
-    showDialog: MutableState<Boolean>,
-    location: MutableState<String>,
-    dateTime: MutableState<LocalDateTime?>
+    freight: MutableState<FreightDBModel>
 ) {
+    val context = LocalContext.current
+    val showDialog = rememberSaveable { mutableStateOf(false) }
+    val showDateTimeDialog = rememberSaveable { mutableStateOf(false) }
+    val showDeletePopup = rememberSaveable { mutableStateOf(false) }
+    val isLoadDialog = rememberSaveable { mutableStateOf(true) }
+
+    val selectedItemLocation = remember { mutableStateOf("") }
+    val selectedItemDateTime = remember { mutableStateOf<LocalDateTime?>(null) }
+
     TitleRow(
         modifier = Modifier.padding(bottom = 12.dp),
         title = if (isLoadsContent) "Loads" else "Unloads",
@@ -262,18 +195,89 @@ fun LoadsUnloadsContent(
         showDialog.value = true
     }
 
-    TextRow(
-        valueDescription = location.value.replace("#", ", "),
-        value = "${dateTime.value?.date ?: ""} ${dateTime.value?.time ?: ""}",
-        clickable = true
+    val deleteItemKey = rememberSaveable { mutableStateOf<Long?>(null) }
+
+    val keyList = if (isLoadsContent) {
+        freight.value.loads.keys.toList().sorted()
+    } else freight.value.unloads.keys.toList().sorted()
+
+    if (keyList.isNotEmpty()) {
+        keyList.forEach { time ->
+
+            val location = remember(freight.value) {
+                mutableStateOf(
+                    if (isLoadsContent) {
+                        freight.value.loads[time].toString()
+                    } else {
+                        freight.value.unloads[time].toString()
+                    }
+                )
+            }
+
+            val dateTime = remember(time) {
+                mutableStateOf(
+                    LocalDateTime(
+                        LocalDate.parse(dateAsString(time)),
+                        LocalTime.parse(timeAsString(time))
+                    )
+                )
+            }
+
+            TextRow(
+                valueDescription = location.value.replace("#", ", "),
+                value = "${dateTime.value.date} ${dateTime.value.time}",
+                clickable = true,
+                onLongClick = {
+                    showDeletePopup.value = true
+                    deleteItemKey.value = time
+                }
+            ) {
+                selectedItemLocation.value = location.value
+                selectedItemDateTime.value = dateTime.value
+                isLoadDialog.value = isLoadsContent
+                showDialog.value = true
+            }
+        }
+    }
+
+    LocationDateTimeDialog(
+        isLoadDialog = isLoadDialog,
+        showDialog = showDialog,
+        showDateTimeDialog = showDateTimeDialog,
+        location = selectedItemLocation,
+        dateTime = selectedItemDateTime,
+        freight = freight,
+        context = context
+    )
+
+    DeleteItemPopup(
+        showDeletePopup = showDeletePopup,
+        itemName = if (isLoadsContent) "load" else "unload"
     ) {
-        isLoadDialog.value = isLoadsContent
-        showDialog.value = true
+        deleteItemKey.value?.let {
+            val itemMap = (if (isLoadsContent) {
+                freight.value.loads
+            } else freight.value.unloads).toMutableMap()
+
+            itemMap.remove(deleteItemKey.value)
+
+            freight.value = freight.value.copy(
+                loads = if (isLoadsContent) {
+                    itemMap.toMap()
+                } else freight.value.loads,
+                unloads = if (!isLoadsContent) {
+                    itemMap.toMap()
+                } else freight.value.unloads
+            )
+        }
+        deleteItemKey.value = null
+        showDeletePopup.value = false
     }
 }
 
 @Composable
-fun DistanceContent(distanceState: MutableState<String>) {
+fun DistanceContent(freight: MutableState<FreightDBModel>) {
+
     val keyboardController = LocalSoftwareKeyboardController.current
 
     TitleRow(
@@ -290,7 +294,15 @@ fun DistanceContent(distanceState: MutableState<String>) {
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         val focusManager = LocalFocusManager.current
+        val distance = freight.value.distance
+
+        val distanceState = remember(distance) {
+            mutableStateOf(
+                if (distance != null && distance > 0) distance.toString() else ""
+            )
+        }
 
         DigitInputField(
             textValue = distanceState,
@@ -299,6 +311,12 @@ fun DistanceContent(distanceState: MutableState<String>) {
             keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Done
         ) {
+            freight.value = freight.value.copy(
+                distance = if (distanceState.value.isNotEmpty()) {
+                    distanceState.value.toInt()
+                } else null
+            )
+
             focusManager.clearFocus()
             keyboardController?.hide()
         }
@@ -307,7 +325,7 @@ fun DistanceContent(distanceState: MutableState<String>) {
 
 @Composable
 fun NoteContent(
-    noteState: MutableState<String>,
+    freight: MutableState<FreightDBModel>,
     showNoteDialog: MutableState<Boolean>
 ) {
 
@@ -325,12 +343,14 @@ fun NoteContent(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        val note = freight.value.notes
+
         Text(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { showNoteDialog.value = true },
-            text = noteState.value.ifEmpty { "Add note" },
-            color = if (noteState.value.isEmpty()) Color.Gray else Color.LightGray,
+            text = if (note.isNullOrEmpty()) "Add note" else note,
+            color = if (note.isNullOrEmpty()) Color.Gray else Color.LightGray,
             maxLines = 5,
             overflow = TextOverflow.Ellipsis
         )
@@ -376,46 +396,30 @@ fun TitleRow(
 @Composable
 fun FABContent(
     isCreateFreight: MutableState<Boolean>,
-    loadLocation: MutableState<String>,
-    loadDateTime: MutableState<LocalDateTime?>,
-    unloadLocation: MutableState<String>,
-    unloadDateTime: MutableState<LocalDateTime?>,
-    distanceState: MutableState<String>,
-    noteState: MutableState<String>,
-    freight: FreightDBModel,
+    freight: MutableState<FreightDBModel>,
     navController: NavController,
     viewModel: FreightScreenViewModel,
     context: Context
 ) {
-
-    val distance = remember(distanceState.value) { mutableStateOf(distanceState.value) }
-    val note = remember(noteState.value) { mutableStateOf(noteState.value) }
-
     AppButton(
         buttonText = if (isCreateFreight.value) "Add Freight" else "Update Freight",
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 50.dp, vertical = 15.dp),
-        enabled = loadLocation.value.isNotEmpty() &&
-                unloadLocation.value.isNotEmpty() &&
-                distance.value.isNotEmpty() && distance.value != "0"
+        enabled = freight.value.loads.isNotEmpty() &&
+                freight.value.unloads.isNotEmpty() &&
+                freight.value.distance != null && freight.value.distance != 0
     ) {
-        if (loadDateTime.value!! < unloadDateTime.value!!) {
+        val firstLoadTime = freight.value.loads.keys.min()
+        val lastLoadTime = freight.value.loads.keys.max()
+        val firstUnloadTime = freight.value.unloads.keys.min()
+        val lastUnloadTime = freight.value.unloads.keys.max()
 
-            val freightUpdated = freight.copy(
-                loads = mapOf(
-                    loadDateTime.value!!.toInstant(
-                        TimeZone.currentSystemDefault()
-                    ).toEpochMilliseconds() to loadLocation.value
-                ),
-                unloads = mapOf(
-                    unloadDateTime.value!!.toInstant(
-                        TimeZone.currentSystemDefault()
-                    ).toEpochMilliseconds() to unloadLocation.value
-                ),
-                distance = distance.value.toInt(),
-                notes = note.value
-            )
+        if (firstLoadTime < lastUnloadTime
+            && firstLoadTime < firstUnloadTime
+            && lastLoadTime < lastUnloadTime
+        ) {
+            val freightUpdated = freight.value.copy()
 
             if (isCreateFreight.value) {
                 viewModel.addFreight(freightUpdated)

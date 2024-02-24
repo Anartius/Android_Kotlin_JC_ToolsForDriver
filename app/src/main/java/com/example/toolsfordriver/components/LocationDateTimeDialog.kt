@@ -15,13 +15,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.example.toolsfordriver.data.FreightDBModel
 import com.example.toolsfordriver.utils.dateAsString
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
@@ -48,10 +50,12 @@ import kotlinx.datetime.toLocalDateTime
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationDateTimeDialog(
+    isLoadDialog: MutableState<Boolean>,
     showDialog: MutableState<Boolean>,
     showDateTimeDialog: MutableState<Boolean>,
-    dateTime: MutableState<LocalDateTime?>,
     location: MutableState<String>,
+    dateTime: MutableState<LocalDateTime?>,
+    freight: MutableState<FreightDBModel>,
     context: Context
 ) {
     if (showDialog.value) {
@@ -70,7 +74,7 @@ fun LocationDateTimeDialog(
             )
         }
 
-        val initDate by rememberSaveable {
+        val initDate = rememberSaveable {
             mutableStateOf(
                 if (dateTime.value != null) {
                     dateTime.value!!.toInstant(TimeZone.currentSystemDefault())
@@ -81,8 +85,8 @@ fun LocationDateTimeDialog(
 
         val currentDate = Clock.System.now().toEpochMilliseconds()
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = initDate ?: currentDate,
-            initialDisplayedMonthMillis = initDate ?: currentDate
+            initialSelectedDateMillis = initDate.value ?: currentDate,
+            initialDisplayedMonthMillis = initDate.value ?: currentDate
         )
 
         val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
@@ -120,30 +124,82 @@ fun LocationDateTimeDialog(
                         timePickerState = timePickerState
                     )
 
-                    DialogButtons(
-                        showDialog = showDialog
-                    ) {
-                        if (countryCode.value.isNotEmpty() && city.value.isNotEmpty()) {
-                            showDialog.value = false
-
-                            dateTime.value = LocalDateTime(
-                                LocalDate.parse(
-                                    dateAsString(datePickerState.selectedDateMillis!!)
-                                ),
-                                LocalTime(timePickerState.hour, timePickerState.minute)
-                            )
-
-                            location.value = "${countryCode.value.trim()}#${city.value.trim()}"
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "Not enough data",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
+                    DialogButtonsContent(
+                        isLoadDialog = isLoadDialog,
+                        showDialog = showDialog,
+                        freight = freight,
+                        location = location,
+                        countryCode = countryCode,
+                        city = city,
+                        initDate = initDate,
+                        dateTime = dateTime,
+                        datePickerState = datePickerState,
+                        timePickerState = timePickerState,
+                        context = context
+                    )
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DialogButtonsContent(
+    isLoadDialog: MutableState<Boolean>,
+    showDialog: MutableState<Boolean>,
+    freight: MutableState<FreightDBModel>,
+    location: MutableState<String>,
+    countryCode: MutableState<String>,
+    city: MutableState<String>,
+    initDate: MutableState<Long?>,
+    dateTime: MutableState<LocalDateTime?>,
+    datePickerState: DatePickerState,
+    timePickerState: TimePickerState,
+    context: Context
+) {
+    DialogButtons(
+        showDialog = showDialog
+    ) {
+        if (countryCode.value.isNotEmpty() && city.value.isNotEmpty()) {
+            showDialog.value = false
+
+            dateTime.value = LocalDateTime(
+                LocalDate.parse(
+                    dateAsString(datePickerState.selectedDateMillis!!)
+                ),
+                LocalTime(timePickerState.hour, timePickerState.minute)
+            )
+
+            location.value = "${countryCode.value.trim()}#${city.value.trim()}"
+            val time = dateTime.value!!
+                .toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+
+            val loadsUnloads = (if (isLoadDialog.value) {
+                freight.value.loads
+            } else freight.value.unloads).toMutableMap()
+
+            if (initDate.value != null) {
+                if (loadsUnloads.contains(initDate.value)) {
+                    loadsUnloads.remove(initDate.value)
+                }
+            }
+            loadsUnloads[time] = location.value
+
+            freight.value = freight.value.copy(
+                loads = if (isLoadDialog.value) {
+                    loadsUnloads.toMap()
+                } else freight.value.loads,
+                unloads = if (!isLoadDialog.value) {
+                    loadsUnloads.toMap()
+                } else freight.value.unloads
+            )
+        } else {
+            Toast.makeText(
+                context,
+                "Not enough data",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 }

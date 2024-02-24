@@ -28,16 +28,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.toolsfordriver.R
+import com.example.toolsfordriver.data.FreightDBModel
 
 @Composable
 fun TextInputDialog (
-    showDialog: MutableState<Boolean>,
-    textValue: MutableState<String>
+    freight: MutableState<FreightDBModel>,
+    showDialog: MutableState<Boolean>
 ) {
     if (showDialog.value) {
-        val text = rememberSaveable { mutableStateOf(textValue.value.ifEmpty { "" }) }
+
         val scrollState = rememberScrollState()
         val trailingIconVisibility = mutableStateOf(false)
+
+        val text = rememberSaveable {
+            mutableStateOf(
+                if (freight.value.notes.isNullOrEmpty()) "" else freight.value.notes!!
+            )
+        }
 
         Dialog(onDismissRequest = {}) {
             Card(
@@ -62,7 +69,7 @@ fun TextInputDialog (
 
                     InputField(
                         modifier = Modifier
-                            .height(340.dp)
+                            .height(330.dp)
                             .fillMaxWidth()
                             .verticalScroll(scrollState)
                             .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 0.dp)
@@ -93,7 +100,7 @@ fun TextInputDialog (
                         showDialog = showDialog
                     ) {
                         showDialog.value = false
-                        if (text.value.isNotEmpty()) textValue.value = text.value
+                        freight.value = freight.value.copy(notes = text.value)
                     }
                 }
             }

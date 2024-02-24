@@ -1,7 +1,9 @@
 package com.example.toolsfordriver.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -57,63 +59,69 @@ fun DeleteItemPopup(
     itemName: String,
     onClick: () -> Unit
 ) {
-    Popup(
-        alignment = Alignment.BottomCenter,
-        onDismissRequest = { showDeletePopup.value = false },
-        properties = PopupProperties(
-            focusable = true,
-            dismissOnBackPress = false,
-            dismissOnClickOutside = true,
-            excludeFromSystemGesture = true
-        )
-    ) {
-        Card(
-            modifier = Modifier
-                .wrapContentSize()
-                .padding(vertical = 20.dp)
-                .clickable { onClick.invoke() },
-            shape = RoundedCornerShape(10.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.Red.copy(alpha = 0.4f)
-            ),
-            elevation = CardDefaults.cardElevation(8.dp),
-            border = BorderStroke(
-                width = 0.5.dp,
-                color = colorResource(id = R.color.light_blue).copy(0.6f))
+    if (showDeletePopup.value) {
+        Popup(
+            alignment = Alignment.BottomCenter,
+            onDismissRequest = { showDeletePopup.value = false },
+            properties = PopupProperties(
+                focusable = true,
+                dismissOnBackPress = false,
+                dismissOnClickOutside = true,
+                excludeFromSystemGesture = true
+            )
         ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
+            Card(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(vertical = 20.dp)
+                    .clickable { onClick.invoke() },
+                shape = RoundedCornerShape(10.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.Red.copy(alpha = 0.4f)
+                ),
+                elevation = CardDefaults.cardElevation(8.dp),
+                border = BorderStroke(
+                    width = 0.5.dp,
+                    color = colorResource(id = R.color.light_blue).copy(0.6f)
+                )
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Delete,
-                    contentDescription = "delete $itemName",
-                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 7.dp)
-                )
-                Text(
-                    text = "Delete $itemName",
-                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 7.dp)
-                )
+                Row(
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = "delete $itemName",
+                        modifier = Modifier.padding(horizontal = 15.dp, vertical = 7.dp)
+                    )
+                    Text(
+                        text = "Delete $itemName",
+                        modifier = Modifier.padding(horizontal = 15.dp, vertical = 7.dp)
+                    )
+                }
             }
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TextRow(
     valueDescription: String,
     value: String,
     clickable: Boolean = false,
     showIcon: Boolean = false,
+    onLongClick: () -> Unit = {},
     onClick: () -> Unit = {}
 ) {
     Row (
         modifier = Modifier
             .padding(horizontal = 25.dp, vertical = 10.dp)
             .fillMaxWidth()
-            .clickable(
+            .combinedClickable(
                 enabled = clickable,
-                onClick = onClick
+                onClick = onClick,
+                onLongClick = onLongClick
             ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
