@@ -135,8 +135,8 @@ fun FreightRow(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                val startDate = dateAsString(freight.loads.keys.first())
-                val endDate = dateAsString(freight.unloads.keys.last())
+                val startDate = dateAsString(freight.loads.keys.minOf { it })
+                val endDate = dateAsString(freight.unloads.keys.maxOf { it })
 
                 Column(
                     modifier = Modifier.weight(1f),
@@ -148,7 +148,7 @@ fun FreightRow(
                         maxLines = 1
                     )
                     Text(
-                        text = freight.loads[freight.loads.keys.first()]
+                        text = freight.loads[freight.loads.keys.minOf { it }]
                             ?.replace("#", ", ")?.trimEnd() ?: "",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -172,7 +172,7 @@ fun FreightRow(
                         maxLines = 1
                     )
                     Text(
-                        text = freight.unloads[freight.unloads.keys.last()]
+                        text = freight.unloads[freight.unloads.keys.maxOf { it }]
                             ?.replace("#", ", ")?.trimEnd() ?: "",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis

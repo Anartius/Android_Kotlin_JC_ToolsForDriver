@@ -30,6 +30,7 @@ import com.example.toolsfordriver.navigation.TFDScreens
 import com.example.toolsfordriver.utils.calcEarnings
 import com.example.toolsfordriver.utils.calcPeriod
 import com.example.toolsfordriver.utils.dateAsString
+import com.example.toolsfordriver.utils.dateAsStringIso
 import com.example.toolsfordriver.utils.formatPeriod
 import com.example.toolsfordriver.utils.timeAsString
 import com.google.firebase.auth.FirebaseAuth
@@ -107,7 +108,7 @@ fun TripScreenContent(
     val startDateTime = remember { mutableStateOf(
         if (trip.startTime != null) {
             LocalDateTime(
-                LocalDate.parse(dateAsString(trip.startTime)),
+                LocalDate.parse(dateAsStringIso(trip.startTime)),
                 LocalTime.parse(timeAsString(trip.startTime))
             )
         } else null
@@ -115,7 +116,7 @@ fun TripScreenContent(
     val endDateTime = remember { mutableStateOf(
         if (trip.endTime != null) {
             LocalDateTime(
-                LocalDate.parse(dateAsString(trip.endTime)),
+                LocalDate.parse(dateAsStringIso(trip.endTime)),
                 LocalTime.parse(timeAsString(trip.endTime))
             )
         } else null
@@ -133,7 +134,7 @@ fun TripScreenContent(
 
     TextRow(
         valueDescription = "Start",
-        value = "${startDateTime.value?.date ?: ""} ${startDateTime.value?.time ?: ""}",
+        value = "${dateAsString(trip.startTime)}  ${startDateTime.value?.time ?: ""}",
         clickable = true,
         showIcon = true
     ) {
@@ -142,7 +143,7 @@ fun TripScreenContent(
     }
     TextRow(
         valueDescription = "Finish",
-        value = "${endDateTime.value?.date ?: ""} ${endDateTime.value?.time ?: ""}",
+        value = "${dateAsString(trip.endTime)}  ${endDateTime.value?.time ?: ""}",
         clickable = true,
         showIcon = true
     ) {

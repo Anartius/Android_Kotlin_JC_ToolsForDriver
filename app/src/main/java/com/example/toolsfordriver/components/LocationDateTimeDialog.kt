@@ -38,7 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.toolsfordriver.data.FreightDBModel
-import com.example.toolsfordriver.utils.dateAsString
+import com.example.toolsfordriver.utils.dateAsStringIso
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -166,7 +166,7 @@ fun DialogButtonsContent(
 
             dateTime.value = LocalDateTime(
                 LocalDate.parse(
-                    dateAsString(datePickerState.selectedDateMillis!!)
+                    dateAsStringIso(datePickerState.selectedDateMillis!!)
                 ),
                 LocalTime(timePickerState.hour, timePickerState.minute)
             )

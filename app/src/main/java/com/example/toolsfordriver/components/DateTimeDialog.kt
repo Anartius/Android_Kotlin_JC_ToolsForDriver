@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.example.toolsfordriver.utils.dateAsString
+import com.example.toolsfordriver.utils.dateAsStringIso
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -81,7 +81,7 @@ fun DateTimeDialog (
                         showDialog.value = false
                         if (datePickerState.selectedDateMillis != null) {
                             dateTime.value = LocalDateTime(
-                                LocalDate.parse(dateAsString(datePickerState.selectedDateMillis!!)),
+                                LocalDate.parse(dateAsStringIso(datePickerState.selectedDateMillis!!)),
                                 LocalTime(timePickerState.hour, timePickerState.minute)
                             )
                         }

@@ -17,6 +17,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -53,6 +54,7 @@ import com.example.toolsfordriver.components.TextRow
 import com.example.toolsfordriver.data.FreightDBModel
 import com.example.toolsfordriver.navigation.TFDScreens
 import com.example.toolsfordriver.utils.dateAsString
+import com.example.toolsfordriver.utils.dateAsStringIso
 import com.example.toolsfordriver.utils.timeAsString
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.datetime.LocalDate
@@ -91,7 +93,8 @@ fun FreightScreen(
                 viewModel = viewModel,
                 context = context
             )
-        }
+        },
+        floatingActionButtonPosition = FabPosition.Center
     ) { paddingValue ->
 
         Surface(
@@ -191,6 +194,8 @@ fun LoadsUnloadsContent(
         showIcon = true,
         iconDescription = "add place and time"
     ) {
+        selectedItemDateTime.value = null
+        selectedItemLocation.value = ""
         isLoadDialog.value = isLoadsContent
         showDialog.value = true
     }
@@ -217,7 +222,7 @@ fun LoadsUnloadsContent(
             val dateTime = remember(time) {
                 mutableStateOf(
                     LocalDateTime(
-                        LocalDate.parse(dateAsString(time)),
+                        LocalDate.parse(dateAsStringIso(time)),
                         LocalTime.parse(timeAsString(time))
                     )
                 )
@@ -225,7 +230,7 @@ fun LoadsUnloadsContent(
 
             TextRow(
                 valueDescription = location.value.replace("#", ", "),
-                value = "${dateTime.value.date} ${dateTime.value.time}",
+                value = "${dateAsString(time)}  ${dateTime.value.time}",
                 clickable = true,
                 onLongClick = {
                     showDeletePopup.value = true

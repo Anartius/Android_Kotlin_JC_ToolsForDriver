@@ -15,6 +15,13 @@ import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.hours
 
 fun dateAsString(dateTime: Long?): String {
+    val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.ROOT)
+    return if (dateTime != null) {
+        formatter.format(Date(dateTime))
+    } else ""
+}
+
+fun dateAsStringIso(dateTime: Long?): String {
     val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
     return if (dateTime != null) {
         formatter.format(Date(dateTime))
