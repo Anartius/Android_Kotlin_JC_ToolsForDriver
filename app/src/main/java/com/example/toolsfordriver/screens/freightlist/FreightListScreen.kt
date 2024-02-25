@@ -1,5 +1,6 @@
 package com.example.toolsfordriver.screens.freightlist
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -47,6 +48,10 @@ fun FreightListScreen(
     val freightList = viewModel.freightList.collectAsState().value
     val showDeletePopup = remember { mutableStateOf(false) }
     val freightToDelete = remember { mutableStateOf<FreightDBModel?>(null) }
+
+    BackHandler(enabled = true) {
+        navController.navigate(TFDScreens.HomeScreen.name)
+    }
 
     Scaffold(
         topBar = {

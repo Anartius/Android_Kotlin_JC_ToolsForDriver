@@ -49,7 +49,7 @@ import kotlinx.datetime.toLocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocationDateTimeDialog(
+fun TimeLocationDialog(
     isLoadDialog: MutableState<Boolean>,
     showDialog: MutableState<Boolean>,
     showDateTimeDialog: MutableState<Boolean>,

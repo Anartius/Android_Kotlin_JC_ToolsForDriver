@@ -1,5 +1,6 @@
 package com.example.toolsfordriver.screens.triplist
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -47,6 +48,10 @@ fun TripListScreen(
     val tripList = viewModel.tripList.collectAsState().value.sortedBy { it.startTime }
     val showDeletePopup = remember { mutableStateOf(false) }
     val tripToDelete = remember { mutableStateOf<TripDBModel?>(null) }
+
+    BackHandler(enabled = true) {
+        navController.navigate(TFDScreens.HomeScreen.name)
+    }
 
     Scaffold(
         topBar = {

@@ -134,7 +134,11 @@ fun TripScreenContent(
 
     TextRow(
         valueDescription = "Start",
-        value = "${dateAsString(trip.startTime)}  ${startDateTime.value?.time ?: ""}",
+        value = "${dateAsString(
+            startDateTime.value?.toInstant(
+                TimeZone.currentSystemDefault()
+            )?.toEpochMilliseconds())}  " +
+                "${startDateTime.value?.time ?: ""}",
         clickable = true,
         showIcon = true
     ) {
@@ -143,7 +147,11 @@ fun TripScreenContent(
     }
     TextRow(
         valueDescription = "Finish",
-        value = "${dateAsString(trip.endTime)}  ${endDateTime.value?.time ?: ""}",
+        value = "${dateAsString(
+            endDateTime.value?.toInstant(
+                TimeZone.currentSystemDefault()
+            )?.toEpochMilliseconds())}  " +
+                "${endDateTime.value?.time ?: ""}",
         clickable = true,
         showIcon = true
     ) {

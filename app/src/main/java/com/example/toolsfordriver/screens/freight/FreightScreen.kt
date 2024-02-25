@@ -10,8 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
@@ -47,10 +48,10 @@ import com.example.toolsfordriver.R
 import com.example.toolsfordriver.components.AppButton
 import com.example.toolsfordriver.components.DeleteItemPopup
 import com.example.toolsfordriver.components.DigitInputField
-import com.example.toolsfordriver.components.LocationDateTimeDialog
 import com.example.toolsfordriver.components.TFDAppBar
 import com.example.toolsfordriver.components.TextInputDialog
 import com.example.toolsfordriver.components.TextRow
+import com.example.toolsfordriver.components.TimeLocationDialog
 import com.example.toolsfordriver.data.FreightDBModel
 import com.example.toolsfordriver.navigation.TFDScreens
 import com.example.toolsfordriver.utils.dateAsString
@@ -102,8 +103,6 @@ fun FreightScreen(
                 .fillMaxSize()
                 .padding(paddingValue)
         ) {
-            val scrollState = rememberScrollState()
-
             val freightList = if (!isCreateFreight.value) {
                 viewModel.freightList.collectAsState().value
             } else emptyList()
@@ -111,8 +110,7 @@ fun FreightScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 15.dp, bottom = 100.dp)
-                    .verticalScroll(scrollState),
+                    .padding(top = 15.dp, bottom = 100.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
@@ -120,10 +118,9 @@ fun FreightScreen(
                 if (freightList.isEmpty() && !isCreateFreight.value) {
                     CircularProgressIndicator()
                 } else {
-                    FreightScreenContent(
-                        freightList = freightList,
-                        freight = freight
-                    )
+                    if (freightList.isNotEmpty()) freight.value = freightList.first()
+
+                    FreightScreenContent(freight = freight)
                 }
             }
         }
@@ -132,122 +129,118 @@ fun FreightScreen(
 
 @Composable
 fun FreightScreenContent(
-    freightList: List<FreightDBModel>,
-    freight: MutableState<FreightDBModel>
-) {
-
-    val showNoteDialog = rememberSaveable { mutableStateOf(false) }
-
-    if (freightList.isNotEmpty()) freight.value = freightList.first()
-
-    LoadsUnloadsContent(
-        isLoadsContent = true,
-        freight = freight
-    )
-
-    LoadsUnloadsContent(
-        isLoadsContent = false,
-        freight = freight
-    )
-
-    DistanceContent(freight = freight)
-
-    TitleRow(
-        modifier = Modifier.padding(bottom = 12.dp),
-        title = "Pictures",
-        icon = Icons.Filled.Add,
-        showIcon = true,
-        iconDescription = "add picture"
-    ) {
-        // TODO ADD PICTURES
-    }
-
-    NoteContent(
-        freight = freight,
-        showNoteDialog = showNoteDialog
-    )
-
-    TextInputDialog(
-        freight = freight,
-        showDialog = showNoteDialog
-    )
-}
-
-@Composable
-fun LoadsUnloadsContent(
-    isLoadsContent: Boolean,
     freight: MutableState<FreightDBModel>
 ) {
     val context = LocalContext.current
-    val showDialog = rememberSaveable { mutableStateOf(false) }
-    val showDateTimeDialog = rememberSaveable { mutableStateOf(false) }
-    val showDeletePopup = rememberSaveable { mutableStateOf(false) }
-    val isLoadDialog = rememberSaveable { mutableStateOf(true) }
 
     val selectedItemLocation = remember { mutableStateOf("") }
     val selectedItemDateTime = remember { mutableStateOf<LocalDateTime?>(null) }
 
-    TitleRow(
-        modifier = Modifier.padding(bottom = 12.dp),
-        title = if (isLoadsContent) "Loads" else "Unloads",
-        icon = Icons.Filled.Add,
-        showIcon = true,
-        iconDescription = "add place and time"
-    ) {
-        selectedItemDateTime.value = null
-        selectedItemLocation.value = ""
-        isLoadDialog.value = isLoadsContent
-        showDialog.value = true
-    }
-
+    val showTimeLocationDialog = rememberSaveable { mutableStateOf(false) }
+    val showDateTimeDialog = rememberSaveable { mutableStateOf(false) }
+    val showNoteDialog = rememberSaveable { mutableStateOf(false) }
+    val showDeletePopup = rememberSaveable { mutableStateOf(false) }
+    val isLoadDialog = rememberSaveable { mutableStateOf(true) }
+    val isLoadContent = rememberSaveable { mutableStateOf(true) }
     val deleteItemKey = rememberSaveable { mutableStateOf<Long?>(null) }
 
-    val keyList = if (isLoadsContent) {
-        freight.value.loads.keys.toList().sorted()
-    } else freight.value.unloads.keys.toList().sorted()
-
-    if (keyList.isNotEmpty()) {
-        keyList.forEach { time ->
-
-            val location = remember(freight.value) {
-                mutableStateOf(
-                    if (isLoadsContent) {
-                        freight.value.loads[time].toString()
-                    } else {
-                        freight.value.unloads[time].toString()
-                    }
-                )
-            }
-
-            val dateTime = remember(time) {
-                mutableStateOf(
-                    LocalDateTime(
-                        LocalDate.parse(dateAsStringIso(time)),
-                        LocalTime.parse(timeAsString(time))
-                    )
-                )
-            }
-
-            TextRow(
-                valueDescription = location.value.replace("#", ", "),
-                value = "${dateAsString(time)}  ${dateTime.value.time}",
-                clickable = true,
-                onLongClick = {
-                    showDeletePopup.value = true
-                    deleteItemKey.value = time
-                }
+    LazyColumn(modifier = Modifier
+        .fillMaxWidth()
+        .wrapContentHeight()
+    ) {
+        item {
+            TitleRow(
+                modifier = Modifier.padding(bottom = 12.dp),
+                title = "Loads",
+                icon = Icons.Filled.Add,
+                showIcon = true,
+                iconDescription = "add place and time"
             ) {
-                selectedItemLocation.value = location.value
-                selectedItemDateTime.value = dateTime.value
-                isLoadDialog.value = isLoadsContent
-                showDialog.value = true
+                selectedItemDateTime.value = null
+                selectedItemLocation.value = ""
+                isLoadDialog.value = true
+                showTimeLocationDialog.value = true
             }
+        }
+
+        items(
+            items = freight.value.loads.toList().sortedBy { it.first }
+        ) { item ->
+            isLoadContent.value = true
+
+            LoadUnloadRow(
+                isLoad = true,
+                isLoadContent = isLoadContent,
+                freight = freight,
+                time = item.first,
+                isLoadDialog = isLoadDialog,
+                showTimeLocationDialog = showTimeLocationDialog,
+                selectedItemLocation = selectedItemLocation,
+                selectedItemDateTime = selectedItemDateTime,
+                showDeletePopup = showDeletePopup,
+                deleteItemKey = deleteItemKey
+            )
+        }
+
+        item {
+            TitleRow(
+                modifier = Modifier.padding(bottom = 12.dp),
+                title = "Unloads",
+                icon = Icons.Filled.Add,
+                showIcon = true,
+                iconDescription = "add place and time"
+            ) {
+                selectedItemDateTime.value = null
+                selectedItemLocation.value = ""
+                isLoadDialog.value = false
+                showTimeLocationDialog.value = true
+            }
+        }
+
+        items(
+            items = freight.value.unloads.toList().sortedBy { it.first }
+        ) { item ->
+            isLoadContent.value = false
+
+            LoadUnloadRow(
+                isLoad = false,
+                isLoadContent = isLoadContent,
+                freight = freight,
+                time = item.first,
+                isLoadDialog = isLoadDialog,
+                showTimeLocationDialog = showTimeLocationDialog,
+                selectedItemLocation = selectedItemLocation,
+                selectedItemDateTime = selectedItemDateTime,
+                showDeletePopup = showDeletePopup,
+                deleteItemKey = deleteItemKey
+            )
+        }
+
+        item { DistanceContent(freight = freight) }
+
+        item {
+            TitleRow(
+                modifier = Modifier.padding(bottom = 12.dp),
+                title = "Pictures",
+                icon = Icons.Filled.Add,
+                showIcon = true,
+                iconDescription = "add picture"
+            ) {
+                // TODO ADD PICTURES
+            }
+        }
+
+        item {
+            NoteContent(
+                freight = freight,
+                showNoteDialog = showNoteDialog
+            )
         }
     }
 
-    LocationDateTimeDialog(
+    TimeLocationDialog(
         isLoadDialog = isLoadDialog,
-        showDialog = showDialog,
+        showDialog = showTimeLocationDialog,
         showDateTimeDialog = showDateTimeDialog,
         location = selectedItemLocation,
         dateTime = selectedItemDateTime,
@@ -255,28 +248,83 @@ fun LoadsUnloadsContent(
         context = context
     )
 
+    TextInputDialog(
+        freight = freight,
+        showDialog = showNoteDialog
+    )
+
     DeleteItemPopup(
         showDeletePopup = showDeletePopup,
-        itemName = if (isLoadsContent) "load" else "unload"
+        itemName = if (isLoadContent.value) "load" else "unload"
     ) {
         deleteItemKey.value?.let {
-            val itemMap = (if (isLoadsContent) {
+            val itemMap = (if (isLoadContent.value) {
                 freight.value.loads
             } else freight.value.unloads).toMutableMap()
 
             itemMap.remove(deleteItemKey.value)
 
             freight.value = freight.value.copy(
-                loads = if (isLoadsContent) {
+                loads = if (isLoadContent.value) {
                     itemMap.toMap()
                 } else freight.value.loads,
-                unloads = if (!isLoadsContent) {
+                unloads = if (!isLoadContent.value) {
                     itemMap.toMap()
                 } else freight.value.unloads
             )
         }
         deleteItemKey.value = null
         showDeletePopup.value = false
+    }
+}
+
+@Composable
+fun LoadUnloadRow(
+    isLoad: Boolean,
+    isLoadContent: MutableState<Boolean>,
+    freight: MutableState<FreightDBModel>,
+    time: Long,
+    isLoadDialog: MutableState<Boolean>,
+    showTimeLocationDialog: MutableState<Boolean>,
+    selectedItemLocation: MutableState<String>,
+    selectedItemDateTime: MutableState<LocalDateTime?>,
+    showDeletePopup: MutableState<Boolean>,
+    deleteItemKey: MutableState<Long?>
+) {
+
+    val location = remember(freight.value) {
+        mutableStateOf(
+            if (isLoad) {
+                freight.value.loads[time].toString()
+            } else {
+                freight.value.unloads[time].toString()
+            }
+        )
+    }
+
+    val dateTime = remember(time) {
+        mutableStateOf(
+            LocalDateTime(
+                LocalDate.parse(dateAsStringIso(time)),
+                LocalTime.parse(timeAsString(time))
+            )
+        )
+    }
+
+    TextRow(
+        valueDescription = location.value.replace("#", ", "),
+        value = "${dateAsString(time)}  ${dateTime.value.time}",
+        clickable = true,
+        onLongClick = {
+            isLoadContent.value = isLoad
+            showDeletePopup.value = true
+            deleteItemKey.value = time
+        }
+    ) {
+        selectedItemLocation.value = location.value
+        selectedItemDateTime.value = dateTime.value
+        isLoadDialog.value = isLoad
+        showTimeLocationDialog.value = true
     }
 }
 
