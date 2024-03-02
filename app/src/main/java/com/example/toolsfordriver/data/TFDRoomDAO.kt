@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.Flow
 interface TFDRoomDAO {
 
     // trips_table
-    @Query("SELECT * FROM trips_table")
-    fun getTrips(): Flow<List<TripDBModel>>
+    @Query("SELECT * FROM trips_table WHERE user_id = :userId")
+    fun getTripsByUserId(userId: String): Flow<List<TripDBModel>>
 
     @Query("SELECT * FROM trips_table WHERE id = :tripId LIMIT 1")
     suspend fun getTripById(tripId: String): TripDBModel
@@ -32,8 +32,8 @@ interface TFDRoomDAO {
 
 
     // freights_table
-    @Query("SELECT * FROM freights_table")
-    fun getFreights(): Flow<List<FreightDBModel>>
+    @Query("SELECT * FROM freights_table WHERE user_id = :userId")
+    fun getFreightsByUserId(userId: String): Flow<List<FreightDBModel>>
 
     @Query("SELECT * FROM freights_table WHERE id = :freightId LIMIT 1")
     suspend fun getFreightById(freightId: String): FreightDBModel

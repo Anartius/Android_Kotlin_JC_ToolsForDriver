@@ -1,8 +1,12 @@
 package com.example.toolsfordriver.screens.freight
 
 import android.content.Context
-import android.widget.Toast
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
@@ -31,8 +37,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -43,15 +51,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.toolsfordriver.R
-import com.example.toolsfordriver.components.AppButton
 import com.example.toolsfordriver.components.DeleteItemPopup
 import com.example.toolsfordriver.components.DigitInputField
 import com.example.toolsfordriver.components.TFDAppBar
 import com.example.toolsfordriver.components.TextInputDialog
 import com.example.toolsfordriver.components.TextRow
 import com.example.toolsfordriver.components.TimeLocationDialog
+import com.example.toolsfordriver.components.ZoomableImageDialog
 import com.example.toolsfordriver.data.FreightDBModel
 import com.example.toolsfordriver.navigation.TFDScreens
 import com.example.toolsfordriver.utils.dateAsString
@@ -75,6 +86,9 @@ fun FreightScreen(
         mutableStateOf(FreightDBModel(userId = FirebaseAuth.getInstance().currentUser!!.uid))
     }
 
+    val imagesToDelete = rememberSaveable { mutableStateOf<MutableList<Uri>>(mutableListOf()) }
+
+
     Scaffold(
         topBar = {
             TFDAppBar(
@@ -87,9 +101,10 @@ fun FreightScreen(
             )
         },
         floatingActionButton = {
-            FABContent(
+            FreightScreenFABContent(
                 isCreateFreight = isCreateFreight,
                 freight = freight,
+                imagesToDelete = imagesToDelete,
                 navController = navController,
                 viewModel = viewModel,
                 context = context
@@ -120,7 +135,11 @@ fun FreightScreen(
                 } else {
                     if (freightList.isNotEmpty()) freight.value = freightList.first()
 
-                    FreightScreenContent(freight = freight)
+                    FreightScreenContent(
+                        freight = freight,
+                        imagesToDelete = imagesToDelete,
+                        viewModel = viewModel
+                    )
                 }
             }
         }
@@ -129,20 +148,41 @@ fun FreightScreen(
 
 @Composable
 fun FreightScreenContent(
-    freight: MutableState<FreightDBModel>
+    freight: MutableState<FreightDBModel>,
+    viewModel: FreightScreenViewModel,
+    imagesToDelete: MutableState<MutableList<Uri>>
 ) {
     val context = LocalContext.current
 
     val selectedItemLocation = remember { mutableStateOf("") }
     val selectedItemDateTime = remember { mutableStateOf<LocalDateTime?>(null) }
+    val imageUri = rememberSaveable { mutableStateOf<Uri?>(null) }
+    val dialogImageUri = rememberSaveable { mutableStateOf<Uri?>(null) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+    ){ uri: Uri? ->
+        uri?.let {
+            imageUri.value = viewModel.saveImageToInternalStorage(context = context, uri = uri)
+
+            val freightUriList = freight.value.pictureUri.toMutableList()
+            freightUriList.add(imageUri.value.toString())
+
+            freight.value = freight.value.copy(pictureUri = freightUriList.toList())
+        }
+    }
 
     val showTimeLocationDialog = rememberSaveable { mutableStateOf(false) }
     val showDateTimeDialog = rememberSaveable { mutableStateOf(false) }
     val showNoteDialog = rememberSaveable { mutableStateOf(false) }
     val showDeletePopup = rememberSaveable { mutableStateOf(false) }
+    val showDeleteImagePopup = rememberSaveable { mutableStateOf(false) }
+    val showZoomableImageDialog = rememberSaveable { mutableStateOf(false) }
+
     val isLoadDialog = rememberSaveable { mutableStateOf(true) }
     val isLoadContent = rememberSaveable { mutableStateOf(true) }
     val deleteItemKey = rememberSaveable { mutableStateOf<Long?>(null) }
+    val imageToDeleteFromUriList = rememberSaveable { mutableStateOf<Uri?>(null) }
 
     LazyColumn(modifier = Modifier
         .fillMaxWidth()
@@ -226,8 +266,21 @@ fun FreightScreenContent(
                 showIcon = true,
                 iconDescription = "add picture"
             ) {
-                // TODO ADD PICTURES
+                launcher.launch("image/*")
             }
+        }
+
+        items(
+            items = freight.value.pictureUri
+        ) { item ->
+            PictureItem(
+                uri = item,
+                dialogImageUri = dialogImageUri,
+                showZoomableImageDialog = showZoomableImageDialog,
+                showDeleteImagePopup = showDeleteImagePopup,
+                imageUriToDelete = imageToDeleteFromUriList,
+                context = context
+            )
         }
 
         item {
@@ -246,6 +299,11 @@ fun FreightScreenContent(
         dateTime = selectedItemDateTime,
         freight = freight,
         context = context
+    )
+
+    ZoomableImageDialog(
+        showDialog = showZoomableImageDialog,
+        imageUri = dialogImageUri.value
     )
 
     TextInputDialog(
@@ -275,6 +333,24 @@ fun FreightScreenContent(
         }
         deleteItemKey.value = null
         showDeletePopup.value = false
+    }
+
+    DeleteItemPopup(
+        showDeletePopup = showDeleteImagePopup,
+        itemName = "image"
+    ) {
+        imageToDeleteFromUriList.value?.let { uri ->
+            val imageUriList = freight.value.pictureUri.toMutableList()
+            imageUriList.remove(imageToDeleteFromUriList.value.toString())
+
+            freight.value = freight.value.copy(
+                pictureUri = imageUriList
+            )
+
+            imagesToDelete.value.add(uri)
+        }
+        imageToDeleteFromUriList.value = null
+        showDeleteImagePopup.value = false
     }
 }
 
@@ -376,6 +452,49 @@ fun DistanceContent(freight: MutableState<FreightDBModel>) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun PictureItem(
+    uri: String,
+    context: Context,
+    showZoomableImageDialog: MutableState<Boolean>,
+    showDeleteImagePopup: MutableState<Boolean>,
+    dialogImageUri: MutableState<Uri?>,
+    imageUriToDelete: MutableState<Uri?>
+) {
+    Surface(
+        modifier = Modifier
+            .padding(horizontal = 25.dp, vertical = 12.dp)
+            .height(130.dp)
+            .fillMaxWidth()
+            .combinedClickable(
+                enabled = true,
+                onClick = {
+                    dialogImageUri.value = uri.toUri()
+                    showZoomableImageDialog.value = true
+                },
+                onLongClick = {
+                    imageUriToDelete.value = uri.toUri()
+                    showDeleteImagePopup.value = true
+                }
+            ),
+        color = Color.Transparent,
+        tonalElevation = 10.dp
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(context)
+                .data(uri)
+                .crossfade(true)
+                .build(),
+            contentDescription = "attached image",
+            modifier = Modifier.clip(
+                RoundedCornerShape(corner = CornerSize(5.dp))
+            ),
+            contentScale = ContentScale.FillWidth
+        )
+    }
+}
+
 @Composable
 fun NoteContent(
     freight: MutableState<FreightDBModel>,
@@ -444,48 +563,3 @@ fun TitleRow(
         }
     }
 }
-
-
-@Composable
-fun FABContent(
-    isCreateFreight: MutableState<Boolean>,
-    freight: MutableState<FreightDBModel>,
-    navController: NavController,
-    viewModel: FreightScreenViewModel,
-    context: Context
-) {
-    AppButton(
-        buttonText = if (isCreateFreight.value) "Add Freight" else "Update Freight",
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 50.dp, vertical = 15.dp),
-        enabled = freight.value.loads.isNotEmpty() &&
-                freight.value.unloads.isNotEmpty() &&
-                freight.value.distance != null && freight.value.distance != 0
-    ) {
-        val firstLoadTime = freight.value.loads.keys.min()
-        val lastLoadTime = freight.value.loads.keys.max()
-        val firstUnloadTime = freight.value.unloads.keys.min()
-        val lastUnloadTime = freight.value.unloads.keys.max()
-
-        if (firstLoadTime < lastUnloadTime
-            && firstLoadTime < firstUnloadTime
-            && lastLoadTime < lastUnloadTime
-        ) {
-            val freightUpdated = freight.value.copy()
-
-            if (isCreateFreight.value) {
-                viewModel.addFreight(freightUpdated)
-            } else viewModel.updateFreight(freightUpdated)
-            navController.popBackStack()
-        } else {
-            Toast.makeText(
-                context,
-                "Unload before load or in the same time",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
-}
-
-

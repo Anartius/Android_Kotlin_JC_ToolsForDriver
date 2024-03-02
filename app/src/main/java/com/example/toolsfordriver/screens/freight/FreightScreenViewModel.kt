@@ -1,5 +1,8 @@
 package com.example.toolsfordriver.screens.freight
 
+import android.content.Context
+import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,5 +36,19 @@ class FreightScreenViewModel @Inject constructor(
 
     fun updateFreight(freight: FreightDBModel) {
         viewModelScope.launch { repository.updateFreight(freight) }
+    }
+
+
+    fun saveImageToInternalStorage(context: Context, uri: Uri): Uri {
+        val fileName = String.format(Locale.GERMANY, "%d.jpg", System.currentTimeMillis())
+
+        val inputStream = context.contentResolver.openInputStream(uri)
+        val outputFile = context.filesDir.resolve(fileName)
+
+        inputStream?.use {
+            it.copyTo(outputFile.outputStream())
+        }
+
+        return outputFile.toUri()
     }
 }

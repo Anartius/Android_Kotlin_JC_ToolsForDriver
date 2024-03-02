@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.toolsfordriver.data.TripDBModel
 import com.example.toolsfordriver.repository.Repository
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,10 +19,11 @@ class TripListScreenViewModel @Inject constructor(
 ) : ViewModel() {
     private val _tripList = MutableStateFlow<List<TripDBModel>>(emptyList())
     val tripList = _tripList.asStateFlow()
+    private val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
     init {
         viewModelScope.launch {
-            repository.getAllTrips().distinctUntilChanged().collect { listOfTrips ->
+            repository.getAllTripsByUserId(userId).distinctUntilChanged().collect { listOfTrips ->
                 if (listOfTrips.isEmpty()) {
                     Log.d("List Of Trips", ": Empty list")
                     _tripList.value = emptyList()

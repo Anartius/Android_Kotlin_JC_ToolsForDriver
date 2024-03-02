@@ -14,8 +14,8 @@ class Repository @Inject constructor(
 ) {
 
     // trip
-    fun getAllTrips(): Flow<List<TripDBModel>> =
-        tfdRoomDAO.getTrips().flowOn(Dispatchers.IO).conflate()
+    fun getAllTripsByUserId(userId: String) =
+        tfdRoomDAO.getTripsByUserId(userId).flowOn(Dispatchers.IO).conflate()
 
     suspend fun getTripById(tripId: String) = tfdRoomDAO.getTripById(tripId)
 
@@ -29,8 +29,8 @@ class Repository @Inject constructor(
 
 
     // freight
-    fun getAllFreights(): Flow<List<FreightDBModel>> =
-        tfdRoomDAO.getFreights().flowOn(Dispatchers.IO).conflate()
+    fun getAllFreightsByUserId(userId: String): Flow<List<FreightDBModel>> =
+        tfdRoomDAO.getFreightsByUserId(userId).flowOn(Dispatchers.IO).conflate()
 
     suspend fun getFreightById(freightId: String) = tfdRoomDAO.getFreightById(freightId)
 

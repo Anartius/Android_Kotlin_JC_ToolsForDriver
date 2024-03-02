@@ -1,5 +1,9 @@
 package com.example.toolsfordriver.utils
 
+import android.content.Context
+import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDateTime
@@ -7,6 +11,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.periodUntil
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.until
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -81,4 +86,21 @@ fun String.isValidEmail(): Boolean {
                 ")+"
     )
     return emailAddressPattern.matcher(this).matches()
+}
+
+fun deleteImageFromInternalStorage(
+    uri: Uri,
+    context: Context
+): Boolean {
+    return try {
+        val directory = context.filesDir
+        val fileName = uri.pathSegments.last()
+        val file = File(directory, fileName)
+        file.delete()
+        true
+    } catch (e: Exception) {
+        Log.e("Image delete", e.message.toString())
+        Toast.makeText(context, "Image wasn't delete", Toast.LENGTH_LONG).show()
+        false
+    }
 }
