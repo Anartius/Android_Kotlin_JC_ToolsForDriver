@@ -26,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -46,8 +45,7 @@ fun TripListContent(
     viewModel: TFDViewModel,
     onNavIconClicked: () -> Unit
 ) {
-    val tripList = viewModel
-        .uiState.collectAsStateWithLifecycle().value.trips.value.sortedBy { it.startTime }
+    val tripList = viewModel.uiState.collectAsStateWithLifecycle().value.trips.value
     val showDeletePopup = remember { mutableStateOf(false) }
     val tripToDelete = remember { mutableStateOf<TripDBModel?>(null) }
 
@@ -147,12 +145,12 @@ fun TripRow(
                 Text(text = dateAsString(trip.startTime))
                 Text(
                     text = timeAsString(trip.startTime),
-                    color = Color.Gray)
+                    color = colorResource(id = R.color.gray))
             }
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = stringResource(id = R.string.arrow_forward),
-                tint = Color.Gray,
+                tint = colorResource(id = R.color.gray),
             )
             Column (
                 verticalArrangement = Arrangement.Center,
@@ -161,7 +159,7 @@ fun TripRow(
                 Text(text = dateAsString(trip.endTime))
                 Text(
                     text = timeAsString(trip.endTime),
-                    color = Color.Gray)
+                    color = colorResource(id = R.color.gray))
             }
         }
     }

@@ -16,7 +16,7 @@ import javax.inject.Singleton
 object AppModule {
     @Singleton
     @Provides
-    fun provideTFDRoomDao(tfdRoomDB: TFDRoomDB):TFDRoomDAO = tfdRoomDB.tfdRoomDao()
+    fun provideTFDRoomDao(tfdRoomDB: TFDRoomDB): TFDRoomDAO = tfdRoomDB.tfdRoomDao()
 
     @Singleton
     @Provides

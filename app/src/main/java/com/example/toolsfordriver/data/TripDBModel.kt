@@ -7,6 +7,9 @@ import java.util.UUID
 
 @Entity(tableName = "trips_table")
 data class TripDBModel(
+
+//    @PrimaryKey(autoGenerate = true)
+//    val id: Int = 0,
     @PrimaryKey
     val id: UUID = UUID.randomUUID(),
 

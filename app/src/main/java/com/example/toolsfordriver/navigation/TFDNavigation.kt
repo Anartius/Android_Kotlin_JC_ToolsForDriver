@@ -1,11 +1,9 @@
 package com.example.toolsfordriver.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.toolsfordriver.ui.TFDViewModel
 import com.example.toolsfordriver.ui.screens.FreightsScreen
 import com.example.toolsfordriver.ui.screens.HomeScreen
 import com.example.toolsfordriver.ui.screens.SplashScreen
@@ -16,7 +14,6 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun TFDNavigation() {
     val navController = rememberNavController()
-    val tfdViewModel = hiltViewModel<TFDViewModel>()
 
     NavHost(navController = navController,
         startDestination = TFDScreens.SplashScreen.name
@@ -52,13 +49,13 @@ fun TFDNavigation() {
         }
 
         composable(TFDScreens.TripsScreen.name) {
-            TripsScreen(viewModel = tfdViewModel) {
+            TripsScreen {
                 navController.navigate(TFDScreens.HomeScreen.name)
             }
         }
 
         composable(TFDScreens.FreightsScreen.name) {
-            FreightsScreen(viewModel = tfdViewModel) {
+            FreightsScreen {
                 navController.navigate(TFDScreens.HomeScreen.name)
             }
         }

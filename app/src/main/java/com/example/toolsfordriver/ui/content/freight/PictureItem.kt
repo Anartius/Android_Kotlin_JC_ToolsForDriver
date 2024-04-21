@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -57,6 +58,7 @@ fun PictureItem(
                 .data(uri)
                 .crossfade(true)
                 .build(),
+            error = painterResource(id = R.drawable.ic_broken_image),
             contentDescription = stringResource(id = R.string.attached_image),
             modifier = Modifier.clip(
                 RoundedCornerShape(corner = CornerSize(5.dp))

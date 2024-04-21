@@ -310,9 +310,6 @@ fun LocationInputText(
     keyboardOptions: KeyboardOptions,
     onAction: () -> Unit
 ) {
-
-    val trailingIconVisibility = remember { mutableStateOf(true) }
-
     InputField(
         modifier = modifier.wrapContentWidth(align = Alignment.End),
         textValueState = text,
@@ -322,7 +319,7 @@ fun LocationInputText(
         isSingleLine = isSingleLine,
         maxLines = maxLines,
         inputTextAlign = TextAlign.End,
-        trailingIconVisibility = trailingIconVisibility,
+        trailingIconVisibility = true,
         keyboardOptions = keyboardOptions,
         onAction = onAction
     )

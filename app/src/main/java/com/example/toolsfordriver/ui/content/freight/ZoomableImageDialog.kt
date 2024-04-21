@@ -16,10 +16,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
+import com.example.toolsfordriver.R
 
 @Composable
 fun ZoomableImageDialog(
@@ -60,6 +62,7 @@ fun ZoomableImage(
 
     AsyncImage(
         model = model,
+        error = painterResource(id = R.drawable.ic_broken_image),
         contentDescription = contentDescription,
         modifier = Modifier
             .pointerInput(Unit) {

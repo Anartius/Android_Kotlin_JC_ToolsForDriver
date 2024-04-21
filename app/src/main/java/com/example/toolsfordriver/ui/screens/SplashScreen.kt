@@ -19,7 +19,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(onStartNavigation: () -> Unit) {
     LaunchedEffect(key1 = true) {
-        delay(1000L)
+        delay(700L)
         onStartNavigation()
     }
 

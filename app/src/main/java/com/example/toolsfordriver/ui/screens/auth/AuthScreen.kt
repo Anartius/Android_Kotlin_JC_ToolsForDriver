@@ -18,10 +18,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -38,41 +37,32 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.toolsfordriver.R
+import com.example.toolsfordriver.ui.AuthUiState
 import com.example.toolsfordriver.ui.components.AppButton
 import com.example.toolsfordriver.ui.components.InputField
 import com.example.toolsfordriver.utils.isValidEmail
 
 @Composable
-fun AuthScreen(
-    viewModel: AuthScreenViewModel = viewModel(),
-    onAuthSuccess: () -> Unit
-) {
-    val showLoginForm = rememberSaveable { mutableStateOf(true) }
-    val context = LocalContext.current
+fun AuthScreen(onAuthSuccess: () -> Unit) {
+    val viewModel: AuthScreenViewModel = viewModel()
+    val isNewAccount = viewModel.authUiState.collectAsStateWithLifecycle().value.isNewAccount
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (showLoginForm.value) {
-                UserForm(load = false, isCreateAccount = false) { email, password ->
-                    viewModel.signUserWithEmailAndPassword(email, password, context) {
-                        onAuthSuccess()
-                    }
-                }
+            if (isNewAccount) {
+                UserForm(viewModel = viewModel) { onAuthSuccess() }
             } else {
-                UserForm(load = false, isCreateAccount = true) { email, password ->
-                    viewModel.createUserWithEmailAndPassword(email, password) {
-                        onAuthSuccess()
-                    }
-                }
+                UserForm(viewModel = viewModel) { onAuthSuccess() }
             }
 
             Button(
-                onClick = { showLoginForm.value = !showLoginForm.value },
+                onClick = { viewModel.invertIsNewAccountValue() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 20.dp, horizontal = 30.dp),
@@ -85,11 +75,11 @@ fun AuthScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val text = stringResource(
-                        id = if (showLoginForm.value) R.string.new_user else R.string.have_account
+                        id = if (isNewAccount) R.string.new_user else R.string.have_account
                     ) + "?"
 
                     val actionText = stringResource(
-                        id = if (showLoginForm.value) R.string.sign_up else R.string.login
+                        id = if (isNewAccount) R.string.sign_up else R.string.login
                     )
 
                     Text(
@@ -111,19 +101,20 @@ fun AuthScreen(
 
 @Composable
 fun UserForm(
-    load: Boolean = false,
-    isCreateAccount: Boolean = false,
-    onDone: (String, String) -> Unit
+    viewModel: AuthScreenViewModel,
+    onDone: () -> Unit
 ) {
-    val email = rememberSaveable { mutableStateOf("") }
-    val password = rememberSaveable { mutableStateOf("") }
-    val passwordVisibility = rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
     val passwordFocusRequester = FocusRequester()
     val keyboardController = LocalSoftwareKeyboardController.current
-    val valid = remember(email.value, password.value) {
-        email.value.trim().isValidEmail() &&
-                password.value.isNotEmpty() &&
-                password.value.length > 5
+
+    val authUiState = viewModel.authUiState.collectAsStateWithLifecycle().value
+    val email = authUiState.email
+    val password = authUiState.password
+    val isCreateAccount = authUiState.isNewAccount
+
+    val inputIsValid = remember(email, password) {
+        email.trim().isValidEmail() && password.isNotEmpty() && password.length > 5
     }
 
     Column(
@@ -149,79 +140,79 @@ fun UserForm(
     }
 
     EmailInput(
-        emailState = email,
-        enabled = !load
-    ) {
-        passwordFocusRequester.requestFocus()
-    }
+        viewModel = viewModel,
+        authUiState = authUiState
+    ) { passwordFocusRequester.requestFocus() }
 
     PasswordInput(
         modifier = Modifier.focusRequester(passwordFocusRequester),
-        passwordState = password,
-        labelId = stringResource(id = R.string.password),
-        enabled = !load,
-        passwordVisibility = passwordVisibility
-    ) {
-        if (valid) onDone(email.value.trim(), password.value.trim())
-        passwordFocusRequester.freeFocus()
-    }
+        viewModel = viewModel,
+        authUiState = authUiState
+    ) { passwordFocusRequester.freeFocus() }
 
     AppButton(
         buttonText = stringResource(
             id = if (isCreateAccount) R.string.create_account else R.string.login
         ),
-        enabled = !load && valid
+        enabled = inputIsValid
     ) {
-        onDone(email.value.trim(), password.value.trim())
         keyboardController?.hide()
-    }
 
+        if (isCreateAccount) {
+            viewModel.createNewUser(context) { onDone() }
+        } else {
+            viewModel.signUser(context) { onDone() }
+        }
+    }
 }
 
 @Composable
 fun EmailInput(
-    emailState: MutableState<String>,
-    labelId: String = stringResource(id = R.string.email),
-    enabled: Boolean = true,
+    viewModel: AuthScreenViewModel,
+    authUiState: AuthUiState,
     onAction: () -> Unit = {}
 ) {
+    val email = authUiState.email
+    val emailState = remember { mutableStateOf(email) }
+
+    LaunchedEffect(emailState.value) { viewModel.updateEmail(emailState.value) }
+
     InputField(
         textValueState = emailState,
-        label = labelId,
-        enabled = enabled,
+        label = stringResource(id = R.string.email),
+        enabled = true,
         keyboardType = KeyboardType.Email,
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-        onAction = onAction
-    )
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
+    ) { onAction() }
 }
 
 @Composable
 fun PasswordInput(
     modifier: Modifier,
-    passwordState: MutableState<String>,
-    labelId: String = stringResource(id = R.string.password),
-    enabled: Boolean = true,
-    passwordVisibility: MutableState<Boolean>,
+    viewModel: AuthScreenViewModel,
+    authUiState: AuthUiState,
     onAction: () -> Unit = {}
 ) {
-    val trailingIconVisibility = remember {
-        mutableStateOf(true)
-    }
+    val password = authUiState.password
+    val passwordState = remember { mutableStateOf(password) }
 
-    val visualTransformation = if (passwordVisibility.value) {
+    LaunchedEffect(passwordState.value) { viewModel.updatePassword(passwordState.value) }
+
+    val passwordVisibility = authUiState.passwordVisibility
+    val visualTransformation = if (passwordVisibility) {
         VisualTransformation.None
     } else PasswordVisualTransformation()
 
     InputField(
         modifier = modifier,
         textValueState = passwordState,
-        label = labelId,
-        enabled = enabled,
+        label = stringResource(id = R.string.password),
+        enabled = true,
         textVisibility = passwordVisibility,
-        trailingIconVisibility = trailingIconVisibility,
+        trailingIconVisibility = true,
         keyboardType = KeyboardType.Password,
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
         visualTransformation = visualTransformation,
-        onAction = onAction
-    )
+        onChangeVisibility = { viewModel.invertPasswordVisibilityValue() }
+    ) { onAction() }
 }

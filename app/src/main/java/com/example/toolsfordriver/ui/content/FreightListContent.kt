@@ -26,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -167,7 +166,7 @@ fun FreightRow(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Arrow Forward",
                     modifier = Modifier.weight(0.5f),
-                    tint = Color.Gray,
+                    tint = colorResource(id = R.color.gray),
                 )
 
                 Column(

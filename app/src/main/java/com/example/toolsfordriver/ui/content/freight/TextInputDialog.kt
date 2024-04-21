@@ -20,7 +20,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -44,7 +43,6 @@ fun TextInputDialog (
 
         val freight = viewModel.uiState.collectAsStateWithLifecycle().value.currentFreight!!
         val scrollState = rememberScrollState()
-        val trailingIconVisibility = mutableStateOf(false)
         val text = rememberSaveable { mutableStateOf(freight.notes ?: "") }
 
         Dialog(onDismissRequest = {}) {
@@ -81,12 +79,12 @@ fun TextInputDialog (
                             ),
                         textValueState = text,
                         isOutlined = false,
-                        trailingIconVisibility = trailingIconVisibility,
+                        trailingIconVisibility = false,
                         maxLines = 10,
                         placeholder = {
                             Text(
                                 text = stringResource(id = R.string.add_note) + "...",
-                                color = Color.Gray
+                                color = colorResource(id = R.color.gray)
                             )
                         },
                         isSingleLine = false,

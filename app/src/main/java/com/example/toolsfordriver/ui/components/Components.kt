@@ -36,22 +36,19 @@ import com.example.toolsfordriver.R
 
 @Composable
 fun TextVisibility(
-    textVisibility: MutableState<Boolean>,
-    iconVisibility: MutableState<Boolean>
+    textVisibility: Boolean,
+    onChangeVisibility: () -> Unit = {}
 ) {
-    if (iconVisibility.value) {
-        val visible = textVisibility.value
-
-        IconButton(onClick = { textVisibility.value = !visible }) {
-            Icon(
-                imageVector = if (visible) {
-                    Icons.Filled.Visibility
-                } else Icons.Filled.VisibilityOff,
-                contentDescription = stringResource(id = R.string.hide_password),
-                tint = MaterialTheme.colorScheme.onBackground
-            )
-        }
+    IconButton(onClick = { onChangeVisibility() }) {
+        Icon(
+            imageVector = if (textVisibility) {
+                Icons.Filled.Visibility
+            } else Icons.Filled.VisibilityOff,
+            contentDescription = stringResource(id = R.string.hide_password),
+            tint = MaterialTheme.colorScheme.onBackground
+        )
     }
+
 }
 
 @Composable

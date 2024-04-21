@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -46,7 +46,9 @@ fun NoteContent(
                 .fillMaxWidth()
                 .clickable { showNoteDialog.value = true },
             text = if (note.isNullOrEmpty()) stringResource(id = R.string.add_note) else note,
-            color = if (note.isNullOrEmpty()) Color.Gray else Color.LightGray,
+            color = if (note.isNullOrEmpty()) {
+                colorResource(id = R.color.gray)
+            } else colorResource(id = R.color.light_gray),
             maxLines = 5,
             overflow = TextOverflow.Ellipsis
         )

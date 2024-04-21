@@ -16,9 +16,12 @@
     <string name="delete">Delete</string>
     <string name="deleted">deleted</string>
     <string name="distance">Distance</string>
+    <string name="duration">Duration</string>
+    <string name="earnings">Earnings</string>
     <string name="edit">Edit</string>
     <string name="email">Email</string>
     <string name="failed_to_delete_attached_images">Failed to delete attached images</string>
+    <string name="finish">Finish</string>
     <string name="freight">Freight</string>
     <string name="freights">Freights</string>
     <string name="have_account">Have account</string>
@@ -50,8 +53,6 @@
     <string name="unloads">Unloads</string>
     <string name="update_freight">Update freight</string>
     <string name="update_trip">Update trip</string>
-    <string name="earnings">Earnings</string>
-    <string name="duration">Duration</string>
-    <string name="finish">Finish</string>
     <string name="start">Start</string>
+    <string name="authentication_failed">Authentication failed. Wrong email or password</string>
 </resources>

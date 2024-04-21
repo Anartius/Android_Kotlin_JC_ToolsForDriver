@@ -27,7 +27,6 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 
-
 @Composable
 fun TripContentColumn(viewModel: TFDViewModel) {
     val showDatePickerDialog = rememberSaveable { mutableStateOf(false) }
@@ -36,7 +35,7 @@ fun TripContentColumn(viewModel: TFDViewModel) {
     val trip = viewModel.uiState.collectAsStateWithLifecycle().value.currentTrip
 
     if (trip != null) {
-        val isNewTrip = viewModel.uiState.value.isNewTrip
+        val isNewTrip = viewModel.uiState.collectAsStateWithLifecycle().value.isNewTrip
 
         val startDateTime = remember(trip) {
             mutableStateOf(

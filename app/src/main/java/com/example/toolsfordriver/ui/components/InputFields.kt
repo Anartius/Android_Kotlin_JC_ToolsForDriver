@@ -47,14 +47,15 @@ fun InputField(
     enabled: Boolean = true,
     isSingleLine: Boolean = true,
     maxLines: Int = 1,
-    textVisibility: MutableState<Boolean> = mutableStateOf(true),
+    textVisibility: Boolean = true,
     inputTextAlign: TextAlign = TextAlign.Start,
     trailingIcon: ImageVector = Icons.Filled.Edit,
     trailingIconDescription: String = stringResource(R.string.edit),
-    trailingIconVisibility: MutableState<Boolean> = mutableStateOf(false),
+    trailingIconVisibility: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
+    onChangeVisibility: () -> Unit = {},
     onAction: () -> Unit = {}
 ) {
     val colorBlue = colorResource(id = R.color.light_blue)
@@ -99,13 +100,8 @@ fun InputField(
                     imeAction = keyboardOptions.imeAction
                 ),
                 visualTransformation = visualTransformation,
-                trailingIcon = if (trailingIconVisibility.value) {
-                    {
-                        TextVisibility(
-                            textVisibility = textVisibility,
-                            iconVisibility = trailingIconVisibility
-                        )
-                    }
+                trailingIcon = if (trailingIconVisibility) {
+                    { TextVisibility(textVisibility = textVisibility) { onChangeVisibility() } }
                 } else null,
                 keyboardActions = KeyboardActions(
                     onDone = { onAction.invoke() },
@@ -140,12 +136,15 @@ fun InputField(
                 maxLines = maxLines,
                 placeholder = placeholder,
                 singleLine = false,
-                trailingIcon = if (trailingIconVisibility.value) {
+                trailingIcon = if (trailingIconVisibility) {
                     {
-                        InputFieldTrailingIcon(
-                            icon = trailingIcon,
-                            description = trailingIconDescription,
-                            visibility = trailingIconVisibility
+                        Icon(
+                            imageVector = trailingIcon,
+                            contentDescription = trailingIconDescription,
+                            tint = colorResource(id = R.color.light_blue),
+                            modifier = Modifier
+                                .padding(0.dp)
+                                .scale(0.8f)
                         )
                     }
                 } else null,
@@ -211,7 +210,7 @@ fun DigitInputField(
                 unfocusedBorderColor = Color.Transparent
             ),
             textStyle = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Start),
-            placeholder = { Text(text = placeholder, color = Color.Gray) },
+            placeholder = { Text(text = placeholder, color = colorResource(id = R.color.gray)) },
             maxLines = maxLines,
             singleLine = false,
             keyboardOptions = keyboardOptions.copy(
@@ -226,24 +225,6 @@ fun DigitInputField(
             } else {
                 SuffixTransformation(suffix)
             }
-        )
-    }
-}
-
-@Composable
-fun InputFieldTrailingIcon(
-    icon: ImageVector,
-    description: String,
-    visibility: MutableState<Boolean>
-) {
-    if (visibility.value) {
-        Icon(
-            imageVector = icon,
-            contentDescription = description,
-            tint = colorResource(id = R.color.light_blue),
-            modifier = Modifier
-                .padding(0.dp)
-                .scale(0.8f)
         )
     }
 }

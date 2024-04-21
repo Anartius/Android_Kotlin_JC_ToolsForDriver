@@ -41,7 +41,7 @@ fun AppButton(
             width = 0.5.dp,
             color = if (enabled) {
                 colorResource(id = R.color.light_blue).copy(0.6f)
-            } else Color.Gray
+            } else colorResource(id = R.color.gray)
         ),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,

@@ -9,7 +9,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.toolsfordriver.data.FreightDBModel
 import com.example.toolsfordriver.data.TripDBModel
-import com.example.toolsfordriver.repository.Repository
+import com.example.toolsfordriver.data.repository.FreightRepository
+import com.example.toolsfordriver.data.repository.TripRepository
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +23,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TFDViewModel @Inject constructor(
-    private val repository: Repository
+    private val tripRepository: TripRepository,
+    private val freightRepository: FreightRepository
 ) : ViewModel() {
+
     private val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
     private val _tripList = MutableStateFlow<List<TripDBModel>>(emptyList())
@@ -37,7 +40,8 @@ class TFDViewModel @Inject constructor(
 
     private fun initializeUiState() {
         viewModelScope.launch {
-            repository.getAllTripsByUserId(userId).distinctUntilChanged().collect { listOfTrips ->
+            tripRepository
+                .getAllTripsByUserId(userId).distinctUntilChanged().collect { listOfTrips ->
                 if (listOfTrips.isEmpty()) {
                     Log.d("List Of Trips", ": Empty list")
                     _tripList.value = emptyList()
@@ -50,7 +54,7 @@ class TFDViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            repository
+            freightRepository
                 .getAllFreightsByUserId(userId).distinctUntilChanged().collect { listOfFreights ->
                     if (listOfFreights.isEmpty()) {
                         Log.d("List Of Freights", ": Empty list")
@@ -78,14 +82,14 @@ class TFDViewModel @Inject constructor(
     }
 
     fun addTrip(trip: TripDBModel) {
-        viewModelScope.launch { repository.addTrip(trip) }
+        viewModelScope.launch { tripRepository.addTrip(trip) }
     }
 
     fun updateTrip(trip: TripDBModel) {
-        viewModelScope.launch { repository.updateTrip(trip) }
+        viewModelScope.launch { tripRepository.updateTrip(trip) }
     }
     fun deleteTrip(trip: TripDBModel) {
-        viewModelScope.launch { repository.deleteTrip(trip) }
+        viewModelScope.launch { tripRepository.deleteTrip(trip) }
     }
 
     fun updateCurrentFreight(freight: FreightDBModel?) {
@@ -101,14 +105,14 @@ class TFDViewModel @Inject constructor(
     }
 
     fun addFreight(freight: FreightDBModel) {
-        viewModelScope.launch { repository.addFreight(freight) }
+        viewModelScope.launch { freightRepository.addFreight(freight) }
     }
 
     fun updateFreight(freight: FreightDBModel) {
-        viewModelScope.launch { repository.updateFreight(freight) }
+        viewModelScope.launch { freightRepository.updateFreight(freight) }
     }
     fun deleteFreight(freight: FreightDBModel) {
-        viewModelScope.launch { repository.deleteFreight(freight) }
+        viewModelScope.launch { freightRepository.deleteFreight(freight) }
     }
 
     fun saveImageToInternalStorage(context: Context, uri: Uri): Uri {

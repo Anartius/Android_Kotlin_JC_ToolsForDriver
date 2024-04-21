@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface TFDRoomDAO {
 
     // trips_table
-    @Query("SELECT * FROM trips_table WHERE user_id = :userId")
+    @Query("SELECT * FROM trips_table WHERE user_id = :userId ORDER BY start_time ASC")
     fun getTripsByUserId(userId: String): Flow<List<TripDBModel>>
 
     @Query("SELECT * FROM trips_table WHERE id = :tripId LIMIT 1")
