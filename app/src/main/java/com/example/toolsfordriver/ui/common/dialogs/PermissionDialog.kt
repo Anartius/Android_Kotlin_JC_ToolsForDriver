@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.toolsfordriver.R
@@ -44,7 +45,7 @@ fun PermissionDialog(onRequestPermission: () -> Unit) {
 }
 
 @Composable
-fun RationaleDialog() {
+fun RationaleDialog(onConfirm: () -> Unit) {
     var showDialog by remember { mutableStateOf(true) }
 
     if (showDialog) {
@@ -52,16 +53,40 @@ fun RationaleDialog() {
             onDismissRequest = { showDialog = false },
             confirmButton = {
                 TextButton(
+                    onClick = {
+                        showDialog = false
+                        onConfirm()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp, 8.dp, 16.dp, 0.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.allow),
+                        color = colorResource(id = R.color.light_blue)
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
                     onClick = { showDialog = false },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp, 8.dp, 16.dp, 0.dp)
                 ) {
-                    Text(text = stringResource(R.string.ok))
+                    Text(
+                        text = stringResource(R.string.deny),
+                        color = colorResource(id = R.color.light_blue)
+                    )
                 }
             },
             modifier = Modifier.wrapContentSize(),
-            title = { Text(text = stringResource(R.string.notification_permission_title)) },
+            title = {
+                Text(
+                    text = stringResource(R.string.notification_permission_title),
+                    color = colorResource(id = R.color.light_blue)
+                )
+            },
             text = { Text(text = stringResource(R.string.notification_permission_description)) }
         )
     }

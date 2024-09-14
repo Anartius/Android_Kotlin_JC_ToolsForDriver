@@ -9,9 +9,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.example.toolsfordriver.navigation.TFDNavigation
 import com.example.toolsfordriver.ui.common.dialogs.PermissionDialog
 import com.example.toolsfordriver.ui.common.dialogs.RationaleDialog
-import com.example.toolsfordriver.navigation.TFDNavigation
 import com.example.toolsfordriver.ui.utils.TFDContentType
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -63,7 +63,8 @@ fun RequestNotificationPermissionDialog() {
         permission = Manifest.permission.POST_NOTIFICATIONS
     )
     if (!permissionState.status.isGranted) {
-        if (permissionState.status.shouldShowRationale) RationaleDialog()
-        else PermissionDialog { permissionState.launchPermissionRequest() }
+        if (permissionState.status.shouldShowRationale) {
+            RationaleDialog { permissionState.launchPermissionRequest() }
+        } else PermissionDialog { permissionState.launchPermissionRequest() }
     }
 }

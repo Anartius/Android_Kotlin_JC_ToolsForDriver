@@ -93,4 +93,6 @@
     <string name="user_profile_image">User profile image</string>
     <string name="tfd_app">TFD App</string>
     <string name="choose_source">Choose source</string>
+    <string name="deny">DENY</string>
+    <string name="allow">ALLOW</string>
 </resources>
