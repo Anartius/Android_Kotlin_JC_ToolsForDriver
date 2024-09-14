@@ -59,11 +59,14 @@ tasks.withType(type = org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.13.0")
-    implementation("androidx.activity:activity-compose:1.9.0")
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.activity:activity-compose:1.9.2")
+    implementation("com.google.accompanist:accompanist-permissions:0.36.0")
+    implementation("com.google.firebase:firebase-storage-ktx:21.0.0")
+    implementation("com.google.firebase:firebase-firestore:25.1.0")
 
     // Compose
-    val composeBomVersion = "2024.04.01"
+    val composeBomVersion = "2024.09.01"
     implementation(platform("androidx.compose:compose-bom:$composeBomVersion"))
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material3:material3-window-size-class")
@@ -74,7 +77,7 @@ dependencies {
     androidTestImplementation(platform("androidx.compose:compose-bom:$composeBomVersion"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.1")
 
     // Lifecycle Scope
     val lifecycleVersion = "2.7.0"
@@ -83,13 +86,13 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion")
 
     // Coroutines
-    val coroutinesVersion = "1.8.0"
+    val coroutinesVersion = "1.8.1"
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion")
 
     // Dagger - Hilt
-    val daggerHiltVersion = "2.51.1"
+    val daggerHiltVersion = "2.52"
     val androidHiltVersion = "1.2.0"
     implementation("com.google.dagger:hilt-android:$daggerHiltVersion")
     ksp("com.google.dagger:hilt-compiler:$daggerHiltVersion")
@@ -104,20 +107,29 @@ dependencies {
     testImplementation("androidx.room:room-testing:$roomVersion")
 
     // Firebase/firestore
-    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
-    implementation("com.google.firebase:firebase-auth-ktx")
-    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
+    implementation("com.google.firebase:firebase-auth-ktx:23.0.0")
+    implementation("com.google.firebase:firebase-firestore-ktx:25.1.0")
+    implementation("com.google.firebase:firebase-storage-ktx:21.0.0")
 
     // Gson
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.google.code.gson:gson:2.11.0")
 
     // DateTime
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
 
     // Coil
-    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
+    // Camera X
+    val cameraVersion = "1.3.4"
+    implementation("androidx.camera:camera-core:$cameraVersion")
+    implementation("androidx.camera:camera-core:$cameraVersion")
+    implementation("androidx.camera:camera-lifecycle:$cameraVersion")
+    implementation("androidx.camera:camera-view:$cameraVersion")
+    implementation("androidx.camera:camera-extensions:$cameraVersion")
 
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 }

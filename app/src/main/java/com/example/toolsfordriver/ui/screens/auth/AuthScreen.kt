@@ -1,20 +1,23 @@
 package com.example.toolsfordriver.ui.screens.auth
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +30,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -35,64 +37,94 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.toolsfordriver.R
-import com.example.toolsfordriver.ui.AuthUiState
-import com.example.toolsfordriver.ui.components.AppButton
-import com.example.toolsfordriver.ui.components.InputField
-import com.example.toolsfordriver.utils.isValidEmail
+import com.example.toolsfordriver.ui.common.AppButton
+import com.example.toolsfordriver.ui.common.InputField
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun AuthScreen(onAuthSuccess: () -> Unit) {
-    val viewModel: AuthScreenViewModel = viewModel()
+    val viewModel: AuthScreenViewModel = hiltViewModel()
     val isNewAccount = viewModel.authUiState.collectAsStateWithLifecycle().value.isNewAccount
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (isNewAccount) {
-                UserForm(viewModel = viewModel) { onAuthSuccess() }
-            } else {
-                UserForm(viewModel = viewModel) { onAuthSuccess() }
+    LaunchedEffect(viewModel.snackbarMessages) {
+        viewModel.snackbarMessages.collect { snackbarMessage ->
+            val job = launch {
+                snackbarHostState.showSnackbar(
+                    message = snackbarMessage.asString(context),
+                    duration = SnackbarDuration.Indefinite
+                )
             }
+            delay(5000)
+            job.cancel()
+        }
+    }
 
-            Button(
-                onClick = { viewModel.invertIsNewAccountValue() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 20.dp, horizontal = 30.dp),
-                shape = RoundedCornerShape(45.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    containerColor = Color.DarkGray,
+                    contentColor = Color.White,
+                    snackbarData = data
+                )
+            }
+        }
+    ) { paddingValues ->
+        Surface(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp
+                ),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                if (isNewAccount) {
+                    UserForm(viewModel = viewModel) { onAuthSuccess() }
+                } else {
+                    UserForm(viewModel = viewModel) { onAuthSuccess() }
+                }
+
+                Button(
+                    onClick = { viewModel.invertIsNewAccountValue() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp, horizontal = 30.dp),
+                    shape = RoundedCornerShape(45.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
                 ) {
-                    val text = stringResource(
-                        id = if (isNewAccount) R.string.new_user else R.string.have_account
-                    ) + "?"
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val text = stringResource(
+                            id = if (isNewAccount) R.string.have_account else R.string.new_user
+                        ) + "?"
 
-                    val actionText = stringResource(
-                        id = if (isNewAccount) R.string.sign_up else R.string.login
-                    )
+                        val actionText = stringResource(
+                            id = if (isNewAccount) R.string.login else R.string.sign_up
+                        )
 
-                    Text(
-                        text = text,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                        Text(
+                            text = text,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
 
-                    Text(
-                        text = actionText,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = colorResource(id = R.color.light_blue)
-                    )
+                        Text(
+                            text = actionText,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = colorResource(id = R.color.light_blue)
+                        )
+                    }
                 }
             }
         }
@@ -102,42 +134,15 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
 @Composable
 fun UserForm(
     viewModel: AuthScreenViewModel,
-    onDone: () -> Unit
+    onAuthSuccess: () -> Unit
 ) {
-    val context = LocalContext.current
     val passwordFocusRequester = FocusRequester()
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val authUiState = viewModel.authUiState.collectAsStateWithLifecycle().value
-    val email = authUiState.email
-    val password = authUiState.password
     val isCreateAccount = authUiState.isNewAccount
 
-    val inputIsValid = remember(email, password) {
-        email.trim().isValidEmail() && password.isNotEmpty() && password.length > 5
-    }
-
-    Column(
-        modifier = Modifier
-            .wrapContentHeight(align = Alignment.CenterVertically)
-            .background(color = MaterialTheme.colorScheme.background),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        val headerHintPlaceholderHeight = with(LocalDensity.current) {
-            LocalTextStyle.current.lineHeight.toDp() * 3 + 80.dp
-        }
-
-        Column(
-            modifier = Modifier.height(headerHintPlaceholderHeight),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = stringResource(id = R.string.create_account_prompt),
-                modifier = Modifier.padding(vertical = 30.dp, horizontal = 50.dp),
-                textAlign = TextAlign.Center
-            )
-        }
-    }
+    Spacer(modifier = Modifier.height(150.dp))
 
     EmailInput(
         viewModel = viewModel,
@@ -153,15 +158,14 @@ fun UserForm(
     AppButton(
         buttonText = stringResource(
             id = if (isCreateAccount) R.string.create_account else R.string.login
-        ),
-        enabled = inputIsValid
+        )
     ) {
         keyboardController?.hide()
 
         if (isCreateAccount) {
-            viewModel.createNewUser(context) { onDone() }
+            viewModel.onCreateNewUserClick { onAuthSuccess() }
         } else {
-            viewModel.signUser(context) { onDone() }
+            viewModel.onSignUserClick { onAuthSuccess() }
         }
     }
 }
@@ -175,12 +179,11 @@ fun EmailInput(
     val email = authUiState.email
     val emailState = remember { mutableStateOf(email) }
 
-    LaunchedEffect(emailState.value) { viewModel.updateEmail(emailState.value) }
+    LaunchedEffect(emailState.value) { viewModel.onEmailChange(emailState.value) }
 
     InputField(
         textValueState = emailState,
         label = stringResource(id = R.string.email),
-        enabled = true,
         keyboardType = KeyboardType.Email,
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
     ) { onAction() }
@@ -196,7 +199,7 @@ fun PasswordInput(
     val password = authUiState.password
     val passwordState = remember { mutableStateOf(password) }
 
-    LaunchedEffect(passwordState.value) { viewModel.updatePassword(passwordState.value) }
+    LaunchedEffect(passwordState.value) { viewModel.onPasswordChange(passwordState.value) }
 
     val passwordVisibility = authUiState.passwordVisibility
     val visualTransformation = if (passwordVisibility) {
@@ -207,7 +210,6 @@ fun PasswordInput(
         modifier = modifier,
         textValueState = passwordState,
         label = stringResource(id = R.string.password),
-        enabled = true,
         textVisibility = passwordVisibility,
         trailingIconVisibility = true,
         keyboardType = KeyboardType.Password,

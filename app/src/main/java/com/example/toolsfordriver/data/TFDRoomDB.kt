@@ -3,13 +3,13 @@ package com.example.toolsfordriver.data
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.toolsfordriver.utils.ListStringConverter
-import com.example.toolsfordriver.utils.MapConverter
-import com.example.toolsfordriver.utils.UUIDConverter
+import com.example.toolsfordriver.common.ListStringConverter
+import com.example.toolsfordriver.common.MapConverter
+import com.example.toolsfordriver.common.UUIDConverter
 
 @Database(
-    entities = [TripDBModel::class, FreightDBModel::class],
-    version = 9,
+    entities = [FreightDBModel::class],
+    version = 10,
     exportSchema = false
 )
 @TypeConverters(

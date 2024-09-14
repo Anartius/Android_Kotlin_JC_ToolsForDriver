@@ -10,9 +10,6 @@ import java.util.UUID
 @Entity(tableName = "freights_table")
 @Parcelize
 data class FreightDBModel(
-
-//    @PrimaryKey(autoGenerate = true)
-//    val id: Int = 0,
     @PrimaryKey
     val id: UUID = UUID.randomUUID(),
 

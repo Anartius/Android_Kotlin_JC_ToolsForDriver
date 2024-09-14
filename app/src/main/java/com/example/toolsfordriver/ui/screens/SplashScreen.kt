@@ -13,17 +13,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.toolsfordriver.R
+import com.example.toolsfordriver.ui.screens.auth.AuthScreenViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(onStartNavigation: () -> Unit) {
+fun SplashScreen(
+    toAuthScreen: () -> Unit,
+    toHomeScreen: () -> Unit
+) {
+    val viewModel: AuthScreenViewModel = hiltViewModel()
+
     LaunchedEffect(key1 = true) {
         delay(700L)
-        onStartNavigation()
+        if (viewModel.isUserAuthenticated()) toHomeScreen() else toAuthScreen()
     }
 
-    Surface(modifier = Modifier.padding(15.dp).fillMaxSize()) {
+    Surface(modifier = Modifier
+        .padding(15.dp)
+        .fillMaxSize()) {
         Column (
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally

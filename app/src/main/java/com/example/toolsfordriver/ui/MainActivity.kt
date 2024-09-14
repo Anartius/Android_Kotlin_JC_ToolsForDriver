@@ -1,14 +1,13 @@
 package com.example.toolsfordriver.ui
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.toolsfordriver.ui.theme.ToolsForDriverTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,17 +16,25 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (!hasRequiredPermissions()) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.CAMERA),
+                0
+            )
+        }
         setContent {
             ToolsForDriverTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val windowSize = calculateWindowSizeClass(activity = this)
-
-                    TFDApp(windowSize = windowSize.widthSizeClass)
-                }
+                val windowSize = calculateWindowSizeClass(activity = this)
+                TFDApp(windowSize = windowSize.widthSizeClass)
             }
         }
+    }
+
+    private fun hasRequiredPermissions(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            applicationContext, android.Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
     }
 }
