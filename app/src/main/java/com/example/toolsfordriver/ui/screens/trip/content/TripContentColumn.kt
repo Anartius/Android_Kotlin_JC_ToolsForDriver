@@ -19,8 +19,8 @@ import com.example.toolsfordriver.common.dateAsStringIso
 import com.example.toolsfordriver.common.formatPeriod
 import com.example.toolsfordriver.common.timeAsString
 import com.example.toolsfordriver.ui.common.AppButton
-import com.example.toolsfordriver.ui.common.dialogs.DateTimeDialog
 import com.example.toolsfordriver.ui.common.TextRow
+import com.example.toolsfordriver.ui.common.dialogs.DateTimeDialog
 import com.example.toolsfordriver.ui.screens.trip.TripViewModel
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -109,7 +109,7 @@ fun TripContentColumn(viewModel: TripViewModel) {
         }
 
         TextRowWithDropdownMenu(
-            text = "Payment",
+            text = stringResource(R.string.payment),
             trip = trip
         )
 

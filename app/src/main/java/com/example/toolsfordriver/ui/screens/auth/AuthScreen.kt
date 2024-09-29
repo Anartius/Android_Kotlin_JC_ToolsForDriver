@@ -106,7 +106,7 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         val text = stringResource(
-                            id = if (isNewAccount) R.string.have_account else R.string.new_user
+                            id = if (isNewAccount) R.string.have_account else R.string.new_account
                         ) + "?"
 
                         val actionText = stringResource(

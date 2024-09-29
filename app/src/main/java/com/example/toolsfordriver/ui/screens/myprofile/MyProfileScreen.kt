@@ -16,9 +16,11 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
+import com.example.toolsfordriver.common.LocaleManager
 import com.example.toolsfordriver.ui.common.Camera
 import com.example.toolsfordriver.ui.common.TFDAppBar
 import com.example.toolsfordriver.ui.common.dialogs.ZoomableImageDialog
+import java.util.Locale
 
 @Composable
 fun MyProfileScreen(
@@ -26,18 +28,20 @@ fun MyProfileScreen(
     onSignOutIconClicked: () -> Unit
 ) {
     val viewModel: MyProfileViewModel = hiltViewModel()
-    val context = LocalContext.current
     val users = viewModel.users.collectAsStateWithLifecycle(initialValue = emptyList()).value
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-    val currentUser = uiState.value.user
-    val showCamera = uiState.value.showCamera
-    val showZoomableImageDialog = uiState.value.showZoomableImageDialog
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val currentUser = uiState.user
+    val showCamera = uiState.showCamera
+    val showZoomableImageDialog = uiState.showZoomableImageDialog
+    val showSelectLocaleDialog = uiState.showSelectLocaleDialog
 
     LaunchedEffect(key1 = users) {
         if (users.isNotEmpty()) { viewModel.updateCurrentUser(users.first()) }
     }
 
     if (currentUser != null) {
+        val context = LocalContext.current
+
         if (showCamera) {
             Camera(user = currentUser) { bitmap ->
                 viewModel.showCamera(false)
@@ -77,10 +81,29 @@ fun MyProfileScreen(
                         .padding(paddingValues)
                         .fillMaxSize()
                 ) {
-                    MyProfileLazyColumn(viewModel = viewModel)
+                    val localeOptions = mapOf(
+                        Locale("en") to stringResource(R.string.english),
+                        Locale("ru") to stringResource(R.string.russian)
+                    )
+
+                    MyProfileLazyColumn(
+                        viewModel = viewModel,
+                        localeOptions = localeOptions
+                    )
+
+                    if (showSelectLocaleDialog) {
+                        val locale = LocaleManager.getSavedLocale(context)
+
+                        SelectLocaleDialog(
+                            localeOptions = localeOptions,
+                            locale = locale
+                        ) { selectedLocale ->
+                            viewModel.showSelectLocaleDialog(false)
+                            viewModel.updateLocale(selectedLocale, context)
+                        }
+                    }
                 }
             }
         }
     }
 }
-

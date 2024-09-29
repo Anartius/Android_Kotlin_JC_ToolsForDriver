@@ -1,5 +1,6 @@
 package com.example.toolsfordriver.ui.screens.myprofile
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,30 +10,38 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
+import com.example.toolsfordriver.common.LocaleManager
 import com.example.toolsfordriver.ui.common.DigitalInputWithTitle
 import com.example.toolsfordriver.ui.common.TextInputWithTitle
+import java.util.Locale
 
 @Composable
 fun MyProfileLazyColumn(
-    viewModel: MyProfileViewModel
+    viewModel: MyProfileViewModel,
+    localeOptions: Map<Locale, String>
 ) {
     val currentUser = viewModel.uiState.collectAsStateWithLifecycle().value.user
+    val context = LocalContext.current
 
     val firstName = currentUser?.firstName ?: ""
     val lastName = currentUser?.lastName ?: ""
     val paymentPerDay = currentUser?.paymentPerDay
     val paymentPerHour = currentUser?.paymentPerHour
+    val locale = LocaleManager.getSavedLocale(context)
 
     val firstNameState = remember { mutableStateOf(firstName) }
     val lastNameState = remember { mutableStateOf(lastName) }
@@ -141,6 +150,25 @@ fun MyProfileLazyColumn(
                     suffix = stringResource(id = R.string.pln),
                     onFocusChanged = { viewModel.updateUser(currentUser) }
                 ) { }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+                    Text(
+                        text = stringResource(R.string.app_language),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = colorResource(id = R.color.light_blue)
+                    )
+
+                    Text(
+                        text = localeOptions[locale]?: locale.displayLanguage,
+                        modifier = Modifier
+                            .padding(vertical = 20.dp)
+                            .clickable { viewModel.showSelectLocaleDialog(true) },
+                    )
+                }
             }
         }
     }

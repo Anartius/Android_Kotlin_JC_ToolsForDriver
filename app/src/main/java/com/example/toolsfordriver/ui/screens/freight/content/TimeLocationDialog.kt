@@ -33,6 +33,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
@@ -120,7 +121,7 @@ fun TimeLocationDialog(
                 ) {
                     DialogTitle(
                         modifier = Modifier.padding(top = 10.dp, bottom = 15.dp),
-                        title = "Select location, date and time"
+                        title = stringResource(R.string.select_location_date_and_time)
                     )
 
                     LocationContent(
@@ -232,8 +233,8 @@ fun LocationContent(
         val cityNameFocusRequester = remember { FocusRequester() }
 
         LocationPickerRow(
-            description = "Country",
-            placeholderText = "Code",
+            description = stringResource(R.string.country),
+            placeholderText = stringResource(R.string.code),
             inputText = countryCode,
             modifier = Modifier.width(150.dp),
             keyboardOptions = KeyboardOptions(
@@ -246,8 +247,8 @@ fun LocationContent(
         }
 
         LocationPickerRow(
-            description = "City",
-            placeholderText = "Name",
+            description = stringResource(R.string.city),
+            placeholderText = stringResource(R.string.name),
             inputText = city,
             isSingleLine = false,
             maxLines = 2,

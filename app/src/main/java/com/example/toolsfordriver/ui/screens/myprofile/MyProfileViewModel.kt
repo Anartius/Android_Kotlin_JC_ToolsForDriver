@@ -1,11 +1,13 @@
 package com.example.toolsfordriver.ui.screens.myprofile
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.toolsfordriver.common.LocaleManager
 import com.example.toolsfordriver.common.UiText
 import com.example.toolsfordriver.common.saveBitmapToInternalStorage
 import com.example.toolsfordriver.common.saveImageToInternalStorage
@@ -21,6 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,6 +41,13 @@ class MyProfileViewModel @Inject constructor(
     val users = firestoreService.users
 
     fun updateUser(user: User) = launchCatching { firestoreService.updateUser(user) }
+
+    fun updateLocale(locale: Locale, context: Context) {
+        LocaleManager.saveLocale(context, locale)
+        val updatedLocale = LocaleManager.getSavedLocale(context)
+        LocaleManager.setLocale(context, updatedLocale)
+        (context as Activity).recreate()
+    }
 
     fun saveAvatarToCloud(
         uri: Uri? = null,
@@ -77,6 +87,10 @@ class MyProfileViewModel @Inject constructor(
 
     fun showAvatarImage(value: Boolean) {
         _uiState.value = _uiState.value.copy(showZoomableImageDialog = value)
+    }
+
+    fun showSelectLocaleDialog(value: Boolean) {
+        _uiState.value = _uiState.value.copy(showSelectLocaleDialog = value)
     }
 
     fun onSignOutClick() = launchCatching {

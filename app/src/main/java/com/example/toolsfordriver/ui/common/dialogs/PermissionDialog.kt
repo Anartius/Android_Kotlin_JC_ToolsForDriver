@@ -39,7 +39,8 @@ fun PermissionDialog(onRequestPermission: () -> Unit) {
             },
             modifier = Modifier.wrapContentSize(),
             title = { Text(text = stringResource(R.string.notification_permission_title)) },
-            text = { Text(text = stringResource(R.string.notification_permission_description)) }
+            text = { Text(text = stringResource(R.string.notification_permission_description)) },
+            containerColor = colorResource(id = R.color.dark_gray).copy(alpha = 0.8f)
         )
     }
 }
@@ -87,7 +88,8 @@ fun RationaleDialog(onConfirm: () -> Unit) {
                     color = colorResource(id = R.color.light_blue)
                 )
             },
-            text = { Text(text = stringResource(R.string.notification_permission_description)) }
+            text = { Text(text = stringResource(R.string.notification_permission_description)) },
+            containerColor = colorResource(id = R.color.dark_gray).copy(alpha = 0.8f)
         )
     }
 }

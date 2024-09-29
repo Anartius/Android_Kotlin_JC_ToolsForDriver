@@ -1,14 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Common -->
-    <string name="my_profile">My profile</string>
+    <string name="allow">ALLOW</string>
     <string name="app_name">Tools for driver</string>
     <string name="arrow_forward">Arrow Forward</string>
     <string name="back">Back</string>
     <string name="camera">Camera</string>
     <string name="cancel">Cancel</string>
+    <string name="choose_source">Choose source</string>
     <string name="date">Date</string>
     <string name="delete">Delete</string>
     <string name="deleted">deleted</string>
+    <string name="deny">DENY</string>
     <string name="edit">Edit</string>
     <string name="gallery">Gallery</string>
     <string name="generic_error">Something wrong happened. Please try again.</string>
@@ -25,8 +28,10 @@
     <string name="select">Select</string>
     <string name="select_date_and_time">Select date and time</string>
     <string name="selected_option">Selected option</string>
+    <string name="tfd_app">TFD App</string>
     <string name="time">Time</string>
     <string name="to_the_previous_screen">To the previous screen</string>
+    <string name="user_profile_image">User profile image</string>
 
     <!-- Auth -->
     <string name="create_account">Create account</string>
@@ -39,7 +44,7 @@
     <string name="have_account">Have account</string>
     <string name="hide_password">Hide password</string>
     <string name="login">Login</string>
-    <string name="new_user">New User</string>
+    <string name="new_account">New Account</string>
     <string name="password">Password</string>
     <string name="password_error">Your password should have at least six characters and include
         one upper case letter, one lower case letter and one digit</string>
@@ -48,18 +53,23 @@
 
     <!-- MyProfile -->
     <string name="add_first_name">Add first name</string>
+    <string name="app_language">App language</string>
+    <string name="add_last_name">Add last name</string>
+    <string name="add_user_profile_photo">Add user profile photo</string>
     <string name="first_name">First name</string>
     <string name="last_name">Last name</string>
-    <string name="add_last_name">Add last name</string>
+    <string name="my_profile">My profile</string>
     <string name="payment_per_day">Payment per day</string>
     <string name="payment_per_hour">Payment per hour</string>
-    <string name="update_profile">Update Profile</string>
+    <string name="select_language">Select Language</string>
+    <string name="update_user_profile_photo">Update user profile photo</string>
 
     <!-- Trip -->
     <string name="add_trip">Add trip</string>
     <string name="duration">Duration</string>
     <string name="earnings">Earnings</string>
     <string name="finish">Finish</string>
+    <string name="payment">Payment</string>
     <string name="per_day">per day</string>
     <string name="per_hour">per hour</string>
     <string name="trip">Trip</string>
@@ -73,6 +83,9 @@
     <string name="add_picture">Add picture</string>
     <string name="add_place_and_time">Add place and time</string>
     <string name="attached_image">Attached image</string>
+    <string name="city">City</string>
+    <string name="code">Code</string>
+    <string name="country">Country</string>
     <string name="distance">Distance</string>
     <string name="failed_to_delete_attached_images">Failed to delete attached images</string>
     <string name="freight">Freight</string>
@@ -83,16 +96,13 @@
     <string name="load">Load</string>
     <string name="loads">Loads</string>
     <string name="load_unload_period_is_wrong">Load - unload period is wrong</string>
+    <string name="name">Name</string>
     <string name="note">Note</string>
     <string name="pictures">Pictures</string>
     <string name="unload">Unload</string>
     <string name="unloads">Unloads</string>
     <string name="update_freight">Update freight</string>
-    <string name="update_user_profile_photo">Update user profile photo</string>
-    <string name="add_user_profile_photo">Add user profile photo</string>
-    <string name="user_profile_image">User profile image</string>
-    <string name="tfd_app">TFD App</string>
-    <string name="choose_source">Choose source</string>
-    <string name="deny">DENY</string>
-    <string name="allow">ALLOW</string>
+    <string name="select_location_date_and_time">Select location, date and time</string>
+    <string name="english">English</string>
+    <string name="russian">Русский</string>
 </resources>

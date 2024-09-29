@@ -9,5 +9,6 @@ data class User(
     val lastName: String = "",
     val avatarUri: String = "",
     val paymentPerDay: Double = 400.0,
-    val paymentPerHour: Double = 26.0
+    val paymentPerHour: Double = 26.0,
+    val locale: String = "en",
 )

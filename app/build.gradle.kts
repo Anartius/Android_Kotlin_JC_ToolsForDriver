@@ -107,7 +107,7 @@ dependencies {
     testImplementation("androidx.room:room-testing:$roomVersion")
 
     // Firebase/firestore
-    implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
     implementation("com.google.firebase:firebase-auth-ktx:23.0.0")
     implementation("com.google.firebase:firebase-firestore-ktx:25.1.0")
     implementation("com.google.firebase:firebase-storage-ktx:21.0.0")

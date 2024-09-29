@@ -7,5 +7,6 @@ data class MyProfileUiState(
     val user: User? = null,
     val showCamera: Boolean = false,
     val temporaryImageUri: Uri? = null,
-    val showZoomableImageDialog: Boolean = false
+    val showZoomableImageDialog: Boolean = false,
+    val showSelectLocaleDialog: Boolean = false
 )
