@@ -23,9 +23,15 @@ class MainActivity : ComponentActivity() {
         if (!hasRequiredPermissions()) {
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(android.Manifest.permission.CAMERA),
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU){
+                    arrayOf(
+                        android.Manifest.permission.CAMERA,
+                        android.Manifest.permission.POST_NOTIFICATIONS
+                    )
+                } else arrayOf(android.Manifest.permission.CAMERA),
                 0
             )
+
         }
 
         setContent {
@@ -37,13 +43,22 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun hasRequiredPermissions(): Boolean {
-        return ContextCompat.checkSelfPermission(
+        var permissionsGranted = ContextCompat.checkSelfPermission(
             applicationContext, android.Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            permissionsGranted = permissionsGranted &&
+                    ContextCompat.checkSelfPermission(
+                        applicationContext, android.Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED
+        }
+        return permissionsGranted
     }
 
     override fun attachBaseContext(newBase: Context) {
         val savedLocale = LocaleManager.getSavedLocale(newBase)
+
         val context = LocaleManager.setLocale(newBase, savedLocale)
         super.attachBaseContext(context)
     }

@@ -16,6 +16,7 @@
     <string name="gallery">Галерея</string>
     <string name="generic_error">Что-то пошло не так. Попробуйте еще раз.</string>
     <string name="icon">Иконка</string>
+    <string name="image_was_not_saved">Изображение не сохранено</string>
     <string name="log_out">Выйти из системы</string>
     <string name="notification_permission_description">Разрешение на уведомления важны для
         правильной работы приложения. Пожалуйста разрешите их.</string>
@@ -36,7 +37,7 @@
     <!-- Auth -->
     <string name="create_account">Создать аккаунт</string>
     <string name="create_account_prompt">Пожалуйста введите дейтсвительный адрес электронной
-        почты и пароль, который содержит как минимум 6 символов, в том одну
+        почты и пароль, который содержит как минимум 6 символов, в том числе одну
         верхнюю и одну нижнюю букву, а также одну цифру</string>
     <string name="email">Эл. почта</string>
     <string name="email_error">Пожалуйста введите действительный адрес электронной почты</string>
@@ -47,7 +48,7 @@
     <string name="login">Войти</string>
     <string name="new_account">Новый аккаунт</string>
     <string name="password">Пароль</string>
-    <string name="password_error">Ваш пароль, должен содержать как минимум 6 символовю, в том
+    <string name="password_error">Ваш пароль, должен содержать как минимум 6 символов, в том числе
         одну верхнюю и одну нижнюю букву, а также одну цифру</string>
     <string name="sign_up">Создать</string>
     <string name="wrong_login_or_password">Логин или пароль неверны</string>
@@ -57,11 +58,13 @@
     <string name="add_user_profile_photo">Добавить фото профиля</string>
     <string name="app_language">Язык приложения</string>
     <string name="add_last_name">Добавить фамилию</string>
+    <string name="english">English</string>
     <string name="first_name">Имя</string>
     <string name="last_name">Фамилия</string>
     <string name="my_profile">Мой профиль</string>
     <string name="payment_per_day">Оплата за день</string>
     <string name="payment_per_hour">Оплата за час</string>
+    <string name="russian">Русский</string>
     <string name="select_language">Выберите язык</string>
     <string name="update_user_profile_photo">Обновить фото профиля</string>
 

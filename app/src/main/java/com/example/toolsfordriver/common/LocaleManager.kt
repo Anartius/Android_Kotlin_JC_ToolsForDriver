@@ -3,6 +3,7 @@ package com.example.toolsfordriver.common
 import android.content.Context
 import android.content.res.Configuration
 import android.os.LocaleList
+import com.example.toolsfordriver.data.Locales
 import java.util.Locale
 
 object LocaleManager {
@@ -21,7 +22,27 @@ object LocaleManager {
 
     fun getSavedLocale(context: Context): Locale {
         val sharedPreferences = context.getSharedPreferences("LocalePrefs", Context.MODE_PRIVATE)
-        val language = sharedPreferences.getString("language", Locale.getDefault().language)
-        return Locale(language?: Locale.getDefault().language)
+
+        if (!sharedPreferences.contains("language")) {
+            val defaultLocale = Locale.getDefault()
+            var isLocaleInSupportList = false
+
+            for (locale in Locales.entries) {
+                if (locale.locale.language == defaultLocale.language) isLocaleInSupportList = true
+            }
+
+            saveLocale(
+                context,
+                if (isLocaleInSupportList) {
+                    Locale.getDefault()
+                } else Locales.LOCALE_EN.locale
+            )
+        }
+
+        return try {
+            Locale(sharedPreferences.getString("language", Locales.LOCALE_EN.locale.language)!!)
+        } catch (e: Exception) {
+            Locales.LOCALE_EN.locale
+        }
     }
 }

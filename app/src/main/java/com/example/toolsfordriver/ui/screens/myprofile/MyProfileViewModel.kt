@@ -7,6 +7,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.LocaleManager
 import com.example.toolsfordriver.common.UiText
 import com.example.toolsfordriver.common.saveBitmapToInternalStorage
@@ -65,7 +66,9 @@ class MyProfileViewModel @Inject constructor(
         )
 
         if (_uiState.value.temporaryImageUri == null) {
-            snackbarChannel.send(UiText.DynamicString("Image wasn't saved"))
+            snackbarChannel.send(
+                UiText.DynamicString(context.getString(R.string.image_was_not_saved))
+            )
             return@launchCatching
         } else {
             val downloadUri = storageService.saveImage(
