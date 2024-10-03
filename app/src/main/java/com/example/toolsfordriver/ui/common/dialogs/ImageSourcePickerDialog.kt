@@ -77,7 +77,10 @@ fun ImageSourcePickerDialog(
                         )
                     }
 
-                    DialogButtons(showDialog = showDialog, showConfirmButton = false)
+                    DialogButtons(
+                        showConfirmButton = false,
+                        onDismiss = { showDialog.value = false }
+                    )
                 }
             }
         }

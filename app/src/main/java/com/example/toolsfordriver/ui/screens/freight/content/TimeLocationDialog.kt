@@ -171,9 +171,7 @@ fun DialogButtonsContent(
 ) {
     val freight = viewModel.uiState.collectAsStateWithLifecycle().value.currentFreight!!
 
-    DialogButtons(
-        showDialog = showDialog
-    ) {
+    DialogButtons(onDismiss = { showDialog.value = false }) {
         if (countryCode.value.isNotEmpty() && city.value.isNotEmpty()) {
             showDialog.value = false
 

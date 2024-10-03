@@ -33,7 +33,6 @@ fun MyProfileScreen(
     val currentUser = uiState.user
     val showCamera = uiState.showCamera
     val showZoomableImageDialog = uiState.showZoomableImageDialog
-    val showSelectLocaleDialog = uiState.showSelectLocaleDialog
 
     LaunchedEffect(key1 = users) {
         if (users.isNotEmpty()) { viewModel.updateCurrentUser(users.first()) }
@@ -67,15 +66,16 @@ fun MyProfileScreen(
                         actions = listOf(
                             Triple(
                                 Icons.AutoMirrored.Filled.Logout,
-                                stringResource(id = R.string.log_out)
-                            ) {
-                                viewModel.onSignOutClick()
-                                onSignOutIconClicked()
-                            }
+                                stringResource(id = R.string.sign_out)
+                            ) { viewModel.showSignOutDialog(true) }
                         )
                     )
                 }
             ) { paddingValues ->
+
+                val showSelectLocaleDialog = uiState.showSelectLocaleDialog
+                val showSignOutDialog = uiState.showSignOutDialog
+
                 Surface(
                     modifier = Modifier
                         .padding(paddingValues)
@@ -100,6 +100,13 @@ fun MyProfileScreen(
                         ) { selectedLocale ->
                             viewModel.showSelectLocaleDialog(false)
                             viewModel.updateLocale(selectedLocale, context)
+                        }
+                    }
+
+                    if (showSignOutDialog) {
+                        SignOutDialog(viewModel = viewModel) {
+                            viewModel.showSignOutDialog(false)
+                            viewModel.onSignOutClick { onSignOutIconClicked() }
                         }
                     }
                 }

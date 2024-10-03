@@ -98,9 +98,7 @@ fun TextInputDialog (
                         )
                     )
 
-                    DialogButtons(
-                        showDialog = showDialog
-                    ) {
+                    DialogButtons(onDismiss = { showDialog.value = false }) {
                         showDialog.value = false
                         viewModel.updateCurrentFreight(freight.copy(note = text.value))
                     }

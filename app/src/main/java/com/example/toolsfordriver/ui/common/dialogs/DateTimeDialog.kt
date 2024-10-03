@@ -82,7 +82,7 @@ fun DateTimeDialog (
                         timePickerState = timePickerState
                     )
 
-                    DialogButtons(showDialog = showDialog) {
+                    DialogButtons(onDismiss = { showDialog.value = false }) {
 
                         if (datePickerState.selectedDateMillis != null) {
                             dateTime.value = LocalDateTime(
@@ -92,7 +92,7 @@ fun DateTimeDialog (
                             )
                         }
 
-                        onConfirmButtonClicked.invoke()
+                        onConfirmButtonClicked()
                         showDialog.value = false
                     }
                 }

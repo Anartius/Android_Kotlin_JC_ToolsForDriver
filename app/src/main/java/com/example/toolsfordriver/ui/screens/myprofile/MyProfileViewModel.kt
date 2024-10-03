@@ -96,8 +96,13 @@ class MyProfileViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(showSelectLocaleDialog = value)
     }
 
-    fun onSignOutClick() = launchCatching {
+    fun showSignOutDialog(value: Boolean) {
+        _uiState.value = _uiState.value.copy(showSignOutDialog = value)
+    }
+
+    fun onSignOutClick(onSignOutClicked: () -> Unit) = launchCatching {
         accountService.signOut()
+        onSignOutClicked()
     }
 
     private fun launchCatching(block: suspend CoroutineScope.() -> Unit) {

@@ -216,8 +216,8 @@ fun AppTimePickerDialog(
 
 @Composable
 fun DialogButtons(
-    showDialog: MutableState<Boolean>,
     showConfirmButton: Boolean = true,
+    onDismiss: () -> Unit = {},
     onConfirm: () -> Unit = {}
 ) {
     Row (
@@ -230,13 +230,13 @@ fun DialogButtons(
         AppButton(
             buttonText = stringResource(id = R.string.cancel),
             modifier = Modifier.padding(10.dp)
-        ) { showDialog.value = false }
+        ) { onDismiss() }
 
         if (showConfirmButton) {
             AppButton(
                 buttonText = stringResource(id = R.string.ok),
                 modifier = Modifier.padding(10.dp)
-            ) { onConfirm.invoke() }
+            ) { onConfirm() }
         }
     }
 }

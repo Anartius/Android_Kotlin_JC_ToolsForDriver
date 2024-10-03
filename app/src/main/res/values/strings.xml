@@ -17,7 +17,6 @@
     <string name="generic_error">Something wrong happened. Please try again.</string>
     <string name="icon">Icon</string>
     <string name="image_was_not_saved">Image wasn\'t saved</string>
-    <string name="log_out">Log out</string>
     <string name="notification_permission_description">The notification permission is important
         for this app. Please grant the permission.</string>
     <string name="notification_permission_title">Notification permission</string>
@@ -54,9 +53,10 @@
 
     <!-- MyProfile -->
     <string name="add_first_name">Add first name</string>
-    <string name="app_language">App language</string>
     <string name="add_last_name">Add last name</string>
     <string name="add_user_profile_photo">Add user profile photo</string>
+    <string name="app_language">App language</string>
+    <string name="ask_for_log_out_ensure">You will be logged out of the app. Are You sure?</string>
     <string name="english">English</string>
     <string name="first_name">First name</string>
     <string name="last_name">Last name</string>
@@ -64,7 +64,8 @@
     <string name="payment_per_day">Payment per day</string>
     <string name="payment_per_hour">Payment per hour</string>
     <string name="russian">Русский</string>
-    <string name="select_language">Select Language</string>
+    <string name="select_language">Select language</string>
+    <string name="sign_out">Sign out</string>
     <string name="update_user_profile_photo">Update user profile photo</string>
 
     <!-- Trip -->
