@@ -1,9 +1,13 @@
-package com.example.toolsfordriver.ui.screens.auth
+package com.example.toolsfordriver.ui.screens.passwordreset
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
@@ -12,7 +16,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,20 +26,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
-import com.example.toolsfordriver.ui.screens.auth.content.TextRowButton
-import com.example.toolsfordriver.ui.screens.auth.content.UserForm
+import com.example.toolsfordriver.ui.common.AppButton
+import com.example.toolsfordriver.ui.common.PasswordInput
+import com.example.toolsfordriver.ui.common.TFDAppBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun AuthScreen(onAuthSuccess: () -> Unit) {
-    val viewModel: AuthScreenViewModel = hiltViewModel()
-    val uiState = viewModel.authUiState.collectAsStateWithLifecycle().value
-    val isNewAccount = uiState.isNewAccount
+fun PasswordResetScreen(oobCode: String, onNavIconClicked: () -> Unit) {
+    val viewModel: PasswordResetScreenViewModel = hiltViewModel()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val passwordState = rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(viewModel.snackbarMessages) {
         viewModel.snackbarMessages.collect { snackbarMessage ->
@@ -50,40 +55,44 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(snackbarHostState) { data ->
+            SnackbarHost(hostState = snackbarHostState) { data ->
                 Snackbar(
                     containerColor = Color.DarkGray,
                     contentColor = Color.White,
                     snackbarData = data
                 )
             }
+        },
+        topBar = {
+            TFDAppBar(
+                title = stringResource(R.string.password_reset),
+                navIcon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                onNavIconClicked = { onNavIconClicked() }
+            )
         }
     ) { paddingValues ->
         Surface(
-            modifier = Modifier.fillMaxSize()
-            .padding(paddingValues)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                UserForm(viewModel = viewModel) { onAuthSuccess() }
 
-                TextRowButton(
-                    text = stringResource(
-                        id = if (isNewAccount) R.string.have_account else R.string.new_account
-                    ) + "?",
-                    actionText = stringResource(id = if (isNewAccount) R.string.login else R.string.sign_up),
-                    modifier = Modifier.padding(top = 30.dp)
-                ) { viewModel.invertIsNewAccountValue() }
+                Spacer(modifier = Modifier.height(150.dp))
 
-                TextRowButton(
-                    text = stringResource(R.string.forgot_password_ask),
-                    actionText = stringResource(R.string.reset)
-                ) {
-                    val email = uiState.email
-                    viewModel.resetPassword(email = email)
+                PasswordInput(
+                    modifier = Modifier.padding(vertical = 30.dp),
+                    passwordState = passwordState
+                )
+
+                AppButton(buttonText = stringResource(R.string.confirm)) {
+                    viewModel.resetPassword(oobCode, passwordState.value) {
+                        onNavIconClicked()
+                    }
                 }
             }
         }

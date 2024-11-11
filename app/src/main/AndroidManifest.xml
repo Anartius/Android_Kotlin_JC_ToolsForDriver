@@ -20,7 +20,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ToolsForDriver"
-        tools:targetApi="31">
+        tools:targetApi="34">
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
@@ -31,6 +31,20 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <data android:scheme="https"
+                    android:host="tfdapp-b8464.web.app" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <action android:name="android.intent.action.VIEW" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <data android:scheme="https"
+                    android:host="tfdapp-b8464.firebaseapp.com" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
     </application>

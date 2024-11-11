@@ -91,7 +91,7 @@ fun TripListContent(
                 .padding(horizontal = 8.dp)
         ) {
             LazyColumn {
-                items(items = tripList) { item ->
+                items(items = tripList.asReversed()) { item ->
                     TripRow(
                         trip = item,
                         viewModel = viewModel

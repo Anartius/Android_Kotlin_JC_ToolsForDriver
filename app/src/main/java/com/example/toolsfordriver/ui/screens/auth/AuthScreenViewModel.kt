@@ -33,10 +33,10 @@ class AuthScreenViewModel @Inject constructor(
 
     fun isUserAuthenticated(): Boolean = accountService.hasUser
 
-    fun onEmailChange(email: String) {
+    fun updateEmail(email: String) {
         _authUiState.value = _authUiState.value.copy(email = email)
     }
-    fun onPasswordChange(password: String) {
+    fun updatePassword(password: String) {
         _authUiState.value = _authUiState.value.copy(password = password)
     }
 
@@ -46,13 +46,7 @@ class AuthScreenViewModel @Inject constructor(
         )
     }
 
-    fun invertPasswordVisibilityValue() {
-        _authUiState.value = _authUiState.value.copy(
-            passwordVisibility = !_authUiState.value.passwordVisibility
-        )
-    }
-
-    fun onSignUserClick(onAuthSuccess: () -> Unit) {
+    fun signUser(onAuthSuccess: () -> Unit) {
         val email = _authUiState.value.email
         val password = _authUiState.value.password
 
@@ -79,14 +73,11 @@ class AuthScreenViewModel @Inject constructor(
 
         launchCatching {
             accountService.authenticate(email, password)
-//            if (accountService.hasUser) {
-//                storageService.saveUser(User(userId = accountService.currentUserId))
-//            }
             onAuthSuccess()
         }
     }
 
-    fun onCreateNewUserClick(onAuthSuccess: () -> Unit) {
+    fun createNewUser(onAuthSuccess: () -> Unit) {
         val email = _authUiState.value.email
         val password = _authUiState.value.password
 
@@ -117,6 +108,27 @@ class AuthScreenViewModel @Inject constructor(
                 storageService.saveUser(User(userId = accountService.currentUserId))
             }
             onAuthSuccess()
+        }
+    }
+
+    fun resetPassword(email: String) {
+        if (email.isEmpty()) {
+            viewModelScope.launch {
+                snackbarChannel.send(UiText.StringResource(R.string.empty_email))
+            }
+            return
+        }
+
+        if (!email.isValidEmail()) {
+            viewModelScope.launch {
+                snackbarChannel.send(UiText.StringResource(R.string.email_error))
+            }
+            return
+        }
+
+        launchCatching {
+            accountService.sendRecoveryEmail(email)
+            snackbarChannel.send(UiText.StringResource(R.string.recovery_email_sent))
         }
     }
 

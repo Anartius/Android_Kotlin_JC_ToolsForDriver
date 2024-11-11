@@ -8,6 +8,7 @@
     <string name="camera">Camera</string>
     <string name="cancel">Cancel</string>
     <string name="choose_source">Choose source</string>
+    <string name="confirm">Confirm</string>
     <string name="date">Date</string>
     <string name="delete">Delete</string>
     <string name="deleted">deleted</string>
@@ -40,7 +41,9 @@
         one lower case letter and one digit</string>
     <string name="email">Email</string>
     <string name="email_error">Please input a valid email</string>
+    <string name="empty_email">Empty email</string>
     <string name="empty_email_and_password">Please input email and password</string>
+    <string name="forgot_password_ask">Forgot password?</string>
     <string name="have_account">Have account</string>
     <string name="hide_password">Hide password</string>
     <string name="login">Login</string>
@@ -48,8 +51,16 @@
     <string name="password">Password</string>
     <string name="password_error">Your password should have at least six characters and include
         one upper case letter, one lower case letter and one digit</string>
+    <string name="recovery_email_sent">Link to reset the password
+        has been sent to your email</string>
+    <string name="reset">Reset</string>
+    <string name="send_recovery_email_failed">Sending recovery email failed</string>
     <string name="sign_up">Sign up</string>
     <string name="wrong_login_or_password">Wrong login or password</string>
+
+    <!-- PasswordReset -->
+    <string name="password_reset">Password reset</string>
+    <string name="password_reset_successful">Password reset successfully</string>
 
     <!-- MyProfile -->
     <string name="add_first_name">Add first name</string>

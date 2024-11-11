@@ -19,6 +19,12 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+//        val intent = intent
+//        val action = intent.action
+//        val data = intent.data
+//        Log.e("MainActivity", "Action: $action, Data: $data")
+
         FirebaseFirestore.getInstance().clearPersistence()
         if (!hasRequiredPermissions()) {
             ActivityCompat.requestPermissions(
@@ -60,6 +66,7 @@ class MainActivity : ComponentActivity() {
         val savedLocale = LocaleManager.getSavedLocale(newBase)
 
         val context = LocaleManager.setLocale(newBase, savedLocale)
+
         super.attachBaseContext(context)
     }
 }
