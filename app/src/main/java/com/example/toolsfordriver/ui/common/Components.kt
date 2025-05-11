@@ -103,8 +103,8 @@ fun DeleteItemPopup(
 @Composable
 fun TextRow(
     valueDescription: String,
-    value: String,
-    firsTextColor: Color = colorResource(id = R.color.light_blue),
+    value: String = "",
+    firstTextColor: Color = colorResource(id = R.color.light_blue),
     clickable: Boolean = false,
     showIcon: Boolean = false,
     onLongClick: () -> Unit = {},
@@ -124,7 +124,7 @@ fun TextRow(
     ) {
         Text(
             text = valueDescription,
-            color = firsTextColor,
+            color = firstTextColor,
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 10.dp),

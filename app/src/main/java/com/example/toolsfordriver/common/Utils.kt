@@ -43,11 +43,17 @@ fun timeAsString(dateTime: Long?): String {
     } else ""
 }
 
-fun calcPeriod(startDateTime: LocalDateTime?, endDateTime: LocalDateTime?): DateTimePeriod? {
+fun calcPeriod(
+    startDateTime: LocalDateTime?,
+    endDateTime: LocalDateTime?
+): DateTimePeriod? {
     return if (startDateTime != null && endDateTime != null) {
-        val start = startDateTime.toInstant(TimeZone.currentSystemDefault())
-        val end = endDateTime.toInstant(TimeZone.currentSystemDefault())
-        start.periodUntil(end, TimeZone.currentSystemDefault())
+        val timeZone = TimeZone.currentSystemDefault()
+
+        val start = startDateTime.toInstant(timeZone)
+        val end = endDateTime.toInstant(timeZone)
+
+        start.periodUntil(end, timeZone)
     } else null
 }
 
@@ -71,8 +77,11 @@ fun calcEarnings(
     moneyPerHour: Double
 ): Double? {
     return if (startDateTime != null && endDateTime != null) {
-        val start = startDateTime.toInstant(TimeZone.currentSystemDefault())
-        val end = endDateTime.toInstant(TimeZone.currentSystemDefault())
+        val timeZone = TimeZone.currentSystemDefault()
+
+        val start = startDateTime.toInstant(timeZone)
+        val end = endDateTime.toInstant(timeZone)
+
         val duration = start.until(end, DateTimeUnit.HOUR).hours.inWholeHours
         ((moneyPerHour * duration) * 100).roundToInt() / 100.0
     } else null

@@ -71,6 +71,7 @@
     <string name="english">English</string>
     <string name="first_name">First name</string>
     <string name="last_name">Last name</string>
+    <string name="min">min</string>
     <string name="my_profile">My profile</string>
     <string name="payment_per_day">Payment per day</string>
     <string name="payment_per_hour">Payment per hour</string>
@@ -84,12 +85,14 @@
     <string name="duration">Duration</string>
     <string name="earnings">Earnings</string>
     <string name="finish">Finish</string>
+    <string name="finish_before_start_or_equal">Finish before start or equal</string>
     <string name="payment">Payment</string>
     <string name="per_day">per day</string>
     <string name="per_hour">per hour</string>
     <string name="trip">Trip</string>
     <string name="trips">Trips</string>
     <string name="update_trip">Update trip</string>
+    <string name="should_be_the_same_month">Should be the same month</string>
     <string name="start">Start</string>
 
     <!-- Freight -->

@@ -14,15 +14,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.ui.common.TFDAppBar
 import com.example.toolsfordriver.ui.screens.trip.TripViewModel
 
 @Composable
-fun TripContent(
-    viewModel: TripViewModel,
-    onNavIconClicked: () -> Unit
-) {
+fun TripContent(onNavIconClicked: () -> Unit) {
+    val viewModel: TripViewModel = hiltViewModel()
+
     BackHandler {
         viewModel.showTripContent(false)
     }
@@ -48,7 +48,7 @@ fun TripContent(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
-                TripContentColumn(viewModel = viewModel)
+                TripContentColumn()
             }
         }
     }

@@ -86,10 +86,7 @@ fun MyProfileScreen(
                         Locale("ru") to stringResource(R.string.russian)
                     )
 
-                    MyProfileLazyColumn(
-                        viewModel = viewModel,
-                        localeOptions = localeOptions
-                    )
+                    MyProfileLazyColumn(localeOptions = localeOptions)
 
                     if (showSelectLocaleDialog) {
                         val locale = LocaleManager.getSavedLocale(context)
@@ -104,7 +101,7 @@ fun MyProfileScreen(
                     }
 
                     if (showSignOutDialog) {
-                        SignOutDialog(viewModel = viewModel) {
+                        SignOutDialog {
                             viewModel.showSignOutDialog(false)
                             viewModel.onSignOutClick { onSignOutIconClicked() }
                         }

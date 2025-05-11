@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.data.model.Trip
@@ -33,10 +34,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun TripListContent(
-    viewModel: TripViewModel,
-    onNavIconClicked: () -> Unit
-) {
+fun TripListContent(onNavIconClicked: () -> Unit) {
+    val viewModel: TripViewModel = hiltViewModel()
     val tripList = viewModel.trips.collectAsStateWithLifecycle(emptyList()).value
     val showDeletePopup = viewModel.uiState.collectAsStateWithLifecycle().value.showDeletePopup
     val snackbarHostState = remember { SnackbarHostState() }

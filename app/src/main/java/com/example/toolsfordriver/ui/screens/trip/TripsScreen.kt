@@ -12,8 +12,8 @@ fun TripsScreen(onNavIconClicked: () -> Unit) {
     val showTripContent = viewModel.uiState.collectAsStateWithLifecycle().value.showTripContent
 
     if (showTripContent) {
-        TripContent(viewModel = viewModel) { viewModel.showTripContent(false) }
+        TripContent { viewModel.showTripContent(false) }
     } else {
-        TripListContent(viewModel = viewModel) { onNavIconClicked.invoke() }
+        TripListContent { onNavIconClicked.invoke() }
     }
 }

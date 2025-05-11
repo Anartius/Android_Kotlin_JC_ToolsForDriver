@@ -77,25 +77,3 @@ class TripViewModel @Inject constructor(
         )
     }
 }
-
-
-//    init {
-//        initializeUiState()
-//    }
-//
-//    private fun initializeUiState() {
-//        viewModelScope.launch {
-//            tripRepository
-//                .getAllTripsByUserId(userId).distinctUntilChanged().collect { listOfTrips ->
-//                    if (listOfTrips.isEmpty()) {
-//                        Log.d("List Of Trips", ": Empty list")
-//                        _tripList.value = emptyList()
-//                    } else {
-//                        _tripList.value = listOfTrips
-//                        _uiState.value = _uiState.value.copy(
-//                            trips = mutableStateOf(_tripList.value)
-//                        )
-//                    }
-//                }
-//        }
-//    }

@@ -1,28 +1,28 @@
 [versions]
-androidGradlePlugin = "8.7.2"
+androidGradlePlugin = "8.7.3"
 kotlin = "2.0.21"
-composeBom = "2024.10.01"
-activityCompose = "1.9.3"
-navigationCompose = "2.8.3"
-lifecycleVersion = "2.7.0"
+composeBom = "2025.05.00"
+activityCompose = "1.10.1"
+navigationCompose = "2.9.0"
+lifecycleVersion = "2.9.0"
 kotlinCoroutines = "1.9.0"
-kotlinSerialisation = "1.7.1"
+kotlinSerialisation = "1.7.3"
 kotlinDateTime = "0.6.1"
 googleServices = "4.4.2"
 accompanistPermissions = "0.36.0"
 daggerHiltVersion = "2.52"
 androidHiltVersion = "1.2.0"
 daggerHilt = "2.51.1"
-roomVersion = "2.6.1"
-firebaseBom = "33.5.1"
-firebaseAuth = "23.1.0"
-firebaseFirestore = "25.1.1"
+roomVersion = "2.7.1"
+firebaseBom = "33.13.0"
+firebaseAuth = "23.2.0"
+firebaseFirestore = "25.1.4"
 firebaseStorage = "21.0.1"
 ksp = "2.0.21-1.0.25"
-ktx = "1.13.1"
+ktx = "1.16.0"
 gson = "2.11.0"
 coil = "2.7.0"
-camera = "1.4.0"
+camera = "1.4.2"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -74,6 +74,7 @@ google-code-gson = { group = "com.google.code.gson", name = "gson", version.ref 
 coil-kt-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
 androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "camera" }
+androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camera" }
 androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camera" }
 androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "camera" }
 androidx-camera-extensions = { group = "androidx.camera", name = "camera-extensions", version.ref = "camera" }

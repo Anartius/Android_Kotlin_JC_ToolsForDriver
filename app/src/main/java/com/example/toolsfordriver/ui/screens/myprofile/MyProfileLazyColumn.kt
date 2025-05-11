@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.LocaleManager
@@ -30,10 +31,8 @@ import com.example.toolsfordriver.ui.common.TextInputWithTitle
 import java.util.Locale
 
 @Composable
-fun MyProfileLazyColumn(
-    viewModel: MyProfileViewModel,
-    localeOptions: Map<Locale, String>
-) {
+fun MyProfileLazyColumn(localeOptions: Map<Locale, String>) {
+    val viewModel: MyProfileViewModel = hiltViewModel()
     val currentUser = viewModel.uiState.collectAsStateWithLifecycle().value.user
     val context = LocalContext.current
 
@@ -41,12 +40,14 @@ fun MyProfileLazyColumn(
     val lastName = currentUser?.lastName ?: ""
     val paymentPerDay = currentUser?.paymentPerDay
     val paymentPerHour = currentUser?.paymentPerHour
+    val minMinutesToWholeHour = currentUser?.minMinutesToWholeHour
     val locale = LocaleManager.getSavedLocale(context)
 
     val firstNameState = remember { mutableStateOf(firstName) }
     val lastNameState = remember { mutableStateOf(lastName) }
     val paymentPerDayState = remember { mutableStateOf(paymentPerDay.toString()) }
     val paymentPerHourState = remember { mutableStateOf(paymentPerHour.toString()) }
+    val minMinutesToWholeHourState = remember { mutableStateOf(minMinutesToWholeHour.toString()) }
 
     if (currentUser != null) {
         LaunchedEffect(key1 = firstNameState.value) {
@@ -81,6 +82,17 @@ fun MyProfileLazyColumn(
             )
         }
 
+        LaunchedEffect(key1 = minMinutesToWholeHourState.value) {
+            viewModel.updateCurrentUser(
+                currentUser.copy(
+                    minMinutesToWholeHour = if (minMinutesToWholeHourState.value.isNotEmpty()) {
+                        val value = minMinutesToWholeHourState.value.toInt()
+                        if (value > 59) 59 else value
+                    } else 0
+                )
+            )
+        }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -93,10 +105,7 @@ fun MyProfileLazyColumn(
                         .wrapContentHeight(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    UserImage(
-                        currentUser = currentUser,
-                        viewModel = viewModel
-                    )
+                    UserImage()
 
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
@@ -148,6 +157,18 @@ fun MyProfileLazyColumn(
                     valueState = paymentPerHourState,
                     placeholder = "0" + stringResource(id = R.string.pln),
                     suffix = stringResource(id = R.string.pln),
+                    onFocusChanged = { viewModel.updateUser(currentUser) }
+                ) { }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(4.dp))
+
+                DigitalInputWithTitle(
+                    title = "Whole hour after",
+                    valueState = minMinutesToWholeHourState,
+                    placeholder = "0" + stringResource(R.string.min),
+                    suffix = stringResource(id = R.string.min),
                     onFocusChanged = { viewModel.updateUser(currentUser) }
                 ) { }
             }

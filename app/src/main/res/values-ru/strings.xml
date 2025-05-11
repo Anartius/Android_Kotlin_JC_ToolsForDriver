@@ -72,6 +72,7 @@
     <string name="english">English</string>
     <string name="first_name">Имя</string>
     <string name="last_name">Фамилия</string>
+    <string name="min">мин</string>
     <string name="my_profile">Мой профиль</string>
     <string name="payment_per_day">Оплата за день</string>
     <string name="payment_per_hour">Оплата за час</string>
@@ -84,13 +85,15 @@
     <string name="add_trip">Добавить поездку</string>
     <string name="duration">Длительность</string>
     <string name="earnings">Заработок</string>
-    <string name="finish">Окончание</string>
+    <string name="finish">Завершение</string>
+    <string name="finish_before_start_or_equal">Завершение перед началом или в тоже самое время</string>
     <string name="payment">Оплата</string>
     <string name="per_day">за день</string>
     <string name="per_hour">за час</string>
     <string name="trip">Поездка</string>
     <string name="trips">Поездки</string>
     <string name="update_trip">Обновить поездку</string>
+    <string name="should_be_the_same_month">Должен быть тот же месяц</string>
     <string name="start">Начало</string>
 
     <!-- Freight -->

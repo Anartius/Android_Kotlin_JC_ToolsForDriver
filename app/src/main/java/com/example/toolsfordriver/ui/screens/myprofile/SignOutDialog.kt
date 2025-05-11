@@ -17,15 +17,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.ui.common.dialogs.DialogButtons
 import com.example.toolsfordriver.ui.common.dialogs.DialogTitle
 
 @Composable
-fun SignOutDialog(
-    viewModel: MyProfileViewModel,
-    onConfirm: () -> Unit
-) {
+fun SignOutDialog(onConfirm: () -> Unit) {
+    val viewModel: MyProfileViewModel = hiltViewModel()
+
     Dialog(onDismissRequest = { viewModel.showSignOutDialog(false) }) {
         Card(
             shape = RoundedCornerShape(16.dp),

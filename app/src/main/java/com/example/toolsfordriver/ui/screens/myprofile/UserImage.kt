@@ -33,104 +33,106 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.example.toolsfordriver.R
-import com.example.toolsfordriver.data.model.User
 import com.example.toolsfordriver.ui.common.dialogs.ImageSourcePickerDialog
 
 @Composable
-fun UserImage(
-    currentUser: User,
-    viewModel: MyProfileViewModel
-) {
+fun UserImage() {
     val context = LocalContext.current
+    val viewModel: MyProfileViewModel = hiltViewModel()
+    val currentUser = viewModel.uiState.collectAsStateWithLifecycle().value.user
 
-    val showSourcePickerDialog = rememberSaveable {
-        mutableStateOf(false)
-    }
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        uri?.let {
-            viewModel.saveAvatarToCloud(
-                uri = uri,
-                user = currentUser,
-                context = context
-            )
-            showSourcePickerDialog.value = false
+    if (currentUser != null) {
+        val showSourcePickerDialog = rememberSaveable {
+            mutableStateOf(false)
         }
-    }
 
-    Box(contentAlignment = Alignment.BottomEnd) {
-        Card(
-            modifier = Modifier
-                .padding(horizontal = 25.dp, vertical = 12.dp)
-                .wrapContentSize(),
-            shape = RoundedCornerShape(50),
-            colors = CardDefaults.cardColors(Color.Transparent)
-        ) {
-            val photoUri = remember(currentUser.avatarUri) {
-                mutableStateOf(currentUser.avatarUri)
+        val launcher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+        ) { uri ->
+            uri?.let {
+                viewModel.saveAvatarToCloud(
+                    uri = uri,
+                    user = currentUser,
+                    context = context
+                )
+                showSourcePickerDialog.value = false
             }
+        }
 
-            SubcomposeAsyncImage(
-                model = ImageRequest.Builder(context)
-                    .data(photoUri.value)
-                    .crossfade(true)
-                    .build(),
-                loading = {
-                    Box(contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = colorResource(id = R.color.light_blue))
-                    }
-                },
-                error = { painterResource(id = R.drawable.ic_account_circle) },
-                contentDescription = stringResource(R.string.user_profile_image),
-                onError = { error ->  Log.e("Coil_img", error.result.throwable.toString()) },
+        Box(contentAlignment = Alignment.BottomEnd) {
+            Card(
                 modifier = Modifier
-                    .size(150.dp)
-                    .clickable(
-                        enabled = true,
-                        onClick = {
-                            if (currentUser.avatarUri.isNotEmpty()) {
-                                viewModel.showAvatarImage(true)
-                            } else viewModel.showCamera(true)
+                    .padding(horizontal = 25.dp, vertical = 12.dp)
+                    .wrapContentSize(),
+                shape = RoundedCornerShape(50),
+                colors = CardDefaults.cardColors(Color.Transparent)
+            ) {
+                val photoUri = remember(currentUser.avatarUri) {
+                    mutableStateOf(currentUser.avatarUri)
+                }
+
+                SubcomposeAsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(photoUri.value)
+                        .crossfade(true)
+                        .build(),
+                    loading = {
+                        Box(contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = colorResource(id = R.color.light_blue))
                         }
-                    )
-                    .clip(RoundedCornerShape(corner = CornerSize(5.dp))),
-                contentScale = ContentScale.Crop
-            )
+                    },
+                    error = { painterResource(id = R.drawable.ic_account_circle) },
+                    contentDescription = stringResource(R.string.user_profile_image),
+                    onError = { error -> Log.e("Coil_img", error.result.throwable.toString()) },
+                    modifier = Modifier
+                        .size(150.dp)
+                        .clickable(
+                            enabled = true,
+                            onClick = {
+                                if (currentUser.avatarUri.isNotEmpty()) {
+                                    viewModel.showAvatarImage(true)
+                                } else viewModel.showCamera(true)
+                            }
+                        )
+                        .clip(RoundedCornerShape(corner = CornerSize(5.dp))),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            IconButton(
+                modifier = Modifier.padding(end = 4.dp),
+                onClick = {
+                    showSourcePickerDialog.value = true
+                }
+            ) {
+
+                val hasAvatar by remember(currentUser.avatarUri) {
+                    mutableStateOf(currentUser.avatarUri.isNotEmpty())
+                }
+
+                Icon(
+                    imageVector = if (hasAvatar) {
+                        Icons.Filled.Cached
+                    } else Icons.Filled.AddAPhoto,
+                    contentDescription = if (hasAvatar) {
+                        stringResource(R.string.update_user_profile_photo)
+                    } else stringResource(R.string.add_user_profile_photo),
+                    tint = colorResource(id = R.color.light_blue)
+                )
+            }
         }
 
-        IconButton(
-            modifier = Modifier.padding(end = 4.dp),
-            onClick = {
-                showSourcePickerDialog.value = true
-            }
-        ) {
-
-            val hasAvatar by remember(currentUser.avatarUri) {
-                mutableStateOf(currentUser.avatarUri.isNotEmpty())
-            }
-
-            Icon(
-                imageVector = if (hasAvatar) {
-                    Icons.Filled.Cached
-                } else Icons.Filled.AddAPhoto,
-                contentDescription = if (hasAvatar) {
-                    stringResource(R.string.update_user_profile_photo)
-                } else stringResource(R.string.add_user_profile_photo),
-                tint = colorResource(id = R.color.light_blue)
+        if (showSourcePickerDialog.value) {
+            ImageSourcePickerDialog(
+                showDialog = showSourcePickerDialog,
+                showCamera = { viewModel.showCamera(true) },
+                showGallery = { launcher.launch("image/*") }
             )
         }
-    }
-
-    if (showSourcePickerDialog.value) {
-        ImageSourcePickerDialog(
-            showDialog = showSourcePickerDialog,
-            showCamera = { viewModel.showCamera(true) },
-            showGallery = { launcher.launch("image/*") }
-        )
     }
 }

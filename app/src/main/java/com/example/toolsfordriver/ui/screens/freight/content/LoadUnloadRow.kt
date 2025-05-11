@@ -53,7 +53,7 @@ fun LoadUnloadRow(
     TextRow(
         valueDescription = location.value.replace("#", ", "),
         value = "${dateAsString(time)}  ${dateTime.value.time}",
-        firsTextColor = MaterialTheme.colorScheme.onBackground,
+        firstTextColor = MaterialTheme.colorScheme.onBackground,
         clickable = true,
         onLongClick = {
             isLoadContent.value = isLoad

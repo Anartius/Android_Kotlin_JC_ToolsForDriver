@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -22,10 +24,12 @@ import androidx.compose.ui.window.Dialog
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.dateAsStringIso
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.offsetAt
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 
@@ -34,6 +38,7 @@ import kotlinx.datetime.toLocalDateTime
 fun DateTimeDialog (
     showDialog: MutableState<Boolean>,
     dateTime: MutableState<LocalDateTime?>,
+    selectableTimeRange: LongRange? = null,
     onConfirmButtonClicked: () -> Unit = {}
 ) {
     if (showDialog.value) {
@@ -43,10 +48,24 @@ fun DateTimeDialog (
                 .toEpochMilliseconds()
         } else null
 
-        val currentDate = Clock.System.now().toEpochMilliseconds()
+        val timeZone = TimeZone.currentSystemDefault()
+
+        val currentTimeInstant = if (initDate != null) {
+            Instant.fromEpochMilliseconds(initDate)
+        } else Clock.System.now()
+
+        val offset = timeZone.offsetAt(currentTimeInstant)
+        val currentDate = currentTimeInstant.toEpochMilliseconds() + offset.totalSeconds * 1000L
+
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = initDate ?: currentDate,
-            initialDisplayedMonthMillis = initDate ?: currentDate
+            initialSelectedDateMillis = currentDate,
+            selectableDates = if (selectableTimeRange != null) {
+                object : SelectableDates {
+                    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                        return utcTimeMillis in selectableTimeRange
+                    }
+                }
+            } else DatePickerDefaults.AllDates
         )
 
         val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
