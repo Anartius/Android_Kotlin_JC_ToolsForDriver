@@ -1,5 +1,6 @@
 package com.example.toolsfordriver.ui.common.dialogs
 
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,13 +31,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.core.os.ConfigurationCompat
+import androidx.core.os.LocaleListCompat
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.dateAsString
 import com.example.toolsfordriver.ui.common.AppButton
+import java.util.Locale
 
 @Composable
 fun DialogTitle(
@@ -118,7 +125,28 @@ fun DatePickerRow(
                     }
                 }
             ) {
-                DatePicker(state = datePickerState)
+                val config = Configuration().apply {
+                    updateFrom(LocalConfiguration.current)
+
+                    ConfigurationCompat.setLocales(
+                        this,
+                        LocaleListCompat.create(
+                            Locale.Builder()
+                                .setRegion("GB")
+                                .setLanguage("EN")
+                                .setUnicodeLocaleKeyword("fw", "mon")
+                                .build()
+                        )
+                    )
+                }
+                val newContext = LocalContext.current.createConfigurationContext(config)
+
+                CompositionLocalProvider(
+                    LocalContext provides newContext,
+                    LocalConfiguration provides config
+                ) {
+                    DatePicker(state = datePickerState)
+                }
             }
         }
     }

@@ -133,7 +133,7 @@ fun TripContentColumn() {
         }
 
         TextRow(
-            valueDescription = stringResource(R.string.finish),
+            valueDescription = stringResource(R.string.end),
             value = "${
                 dateAsString(endDateTime.value?.toInstant(timeZone)?.toEpochMilliseconds())
             }  " + "${endDateTime.value?.time ?: ""}",
@@ -188,8 +188,8 @@ fun TripContentColumn() {
             Row {
                 Text(
                     text = if (isEndBeforeStartOrEqual) {
-                        stringResource(R.string.finish_before_start_or_equal)
-                    } else stringResource(R.string.should_be_the_same_month),
+                        stringResource(R.string.start_must_be_before_end)
+                    } else stringResource(R.string.dates_must_be_in_the_same_month),
                     modifier = Modifier
                         .padding(vertical = 16.dp)
                         .fillMaxWidth(),

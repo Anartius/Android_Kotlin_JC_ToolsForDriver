@@ -83,18 +83,18 @@
 
     <!-- Trip -->
     <string name="add_trip">Добавить поездку</string>
+    <string name="dates_must_be_in_the_same_month">Даты должны быть в пределах одного календарного месяца</string>
     <string name="duration">Длительность</string>
     <string name="earnings">Заработок</string>
-    <string name="finish">Завершение</string>
-    <string name="finish_before_start_or_equal">Завершение перед началом или в тоже самое время</string>
+    <string name="end">Завершение</string>
     <string name="payment">Оплата</string>
     <string name="per_day">за день</string>
     <string name="per_hour">за час</string>
     <string name="trip">Поездка</string>
     <string name="trips">Поездки</string>
     <string name="update_trip">Обновить поездку</string>
-    <string name="should_be_the_same_month">Должен быть тот же месяц</string>
     <string name="start">Начало</string>
+    <string name="start_must_be_before_end">Начало должно быть перед завершением</string>
 
     <!-- Freight -->
     <string name="add_freight">Добавить перевозку</string>
