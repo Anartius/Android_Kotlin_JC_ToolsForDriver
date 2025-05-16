@@ -6,10 +6,12 @@ import com.example.toolsfordriver.data.model.Trip
 
 data class TripUiState(
     val trips: MutableState<List<Trip>> = mutableStateOf(emptyList()),
+    val swipedItemId: String = "",
     val currentTrip: Trip? = null,
     val isNewTrip: Boolean = false,
     val showTripContent: Boolean = false,
     val tripToDelete: Trip? = null,
-    val showDeletePopup: Boolean = false,
-    val tripDuration: String = ""
+    val showDeleteItemConfDialog: Boolean = false,
+    val tripDuration: String = "",
+    val tripEarnings: String = ""
 )

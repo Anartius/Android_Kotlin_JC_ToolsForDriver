@@ -78,7 +78,6 @@ fun DateTimeDialog (
             Card(
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier
-                    .padding(5.dp)
                     .fillMaxWidth()
                     .wrapContentHeight(),
                 colors = CardDefaults.cardColors(
@@ -87,33 +86,32 @@ fun DateTimeDialog (
                 elevation = CardDefaults.cardElevation(8.dp)
             ) {
                 Column(
+                    modifier = Modifier.padding(vertical = 0.dp, horizontal = 20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    DialogTitle(
-                        modifier = Modifier.padding(top = 10.dp, bottom = 15.dp),
-                        title = stringResource(id = R.string.select_date_and_time)
+                    DialogTitle(title = stringResource(id = R.string.select_date_and_time))
+
+                    DatePickerRow(datePickerState = datePickerState)
+
+                    TimePickerRow(timePickerState = timePickerState)
+
+                    DialogButtons(
+                        onConfirm = {
+                            if (datePickerState.selectedDateMillis != null) {
+                                dateTime.value = LocalDateTime(
+                                    LocalDate.parse(
+                                        dateAsStringIso(datePickerState.selectedDateMillis!!)
+                                    ),
+                                    LocalTime(timePickerState.hour, timePickerState.minute)
+                                )
+                            }
+
+                            onConfirmButtonClicked()
+                            showDialog.value = false
+                        },
+                        onDismiss = { showDialog.value = false }
                     )
-
-                    DateTimePickersContent(
-                        showDialog = showDialog,
-                        datePickerState = datePickerState,
-                        timePickerState = timePickerState
-                    )
-
-                    DialogButtons(onDismiss = { showDialog.value = false }) {
-
-                        if (datePickerState.selectedDateMillis != null) {
-                            dateTime.value = LocalDateTime(
-                                LocalDate.parse(
-                                    dateAsStringIso(datePickerState.selectedDateMillis!!)),
-                                LocalTime(timePickerState.hour, timePickerState.minute)
-                            )
-                        }
-
-                        onConfirmButtonClicked()
-                        showDialog.value = false
-                    }
                 }
             }
         }

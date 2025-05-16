@@ -42,7 +42,6 @@ fun FreightContentLazyColumn(viewModel: FreightViewModel) {
         val selectedItemDateTime = remember { mutableStateOf<LocalDateTime?>(null) }
 
         val showTimeLocationDialog = rememberSaveable { mutableStateOf(false) }
-        val showDateTimeDialog = rememberSaveable { mutableStateOf(false) }
         val showNoteDialog = rememberSaveable { mutableStateOf(false) }
         val showSourcePickerDialog = rememberSaveable { mutableStateOf(false) }
         val showDeleteItemPopup = uiState.showDeleteItemPopup
@@ -168,7 +167,6 @@ fun FreightContentLazyColumn(viewModel: FreightViewModel) {
         TimeLocationDialog(
             isLoadDialog = isLoadDialog,
             showDialog = showTimeLocationDialog,
-            showDateTimeDialog = showDateTimeDialog,
             location = selectedItemLocation,
             dateTime = selectedItemDateTime,
             viewModel = viewModel,

@@ -24,13 +24,13 @@ import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.dateAsString
 import com.example.toolsfordriver.common.timeAsString
 import com.example.toolsfordriver.data.model.Trip
-import com.example.toolsfordriver.ui.screens.trip.TripViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TripRow(
     trip: Trip,
-    viewModel: TripViewModel
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {}
 ) {
     Surface(
         modifier = Modifier
@@ -38,15 +38,8 @@ fun TripRow(
             .padding(horizontal = 16.dp, vertical = 6.dp)
             .combinedClickable(
                 enabled = true,
-                onClick = {
-                    viewModel.updateCurrentTrip(trip)
-                    viewModel.setCurrentTripAsNew(false)
-                    viewModel.showTripContent(true)
-                },
-                onLongClick = {
-                    viewModel.addTripToDelete(trip)
-                    viewModel.showDeletePopup(true)
-                }
+                onClick = { onClick() },
+                onLongClick = { onLongClick() }
             ),
         border = BorderStroke(
             width = 0.5.dp,

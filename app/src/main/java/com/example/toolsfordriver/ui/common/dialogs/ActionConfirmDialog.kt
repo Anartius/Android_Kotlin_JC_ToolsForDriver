@@ -1,4 +1,4 @@
-package com.example.toolsfordriver.ui.screens.myprofile
+package com.example.toolsfordriver.ui.common.dialogs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,20 +13,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.toolsfordriver.R
-import com.example.toolsfordriver.ui.common.dialogs.DialogButtons
-import com.example.toolsfordriver.ui.common.dialogs.DialogTitle
 
 @Composable
-fun SignOutDialog(onConfirm: () -> Unit) {
-    val viewModel: MyProfileViewModel = hiltViewModel()
-
-    Dialog(onDismissRequest = { viewModel.showSignOutDialog(false) }) {
+fun ActionConfirmDialog(
+    title: String,
+    message: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    Dialog(onDismissRequest = { onDismiss() }) {
         Card(
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
@@ -42,20 +41,18 @@ fun SignOutDialog(onConfirm: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                DialogTitle(
-                    modifier = Modifier.padding(top = 10.dp),
-                    title = stringResource(id = R.string.sign_out)
-                )
+                DialogTitle(title = title)
 
                 Text(
-                    text = stringResource(R.string.ask_for_log_out_ensure),
+                    text = message,
                     modifier = Modifier.fillMaxWidth().padding(20.dp),
                     textAlign = TextAlign.Center
                 )
 
-                DialogButtons(onDismiss = { viewModel.showSignOutDialog(false) }) {
-                    onConfirm()
-                }
+                DialogButtons(
+                    onConfirm = { onConfirm() },
+                    onDismiss = { onDismiss() }
+                )
             }
         }
     }

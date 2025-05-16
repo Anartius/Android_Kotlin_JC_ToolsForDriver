@@ -45,13 +45,10 @@ import com.example.toolsfordriver.ui.common.AppButton
 import java.util.Locale
 
 @Composable
-fun DialogTitle(
-    modifier: Modifier,
-    title: String
-) {
+fun DialogTitle(title: String) {
     Row(
         horizontalArrangement = Arrangement.Center,
-        modifier = modifier
+        modifier = Modifier.padding(top = 10.dp, bottom = 15.dp)
     ) {
         Text(
             text = title,
@@ -63,26 +60,7 @@ fun DialogTitle(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateTimePickersContent(
-    showDialog: MutableState<Boolean>,
-    datePickerState: DatePickerState,
-    timePickerState: TimePickerState
-) {
-    Column(modifier = Modifier.padding(vertical = 0.dp, horizontal = 20.dp)) {
-        DatePickerRow(
-            datePickerState = datePickerState,
-            showDialog = showDialog
-        )
-        TimePickerRow(timePickerState = timePickerState)
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerRow(
-    datePickerState: DatePickerState,
-    showDialog: MutableState<Boolean>
-) {
+fun DatePickerRow(datePickerState: DatePickerState) {
     var showDatePickerDialog by rememberSaveable { mutableStateOf(false) }
 
     Row(
@@ -110,7 +88,7 @@ fun DatePickerRow(
 
         if (showDatePickerDialog) {
             DatePickerDialog(
-                onDismissRequest = {showDialog.value = false},
+                onDismissRequest = { showDatePickerDialog = false },
                 confirmButton = {
                     TextButton(onClick = {
                         showDatePickerDialog = false
@@ -245,8 +223,8 @@ fun AppTimePickerDialog(
 @Composable
 fun DialogButtons(
     showConfirmButton: Boolean = true,
-    onDismiss: () -> Unit = {},
-    onConfirm: () -> Unit = {}
+    onConfirm: () -> Unit = {},
+    onDismiss: () -> Unit = {}
 ) {
     Row (
         modifier = Modifier

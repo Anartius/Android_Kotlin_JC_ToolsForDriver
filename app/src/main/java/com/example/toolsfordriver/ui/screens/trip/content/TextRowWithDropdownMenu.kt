@@ -31,17 +31,16 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
-import com.example.toolsfordriver.data.model.Trip
 import com.example.toolsfordriver.ui.screens.trip.TripViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TextRowWithDropdownMenu(
-    text: String,
-    trip: Trip
-) {
+fun TextRowWithDropdownMenu(text: String) {
     val viewModel: TripViewModel = hiltViewModel()
+    val trip = viewModel.uiState.collectAsStateWithLifecycle().value.currentTrip!!
+
     val items = listOf(stringResource(R.string.per_day), stringResource(R.string.per_hour))
     val selectedOptionText = if (trip.hourlyPayment) items[1] else items[0]
     var expanded by rememberSaveable { mutableStateOf(false) }

@@ -19,6 +19,7 @@ import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.LocaleManager
 import com.example.toolsfordriver.ui.common.Camera
 import com.example.toolsfordriver.ui.common.TFDAppBar
+import com.example.toolsfordriver.ui.common.dialogs.ActionConfirmDialog
 import com.example.toolsfordriver.ui.common.dialogs.ZoomableImageDialog
 import java.util.Locale
 
@@ -101,10 +102,17 @@ fun MyProfileScreen(
                     }
 
                     if (showSignOutDialog) {
-                        SignOutDialog {
-                            viewModel.showSignOutDialog(false)
-                            viewModel.onSignOutClick { onSignOutIconClicked() }
-                        }
+                        ActionConfirmDialog(
+                            title = stringResource(id = R.string.sign_out),
+                            message = stringResource(
+                                id = R.string.ask_for_log_out_ensure
+                            ),
+                            onConfirm = {
+                                viewModel.showSignOutDialog(false)
+                                viewModel.onSignOutClick { onSignOutIconClicked() }
+                            },
+                            onDismiss = { viewModel.showSignOutDialog(false) }
+                        )
                     }
                 }
             }

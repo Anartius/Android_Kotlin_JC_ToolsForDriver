@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,24 +23,18 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
-import com.example.toolsfordriver.common.calcEarnings
-import com.example.toolsfordriver.common.calcPeriod
 import com.example.toolsfordriver.common.dateAsString
 import com.example.toolsfordriver.common.dateAsStringIso
-import com.example.toolsfordriver.common.formatPeriod
+import com.example.toolsfordriver.common.getSelectableDateRange
 import com.example.toolsfordriver.common.timeAsString
 import com.example.toolsfordriver.ui.common.AppButton
 import com.example.toolsfordriver.ui.common.TextRow
 import com.example.toolsfordriver.ui.common.dialogs.DateTimeDialog
 import com.example.toolsfordriver.ui.screens.trip.TripViewModel
-import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.minus
 import kotlinx.datetime.toInstant
 
 @Composable
@@ -49,12 +44,16 @@ fun TripContentColumn() {
     val showDatePickerDialog = rememberSaveable { mutableStateOf(false) }
     var isStartDatePickerDialog by remember { mutableStateOf(true) }
 
-    val trip = viewModel.uiState.collectAsStateWithLifecycle().value.currentTrip
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val trip = uiState.currentTrip
+    val tripDuration = uiState.tripDuration
+    val tripEarnings = uiState.tripEarnings
+
     val users = viewModel.users.collectAsStateWithLifecycle(initialValue = emptyList()).value
 
     if (trip != null && users.isNotEmpty()) {
         val user = users.first()
-        val isNewTrip = viewModel.uiState.collectAsStateWithLifecycle().value.isNewTrip
+        val isNewTrip = uiState.isNewTrip
 
         val paymentPerHour =
             try {
@@ -86,6 +85,14 @@ fun TripContentColumn() {
             )
         }
 
+        LaunchedEffect(startDateTime, endDateTime, paymentPerHour) {
+            viewModel.updateTripDuration(startDateTime.value, endDateTime.value)
+
+            viewModel.updateTripEarnings(
+                startDateTime.value, endDateTime.value, paymentPerHour
+            )
+        }
+
         var isStartDateTimeExist by remember(startDateTime) {
             mutableStateOf(startDateTime.value != null)
         }
@@ -107,17 +114,6 @@ fun TripContentColumn() {
             )
         }
 
-        val tripDuration = remember(trip) {
-            mutableStateOf(
-                calcPeriod(startDateTime.value, endDateTime.value)
-            )
-        }
-
-        val earnings = remember(trip) {
-            mutableStateOf(
-                calcEarnings(startDateTime.value, endDateTime.value, (paymentPerHour))
-            )
-        }
 
         TextRow(
             valueDescription = stringResource(R.string.start),
@@ -147,14 +143,11 @@ fun TripContentColumn() {
             showDatePickerDialog.value = true
         }
 
-        TextRowWithDropdownMenu(
-            text = stringResource(R.string.payment),
-            trip = trip
-        )
+        TextRowWithDropdownMenu(text = stringResource(R.string.payment))
 
         TextRow(
             valueDescription = stringResource(R.string.duration),
-            value = if (tripDuration.value != null) formatPeriod(tripDuration.value!!) else "",
+            value = tripDuration,
             firstTextColor = if (isStartDateTimeExist && isEndDateTimeExist) {
                 colorResource(R.color.light_blue)
             } else colorResource(R.color.gray)
@@ -162,7 +155,7 @@ fun TripContentColumn() {
 
         TextRow(
             valueDescription = stringResource(R.string.earnings),
-            value = if (earnings.value != null) "${earnings.value} PLN" else "",
+            value = tripEarnings,
             firstTextColor = if (isStartDateTimeExist && isEndDateTimeExist) {
                 colorResource(R.color.light_blue)
             } else colorResource(R.color.gray)
@@ -219,24 +212,4 @@ fun TripContentColumn() {
             )
         }
     }
-}
-
-fun getSelectableDateRange(startDate: LocalDate?): LongRange? {
-    return if (startDate != null) {
-        val timeZone = TimeZone.currentSystemDefault()
-        val year = startDate.year
-        val month = startDate.month
-
-        val nextMonth = if (month == Month.DECEMBER) {
-            LocalDate(year +1, 1, 1)
-        } else LocalDate(year, month + 1, 1)
-
-        val lastDayOfMonth = nextMonth.minus(DatePeriod(days = 1)).dayOfMonth
-
-        val start = LocalDate(year, month, 1).atStartOfDayIn(timeZone).toEpochMilliseconds()
-        val end = LocalDate(year, month, lastDayOfMonth).atStartOfDayIn(timeZone)
-            .toEpochMilliseconds()
-
-        start..end
-    } else null
 }

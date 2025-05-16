@@ -83,6 +83,7 @@
 
     <!-- Trip -->
     <string name="add_trip">Добавить поездку</string>
+    <string name="ask_to_trip_delete">Вы уверены, что хотите удалить эту поездку?</string>
     <string name="dates_must_be_in_the_same_month">Даты должны быть в пределах одного календарного месяца</string>
     <string name="duration">Длительность</string>
     <string name="earnings">Заработок</string>
@@ -91,6 +92,7 @@
     <string name="per_day">за день</string>
     <string name="per_hour">за час</string>
     <string name="trip">Поездка</string>
+    <string name="trip_delete">Удаление поездки</string>
     <string name="trips">Поездки</string>
     <string name="update_trip">Обновить поездку</string>
     <string name="start">Начало</string>

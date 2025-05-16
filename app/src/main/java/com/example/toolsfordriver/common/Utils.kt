@@ -6,10 +6,15 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.core.net.toUri
+import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.minus
 import kotlinx.datetime.periodUntil
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.until
@@ -84,6 +89,26 @@ fun calcEarnings(
 
         val duration = start.until(end, DateTimeUnit.HOUR).hours.inWholeHours
         ((moneyPerHour * duration) * 100).roundToInt() / 100.0
+    } else null
+}
+
+fun getSelectableDateRange(startDate: LocalDate?): LongRange? {
+    return if (startDate != null) {
+        val timeZone = TimeZone.currentSystemDefault()
+        val year = startDate.year
+        val month = startDate.month
+
+        val nextMonth = if (month == Month.DECEMBER) {
+            LocalDate(year +1, 1, 1)
+        } else LocalDate(year, month + 1, 1)
+
+        val lastDayOfMonth = nextMonth.minus(DatePeriod(days = 1)).dayOfMonth
+
+        val start = LocalDate(year, month, 1).atStartOfDayIn(timeZone).toEpochMilliseconds()
+        val end = LocalDate(year, month, lastDayOfMonth).atStartOfDayIn(timeZone)
+            .toEpochMilliseconds()
+
+        start..end
     } else null
 }
 

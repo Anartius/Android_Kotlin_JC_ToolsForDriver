@@ -46,10 +46,7 @@ fun ImageSourcePickerDialog(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    DialogTitle(
-                        modifier = Modifier.padding(top = 10.dp, bottom = 15.dp),
-                        title = stringResource(R.string.choose_source)
-                    )
+                    DialogTitle(title = stringResource(R.string.choose_source))
 
                     Row(
                         modifier = Modifier

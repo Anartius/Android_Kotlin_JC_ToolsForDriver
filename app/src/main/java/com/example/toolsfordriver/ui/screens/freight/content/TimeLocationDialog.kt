@@ -43,9 +43,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.dateAsStringIso
 import com.example.toolsfordriver.ui.common.InputField
-import com.example.toolsfordriver.ui.common.dialogs.DateTimePickersContent
+import com.example.toolsfordriver.ui.common.dialogs.DatePickerRow
 import com.example.toolsfordriver.ui.common.dialogs.DialogButtons
 import com.example.toolsfordriver.ui.common.dialogs.DialogTitle
+import com.example.toolsfordriver.ui.common.dialogs.TimePickerRow
 import com.example.toolsfordriver.ui.screens.freight.FreightViewModel
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
@@ -60,7 +61,6 @@ import kotlinx.datetime.toLocalDateTime
 fun TimeLocationDialog(
     isLoadDialog: MutableState<Boolean>,
     showDialog: MutableState<Boolean>,
-    showDateTimeDialog: MutableState<Boolean>,
     location: MutableState<String>,
     dateTime: MutableState<LocalDateTime?>,
     viewModel: FreightViewModel,
@@ -74,6 +74,7 @@ fun TimeLocationDialog(
                 } else  ""
             )
         }
+
         val city = rememberSaveable {
             mutableStateOf(
                 if (location.value.contains('#')) {
@@ -119,21 +120,17 @@ fun TimeLocationDialog(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    DialogTitle(
-                        modifier = Modifier.padding(top = 10.dp, bottom = 15.dp),
-                        title = stringResource(R.string.select_location_date_and_time)
-                    )
+                    DialogTitle(title = stringResource(R.string.select_location_date_and_time))
 
                     LocationContent(
                         countryCode = countryCode,
                         city = city
                     )
 
-                    DateTimePickersContent(
-                        showDialog = showDateTimeDialog,
-                        datePickerState = datePickerState,
-                        timePickerState = timePickerState
-                    )
+                    Column(modifier = Modifier.padding(vertical = 0.dp, horizontal = 20.dp)) {
+                        DatePickerRow(datePickerState = datePickerState)
+                        TimePickerRow(timePickerState = timePickerState)
+                    }
 
                     DialogButtonsContent(
                         isLoadDialog = isLoadDialog,
@@ -171,50 +168,53 @@ fun DialogButtonsContent(
 ) {
     val freight = viewModel.uiState.collectAsStateWithLifecycle().value.currentFreight!!
 
-    DialogButtons(onDismiss = { showDialog.value = false }) {
-        if (countryCode.value.isNotEmpty() && city.value.isNotEmpty()) {
-            showDialog.value = false
+    DialogButtons(
+        onConfirm = {
+            if (countryCode.value.isNotEmpty() && city.value.isNotEmpty()) {
+                showDialog.value = false
 
-            dateTime.value = LocalDateTime(
-                LocalDate.parse(
-                    dateAsStringIso(datePickerState.selectedDateMillis!!)
-                ),
-                LocalTime(timePickerState.hour, timePickerState.minute)
-            )
-
-            location.value = "${countryCode.value.trim()}#${city.value.trim()}"
-            val time = dateTime.value!!
-                .toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
-
-            val loadsUnloads = (if (isLoadDialog.value) {
-                freight.loads
-            } else freight.unloads).toMutableMap()
-
-            if (initDate.value != null) {
-                if (loadsUnloads.contains(initDate.value.toString())) {
-                    loadsUnloads.remove(initDate.value.toString())
-                }
-            }
-            loadsUnloads[time.toString()] = location.value
-
-            viewModel.updateCurrentFreight(
-                freight.copy(
-                    loads = if (isLoadDialog.value) {
-                        loadsUnloads.toMap()
-                    } else freight.loads,
-                    unloads = if (!isLoadDialog.value) {
-                        loadsUnloads.toMap()
-                    } else freight.unloads
+                dateTime.value = LocalDateTime(
+                    LocalDate.parse(
+                        dateAsStringIso(datePickerState.selectedDateMillis!!)
+                    ),
+                    LocalTime(timePickerState.hour, timePickerState.minute)
                 )
-            )
-        } else {
-            Toast.makeText(
-                context,
-                "Not enough data",
-                Toast.LENGTH_LONG
-            ).show()
-        }
-    }
+
+                location.value = "${countryCode.value.trim()}#${city.value.trim()}"
+                val time = dateTime.value!!
+                    .toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+
+                val loadsUnloads = (if (isLoadDialog.value) {
+                    freight.loads
+                } else freight.unloads).toMutableMap()
+
+                if (initDate.value != null) {
+                    if (loadsUnloads.contains(initDate.value.toString())) {
+                        loadsUnloads.remove(initDate.value.toString())
+                    }
+                }
+                loadsUnloads[time.toString()] = location.value
+
+                viewModel.updateCurrentFreight(
+                    freight.copy(
+                        loads = if (isLoadDialog.value) {
+                            loadsUnloads.toMap()
+                        } else freight.loads,
+                        unloads = if (!isLoadDialog.value) {
+                            loadsUnloads.toMap()
+                        } else freight.unloads
+                    )
+                )
+            } else {
+                Toast.makeText(
+                    context,
+                    "Not enough data",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        },
+        onDismiss = { showDialog.value = false }
+    )
 }
 
 @Composable

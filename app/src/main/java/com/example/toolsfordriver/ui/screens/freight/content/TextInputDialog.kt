@@ -64,10 +64,7 @@ fun TextInputDialog (
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    DialogTitle(
-                        modifier = Modifier.padding(vertical = 15.dp),
-                        title = stringResource(id = R.string.note)
-                    )
+                    DialogTitle(title = stringResource(id = R.string.note))
 
                     InputField(
                         modifier = Modifier
@@ -98,10 +95,13 @@ fun TextInputDialog (
                         )
                     )
 
-                    DialogButtons(onDismiss = { showDialog.value = false }) {
-                        showDialog.value = false
-                        viewModel.updateCurrentFreight(freight.copy(note = text.value))
-                    }
+                    DialogButtons(
+                        onConfirm = {
+                            showDialog.value = false
+                            viewModel.updateCurrentFreight(freight.copy(note = text.value))
+                        },
+                        onDismiss = { showDialog.value = false }
+                    )
                 }
             }
         }

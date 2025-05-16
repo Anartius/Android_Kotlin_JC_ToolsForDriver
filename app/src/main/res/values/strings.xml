@@ -82,6 +82,7 @@
 
     <!-- Trip -->
     <string name="add_trip">Add trip</string>
+    <string name="ask_to_trip_delete">Are you sure you want to delete this trip?</string>
     <string name="dates_must_be_in_the_same_month">Dates must be in the same month</string>
     <string name="duration">Duration</string>
     <string name="earnings">Earnings</string>
@@ -90,6 +91,7 @@
     <string name="per_day">per day</string>
     <string name="per_hour">per hour</string>
     <string name="trip">Trip</string>
+    <string name="trip_delete">Trip delete</string>
     <string name="trips">Trips</string>
     <string name="update_trip">Update trip</string>
     <string name="start">Start</string>
