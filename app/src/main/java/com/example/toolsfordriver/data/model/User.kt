@@ -10,6 +10,6 @@ data class User(
     val avatarUri: String = "",
     val paymentPerDay: Double = 400.0,
     val paymentPerHour: Double = 26.0,
-    val minMinutesToWholeHour: Int = 20,
+    val roundUpFromMinutes: Int = 20,
     val locale: String = "en",
 )

@@ -53,6 +53,7 @@ fun TripContentColumn() {
 
     if (trip != null && users.isNotEmpty()) {
         val user = users.first()
+        val roundUpFromMinutes = user.roundUpFromMinutes
         val isNewTrip = uiState.isNewTrip
 
         val paymentPerHour =
@@ -86,10 +87,11 @@ fun TripContentColumn() {
         }
 
         LaunchedEffect(startDateTime, endDateTime, paymentPerHour) {
-            viewModel.updateTripDuration(startDateTime.value, endDateTime.value)
+            viewModel.updateTripDuration(
+                startDateTime.value, endDateTime.value, roundUpFromMinutes)
 
             viewModel.updateTripEarnings(
-                startDateTime.value, endDateTime.value, paymentPerHour
+                startDateTime.value, endDateTime.value, roundUpFromMinutes, paymentPerHour
             )
         }
 

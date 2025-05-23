@@ -40,7 +40,7 @@ fun MyProfileLazyColumn(localeOptions: Map<Locale, String>) {
     val lastName = currentUser?.lastName ?: ""
     val paymentPerDay = currentUser?.paymentPerDay
     val paymentPerHour = currentUser?.paymentPerHour
-    val minMinutesToWholeHour = currentUser?.minMinutesToWholeHour
+    val minMinutesToWholeHour = currentUser?.roundUpFromMinutes
     val locale = LocaleManager.getSavedLocale(context)
 
     val firstNameState = remember { mutableStateOf(firstName) }
@@ -85,7 +85,7 @@ fun MyProfileLazyColumn(localeOptions: Map<Locale, String>) {
         LaunchedEffect(key1 = minMinutesToWholeHourState.value) {
             viewModel.updateCurrentUser(
                 currentUser.copy(
-                    minMinutesToWholeHour = if (minMinutesToWholeHourState.value.isNotEmpty()) {
+                    roundUpFromMinutes = if (minMinutesToWholeHourState.value.isNotEmpty()) {
                         val value = minMinutesToWholeHourState.value.toInt()
                         if (value > 59) 59 else value
                     } else 0

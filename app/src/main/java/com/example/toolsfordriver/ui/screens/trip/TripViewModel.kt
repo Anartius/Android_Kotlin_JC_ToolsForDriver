@@ -65,15 +65,24 @@ class TripViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(showDeleteItemConfDialog = value)
     }
 
-    fun updateTripDuration(start: LocalDateTime?, end: LocalDateTime?) {
-        val period = calcPeriod(start, end)
+    fun updateTripDuration(
+        start: LocalDateTime?,
+        end: LocalDateTime?,
+        roundUpFromMinutes: Int
+    ) {
+        val period = calcPeriod(start, end, roundUpFromMinutes)
         _uiState.value = _uiState.value.copy(
             tripDuration = if (period != null) formatPeriod(period) else ""
         )
     }
 
-    fun updateTripEarnings(start: LocalDateTime?, end: LocalDateTime?, perHour: Double) {
-        val earnings = calcEarnings(start, end, perHour)
+    fun updateTripEarnings(
+        start: LocalDateTime?,
+        end: LocalDateTime?,
+        roundUpFromMinutes: Int?,
+        moneyPerHour: Double
+    ) {
+        val earnings = calcEarnings(start, end, roundUpFromMinutes ?: 0, moneyPerHour)
         _uiState.value = _uiState.value.copy(
             tripEarnings = if (earnings != null) "$earnings PLN" else ""
         )

@@ -9,6 +9,7 @@ import androidx.core.net.toUri
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.Month
@@ -16,6 +17,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
 import kotlinx.datetime.periodUntil
+import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.until
 import java.io.File
@@ -50,16 +52,26 @@ fun timeAsString(dateTime: Long?): String {
 
 fun calcPeriod(
     startDateTime: LocalDateTime?,
-    endDateTime: LocalDateTime?
+    endDateTime: LocalDateTime?,
+    roundUpFromMinutes: Int
 ): DateTimePeriod? {
     return if (startDateTime != null && endDateTime != null) {
         val timeZone = TimeZone.currentSystemDefault()
 
-        val start = startDateTime.toInstant(timeZone)
-        val end = endDateTime.toInstant(timeZone)
+        val start = roundFromMinutes(startDateTime, roundUpFromMinutes)
+        val end = roundFromMinutes(endDateTime, roundUpFromMinutes)
 
         start.periodUntil(end, timeZone)
     } else null
+}
+
+fun roundFromMinutes(value: LocalDateTime, roundFrom: Int): Instant {
+    val timeZone = TimeZone.currentSystemDefault()
+    val minute = value.minute
+
+    val addMinutes = if (minute >= roundFrom) 60 - minute  else -minute
+
+    return value.toInstant(timeZone).plus(addMinutes, DateTimeUnit.MINUTE, timeZone)
 }
 
 fun formatPeriod(period: DateTimePeriod): String {
@@ -79,13 +91,13 @@ fun formatPeriod(period: DateTimePeriod): String {
 fun calcEarnings(
     startDateTime: LocalDateTime?,
     endDateTime: LocalDateTime?,
+    roundUpFromMinutes: Int,
     moneyPerHour: Double
 ): Double? {
     return if (startDateTime != null && endDateTime != null) {
-        val timeZone = TimeZone.currentSystemDefault()
 
-        val start = startDateTime.toInstant(timeZone)
-        val end = endDateTime.toInstant(timeZone)
+        val start = roundFromMinutes(startDateTime, roundUpFromMinutes)
+        val end = roundFromMinutes(endDateTime, roundUpFromMinutes)
 
         val duration = start.until(end, DateTimeUnit.HOUR).hours.inWholeHours
         ((moneyPerHour * duration) * 100).roundToInt() / 100.0
@@ -97,6 +109,7 @@ fun getSelectableDateRange(startDate: LocalDate?): LongRange? {
         val timeZone = TimeZone.currentSystemDefault()
         val year = startDate.year
         val month = startDate.month
+        val day = startDate.dayOfMonth
 
         val nextMonth = if (month == Month.DECEMBER) {
             LocalDate(year +1, 1, 1)
@@ -104,7 +117,7 @@ fun getSelectableDateRange(startDate: LocalDate?): LongRange? {
 
         val lastDayOfMonth = nextMonth.minus(DatePeriod(days = 1)).dayOfMonth
 
-        val start = LocalDate(year, month, 1).atStartOfDayIn(timeZone).toEpochMilliseconds()
+        val start = LocalDate(year, month, day).atStartOfDayIn(timeZone).toEpochMilliseconds()
         val end = LocalDate(year, month, lastDayOfMonth).atStartOfDayIn(timeZone)
             .toEpochMilliseconds()
 
