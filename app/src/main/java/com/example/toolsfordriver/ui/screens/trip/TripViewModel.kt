@@ -88,11 +88,12 @@ class TripViewModel @Inject constructor(
         )
     }
 
-    fun deleteTrip() {
+    fun deleteTrip(successMsg: String = "") {
         launchCatching {
             _uiState.value.tripToDelete?.let { firestoreService.deleteTrip(it.id) }
             _uiState.value = _uiState.value.copy(tripToDelete = null)
             showDeleteItemConfDialog(false)
+            snackbarChannel.send(UiText.DynamicString(successMsg))
         }
     }
 

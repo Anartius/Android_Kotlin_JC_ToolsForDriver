@@ -3,7 +3,6 @@ package com.example.toolsfordriver.common
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.core.net.toUri
 import kotlinx.datetime.DatePeriod
@@ -118,7 +117,7 @@ fun getSelectableDateRange(startDate: LocalDate?): LongRange? {
         val lastDayOfMonth = nextMonth.minus(DatePeriod(days = 1)).dayOfMonth
 
         val start = LocalDate(year, month, day).atStartOfDayIn(timeZone).toEpochMilliseconds()
-        val end = LocalDate(year, month, lastDayOfMonth).atStartOfDayIn(timeZone)
+        val end = LocalDate(year, month, lastDayOfMonth).atStartOfDayIn(TimeZone.UTC)
             .toEpochMilliseconds()
 
         start..end
@@ -165,19 +164,19 @@ fun saveImageToInternalStorage(uri: Uri, context: Context): Uri {
     return if (outputFile.exists()) { outputFile.toUri() } else "".toUri()
 }
 
-fun deleteImageFromInternalStorage(
-    uri: Uri,
-    context: Context
-): Boolean {
-    return try {
-        val directory = context.filesDir
-        val fileName = uri.pathSegments.last()
-        val file = File(directory, fileName)
-        file.delete()
-        true
-    } catch (e: Exception) {
-        Log.e("Image delete", e.message.toString())
-        Toast.makeText(context, "Image wasn't delete", Toast.LENGTH_LONG).show()
-        false
-    }
-}
+//fun deleteImageFromInternalStorage(
+//    uri: Uri,
+//    context: Context
+//): Boolean {
+//    return try {
+//        val directory = context.filesDir
+//        val fileName = uri.pathSegments.last()
+//        val file = File(directory, fileName)
+//        file.delete()
+//        true
+//    } catch (e: Exception) {
+//        Log.e("Image delete", e.message.toString())
+//        Toast.makeText(context, "Image wasn't delete", Toast.LENGTH_LONG).show()
+//        false
+//    }
+//}
