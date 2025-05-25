@@ -8,7 +8,7 @@ data class Trip(
     @DocumentId val id: String = "",
     @ServerTimestamp val createdAt: Date = Date(),
     val userId: String = "",
-    val startTime: Long? = null,
-    val endTime: Long? = null,
+    val startTime: Date? = null,
+    val endTime: Date? = null,
     val hourlyPayment: Boolean = false
 )

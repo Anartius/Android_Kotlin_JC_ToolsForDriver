@@ -24,23 +24,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.dateAsString
-import com.example.toolsfordriver.common.dateAsStringIso
-import com.example.toolsfordriver.common.getSelectableDateRange
 import com.example.toolsfordriver.common.timeAsString
 import com.example.toolsfordriver.ui.common.AppButton
 import com.example.toolsfordriver.ui.common.TextRow
 import com.example.toolsfordriver.ui.common.dialogs.DateTimeDialog
 import com.example.toolsfordriver.ui.screens.trip.TripViewModel
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.util.Date
 
 @Composable
 fun TripContentColumn() {
     val viewModel: TripViewModel = hiltViewModel()
-    val timeZone = TimeZone.currentSystemDefault()
+    val timeZoneId = ZoneId.systemDefault()
     val showDatePickerDialog = rememberSaveable { mutableStateOf(false) }
     var isStartDatePickerDialog by remember { mutableStateOf(true) }
 
@@ -67,10 +64,7 @@ fun TripContentColumn() {
         val startDateTime = remember(trip) {
             mutableStateOf(
                 if (trip.startTime != null) {
-                    LocalDateTime(
-                        LocalDate.parse(dateAsStringIso(trip.startTime)),
-                        LocalTime.parse(timeAsString(trip.startTime))
-                    )
+                    LocalDateTime.ofInstant(trip.startTime.toInstant(), timeZoneId)
                 } else null
             )
         }
@@ -78,21 +72,17 @@ fun TripContentColumn() {
         val endDateTime = remember(trip) {
             mutableStateOf(
                 if (trip.endTime != null) {
-                    LocalDateTime(
-                        LocalDate.parse(dateAsStringIso(trip.endTime)),
-                        LocalTime.parse(timeAsString(trip.endTime))
-                    )
+                    LocalDateTime.ofInstant(trip.endTime.toInstant(), timeZoneId)
                 } else null
             )
         }
 
         LaunchedEffect(startDateTime, endDateTime, paymentPerHour) {
             viewModel.updateTripDuration(
-                startDateTime.value, endDateTime.value, roundUpFromMinutes)
-
-            viewModel.updateTripEarnings(
-                startDateTime.value, endDateTime.value, roundUpFromMinutes, paymentPerHour
+                startDateTime.value, endDateTime.value, roundUpFromMinutes
             )
+            viewModel.updateTripEarnings(
+                startDateTime.value, endDateTime.value, roundUpFromMinutes, paymentPerHour)
         }
 
         var isStartDateTimeExist by remember(startDateTime) {
@@ -109,19 +99,9 @@ fun TripContentColumn() {
             )
         }
 
-        var isTripPeriodInsideOneMonth by remember(endDateTime, startDateTime) {
-            mutableStateOf(
-                isStartDateTimeExist && isEndDateTimeExist &&
-                        startDateTime.value?.month == endDateTime.value?.month
-            )
-        }
-
-
         TextRow(
             valueDescription = stringResource(R.string.start),
-            value = "${
-                dateAsString(startDateTime.value?.toInstant(timeZone)?.toEpochMilliseconds())
-            }  " + "${startDateTime.value?.time ?: ""}",
+            value = dateAsString(startDateTime.value) + " " + timeAsString(startDateTime.value),
             clickable = true,
             showIcon = true,
             firstTextColor = colorResource(R.color.light_blue)
@@ -132,9 +112,7 @@ fun TripContentColumn() {
 
         TextRow(
             valueDescription = stringResource(R.string.end),
-            value = "${
-                dateAsString(endDateTime.value?.toInstant(timeZone)?.toEpochMilliseconds())
-            }  " + "${endDateTime.value?.time ?: ""}",
+            value = dateAsString(endDateTime.value) + " " + timeAsString(endDateTime.value),
             clickable = isStartDateTimeExist,
             firstTextColor = colorResource(
                 if (isStartDateTimeExist) R.color.light_blue else R.color.gray
@@ -170,21 +148,17 @@ fun TripContentColumn() {
                 id = if (isNewTrip) R.string.add_trip else R.string.update_trip
             ),
             enabled = isStartDateTimeExist && !isEndDateTimeExist ||
-                    isStartDateTimeExist &&
-                    (trip.startTime!! < trip.endTime!!) &&
-                    isTripPeriodInsideOneMonth
+                    isStartDateTimeExist && (trip.startTime!! < trip.endTime!!)
         ) {
             if (isNewTrip) viewModel.addTrip(trip) else viewModel.updateTrip(trip)
 
             viewModel.showTripContent(false)
         }
 
-        if (isEndDateTimeExist && (isEndBeforeStartOrEqual || !isTripPeriodInsideOneMonth)) {
+        if (isEndDateTimeExist && isEndBeforeStartOrEqual) {
             Row {
                 Text(
-                    text = if (isEndBeforeStartOrEqual) {
-                        stringResource(R.string.start_must_be_before_end)
-                    } else stringResource(R.string.dates_must_be_in_the_same_month),
+                    text = stringResource(R.string.start_must_be_before_end),
                     modifier = Modifier
                         .padding(vertical = 16.dp)
                         .fillMaxWidth(),
@@ -197,18 +171,22 @@ fun TripContentColumn() {
         DateTimeDialog(
             showDialog = showDatePickerDialog,
             dateTime = if (isStartDatePickerDialog) startDateTime else endDateTime,
-            selectableTimeRange = if (!isStartDatePickerDialog) {
-                getSelectableDateRange(startDateTime.value?.date)
+            minDate = if (!isStartDatePickerDialog) {
+                startDateTime.value?.minusDays(1L)?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
             } else null
         ) {
             viewModel.updateCurrentTrip(
                 if (isStartDatePickerDialog) {
                     trip.copy(
-                        startTime = startDateTime.value?.toInstant(timeZone)?.toEpochMilliseconds()
+                        startTime = Date.from(
+                            startDateTime.value?.atZone(ZoneId.systemDefault())?.toInstant()
+                        )
                     )
                 } else {
                     trip.copy(
-                        endTime = endDateTime.value?.toInstant(timeZone)?.toEpochMilliseconds()
+                        endTime = Date.from(
+                            endDateTime.value?.atZone(ZoneId.systemDefault())?.toInstant()
+                        )
                     )
                 }
             )
