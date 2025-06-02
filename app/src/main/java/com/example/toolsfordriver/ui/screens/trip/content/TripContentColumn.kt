@@ -151,7 +151,6 @@ fun TripContentColumn() {
                     isStartDateTimeExist && (trip.startTime!! < trip.endTime!!)
         ) {
             if (isNewTrip) viewModel.addTrip(trip) else viewModel.updateTrip(trip)
-
             viewModel.showTripContent(false)
         }
 

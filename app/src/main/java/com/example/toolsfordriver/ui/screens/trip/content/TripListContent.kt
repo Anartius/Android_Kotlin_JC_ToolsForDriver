@@ -27,8 +27,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
+import com.example.toolsfordriver.common.getNameStrRes
+import com.example.toolsfordriver.data.model.Category
 import com.example.toolsfordriver.data.model.Trip
 import com.example.toolsfordriver.ui.common.ActionIcon
+import com.example.toolsfordriver.ui.common.CategoryHeader
 import com.example.toolsfordriver.ui.common.CustomSnackBar
 import com.example.toolsfordriver.ui.common.FABContent
 import com.example.toolsfordriver.ui.common.SwipeableItemWithActions
@@ -38,17 +41,35 @@ import com.example.toolsfordriver.ui.screens.trip.TripViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.YearMonth
+import java.time.ZoneId
 
 @Composable
 fun TripListContent(onNavIconClicked: () -> Unit) {
     val viewModel: TripViewModel = hiltViewModel()
-    val context = LocalContext.current
 
-    val tripList = viewModel.trips.collectAsStateWithLifecycle(emptyList()).value
+    val context = LocalContext.current
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val swipedItemId = uiState.swipedItemId
-    val showDeleteConfDialog =uiState.showDeleteItemConfDialog
+    val showDeleteConfDialog = uiState.showDeleteItemConfDialog
     val snackbarHostState = remember { SnackbarHostState() }
+    val tripList = viewModel.trips.collectAsStateWithLifecycle(emptyList()).value
+
+    val groupedTripMap = tripList.groupBy {
+        YearMonth.from(
+            it.startTime?.toInstant()?.atZone(ZoneId.systemDefault())
+        )
+    }.toSortedMap()
+
+    val categoryList = groupedTripMap.map {
+        val month = it.key.month.getNameStrRes()?.let { stringResource(it) } ?: ""
+
+        Category(
+            name = month + " " + it.key.year,
+            items = it.value.asReversed()
+        )
+    }.asReversed()
+
 
     BackHandler(enabled = true) { onNavIconClicked() }
 
@@ -70,6 +91,7 @@ fun TripListContent(onNavIconClicked: () -> Unit) {
             TFDAppBar(
                 title = stringResource(id = R.string.trips),
                 navIcon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                modifier = Modifier.padding(bottom = 8.dp),
                 onNavIconClicked = onNavIconClicked
             )
         },
@@ -106,51 +128,59 @@ fun TripListContent(onNavIconClicked: () -> Unit) {
                 .padding(paddingValue)
                 .padding(horizontal = 8.dp)
         ) {
-            items(items = tripList.asReversed()) { item ->
-                var isRevealed = swipedItemId == item.id
-
-                SwipeableItemWithActions(
-                    isRevealed = isRevealed,
-                    actions = {
-                        ActionIcon(
-                            icon = Icons.Outlined.Delete,
-                            iconDescription = stringResource(R.string.delete)
-                                    + stringResource(R.string.trip),
-                            modifier = Modifier.fillMaxHeight().padding(start = 30.dp),
-                            tint = Color.Red
-                        ) {
-                            viewModel.addTripToDelete(trip = item)
-                            viewModel.showDeleteItemConfDialog(true)
-                        }
-                    },
-                    onExpanded = { viewModel.updateSwipedItemId(item.id) },
-                    onCollapsed = { viewModel.updateSwipedItemId("") },
-                    onSwipeDetected = { viewModel.updateSwipedItemId("") }
-                ) {
-                    TripRow(
-                        trip = item,
-                        onClick = {
-                            viewModel.updateCurrentTrip(item)
-                            viewModel.setCurrentTripAsNew(false)
-                            viewModel.showTripContent(true)
-                        }
-                    )
+            categoryList.forEach { category ->
+                stickyHeader {
+                    CategoryHeader(text = category.name)
                 }
 
-                if (showDeleteConfDialog) {
-                    ActionConfirmDialog(
-                        title = stringResource(R.string.trip_delete),
-                        message = stringResource(R.string.ask_to_trip_delete),
-                        onConfirm = {
-                            viewModel.deleteTrip(context.getString(R.string.trip) +
-                            " " + context.getString(R.string.deleted))
-                            viewModel.updateSwipedItemId("")
+                items(items = category.items) { item ->
+                    var isRevealed = swipedItemId == item.id
+
+                    SwipeableItemWithActions(
+                        isRevealed = isRevealed,
+                        actions = {
+                            ActionIcon(
+                                icon = Icons.Outlined.Delete,
+                                iconDescription = stringResource(R.string.delete)
+                                        + stringResource(R.string.trip),
+                                modifier = Modifier.fillMaxHeight().padding(start = 30.dp),
+                                tint = Color.Red
+                            ) {
+                                viewModel.addTripToDelete(trip = item)
+                                viewModel.showDeleteItemConfDialog(true)
+                            }
                         },
-                        onDismiss = {
-                            viewModel.showDeleteItemConfDialog(false)
-                            viewModel.updateSwipedItemId("")
-                        }
-                    )
+                        onExpanded = { viewModel.updateSwipedItemId(item.id) },
+                        onCollapsed = { viewModel.updateSwipedItemId("") },
+                        onSwipeDetected = { viewModel.updateSwipedItemId("") }
+                    ) {
+                        TripRow(
+                            trip = item,
+                            onClick = {
+                                viewModel.updateCurrentTrip(item)
+                                viewModel.setCurrentTripAsNew(false)
+                                viewModel.showTripContent(true)
+                            }
+                        )
+                    }
+
+                    if (showDeleteConfDialog) {
+                        ActionConfirmDialog(
+                            title = stringResource(R.string.trip_delete),
+                            message = stringResource(R.string.ask_to_trip_delete),
+                            onConfirm = {
+                                viewModel.deleteTrip(
+                                    context.getString(R.string.trip) +
+                                            " " + context.getString(R.string.deleted)
+                                )
+                                viewModel.updateSwipedItemId("")
+                            },
+                            onDismiss = {
+                                viewModel.showDeleteItemConfDialog(false)
+                                viewModel.updateSwipedItemId("")
+                            }
+                        )
+                    }
                 }
             }
         }

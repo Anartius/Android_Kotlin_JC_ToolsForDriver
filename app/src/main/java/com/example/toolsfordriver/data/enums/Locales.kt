@@ -1,4 +1,4 @@
-package com.example.toolsfordriver.data
+package com.example.toolsfordriver.data.enums
 
 import java.util.Locale
 

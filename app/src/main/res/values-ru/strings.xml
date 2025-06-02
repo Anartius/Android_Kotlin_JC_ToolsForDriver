@@ -125,4 +125,18 @@
     <string name="unloads">Разгрузки</string>
     <string name="update_freight">Обновить перевозку</string>
     <string name="select_location_date_and_time">Выберите место, дату и время</string>
+
+    <!-- Months -->
+    <string name="january">Январь</string>
+    <string name="february">Февраль</string>
+    <string name="march">Март</string>
+    <string name="april">Апрель</string>
+    <string name="may">Май</string>
+    <string name="june">Июнь</string>
+    <string name="july">Июль</string>
+    <string name="august">Август</string>
+    <string name="september">Сентабрь</string>
+    <string name="october">Октябрь</string>
+    <string name="november">Ноябрь</string>
+    <string name="december">Декабрь</string>
 </resources>

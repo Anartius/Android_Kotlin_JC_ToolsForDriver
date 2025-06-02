@@ -3,7 +3,7 @@ package com.example.toolsfordriver.common
 import android.content.Context
 import android.content.res.Configuration
 import android.os.LocaleList
-import com.example.toolsfordriver.data.Locales
+import com.example.toolsfordriver.data.enums.Locales
 import java.util.Locale
 
 object LocaleManager {
