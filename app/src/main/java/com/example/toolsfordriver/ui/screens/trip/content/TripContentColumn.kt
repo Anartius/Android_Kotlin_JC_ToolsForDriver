@@ -42,6 +42,7 @@ fun TripContentColumn() {
     var isStartDatePickerDialog by remember { mutableStateOf(true) }
 
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val tripBeforeChange = uiState.currentTripBeforeChange
     val trip = uiState.currentTrip
     val tripDuration = uiState.tripDuration
     val tripEarnings = uiState.tripEarnings
@@ -147,10 +148,13 @@ fun TripContentColumn() {
             buttonText = stringResource(
                 id = if (isNewTrip) R.string.add_trip else R.string.update_trip
             ),
-            enabled = isStartDateTimeExist && !isEndDateTimeExist ||
-                    isStartDateTimeExist && (trip.startTime!! < trip.endTime!!)
+            enabled = (trip != tripBeforeChange) &&
+                    (isStartDateTimeExist && !isEndDateTimeExist ||
+                    isStartDateTimeExist && (trip.startTime!! < trip.endTime!!))
         ) {
             if (isNewTrip) viewModel.addTrip(trip) else viewModel.updateTrip(trip)
+            viewModel.updateCurrentTripBeforeChange(null)
+            viewModel.updateCurrentTrip(null)
             viewModel.showTripContent(false)
         }
 

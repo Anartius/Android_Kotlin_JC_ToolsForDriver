@@ -7,6 +7,7 @@ import com.example.toolsfordriver.data.model.Trip
 data class TripUiState(
     val trips: MutableState<List<Trip>> = mutableStateOf(emptyList()),
     val swipedItemId: String = "",
+    val currentTripBeforeChange: Trip? = null,
     val currentTrip: Trip? = null,
     val isNewTrip: Boolean = false,
     val showTripContent: Boolean = false,

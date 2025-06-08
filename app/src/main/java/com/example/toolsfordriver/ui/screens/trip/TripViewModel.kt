@@ -62,7 +62,11 @@ class TripViewModel @Inject constructor(
         _uiState.update { it.copy(showTripContent = value) }
     }
 
-    fun updateCurrentTrip(trip: Trip) {
+    fun updateCurrentTripBeforeChange(trip: Trip?) {
+        _uiState.update { it.copy(currentTripBeforeChange = trip) }
+    }
+
+    fun updateCurrentTrip(trip: Trip?) {
         _uiState.update { it.copy(currentTrip = trip) }
     }
 

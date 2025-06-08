@@ -130,7 +130,7 @@ fun TripListContent(onNavIconClicked: () -> Unit) {
         ) {
             categoryList.forEach { category ->
                 stickyHeader {
-                    CategoryHeader(text = category.name)
+                    CategoryHeader(text = category.name) { }
                 }
 
                 items(items = category.items) { item ->
@@ -158,6 +158,7 @@ fun TripListContent(onNavIconClicked: () -> Unit) {
                             trip = item,
                             onClick = {
                                 viewModel.updateCurrentTrip(item)
+                                viewModel.updateCurrentTripBeforeChange(item)
                                 viewModel.setCurrentTripAsNew(false)
                                 viewModel.showTripContent(true)
                             }

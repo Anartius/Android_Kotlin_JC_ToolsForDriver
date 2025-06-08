@@ -74,9 +74,13 @@ fun TripRow(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = dateAsString(trip.endTime))
+                val endDateAsString = dateAsString(trip.endTime)
+                val endTimeAsString = timeAsString(trip.endTime)
                 Text(
-                    text = timeAsString(trip.endTime),
+                    text = if (endDateAsString.isEmpty()) "__-__-____ " else endDateAsString
+                )
+                Text(
+                    text = if (endTimeAsString.isEmpty()) "__:__ " else endTimeAsString,
                     color = colorResource(id = R.color.gray)
                 )
             }
