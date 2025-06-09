@@ -1,18 +1,13 @@
-package com.example.toolsfordriver.ui.common
+package com.example.toolsfordriver.ui.common.buttons
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -57,27 +52,5 @@ fun AppButton(
                 style = MaterialTheme.typography.titleMedium
             )
         }
-    }
-}
-
-
-@Composable
-fun FABContent(
-    fabDescription: String,
-    onClick: () -> Unit
-) {
-    FloatingActionButton(
-        onClick = onClick,
-        shape = RoundedCornerShape(50.dp),
-        containerColor = colorResource(id = R.color.light_blue),
-        modifier = Modifier.size(55.dp),
-        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(8.dp)
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Add,
-            contentDescription = fabDescription,
-            tint = Color.White,
-            modifier = Modifier.size(35.dp)
-        )
     }
 }

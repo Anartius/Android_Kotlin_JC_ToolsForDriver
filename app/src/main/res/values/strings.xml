@@ -137,4 +137,7 @@
     <string name="october">October</string>
     <string name="november">November</string>
     <string name="december">December</string>
+
+    <!-- TripsReport -->
+    <string name="trips_report">Trips report</string>
 </resources>

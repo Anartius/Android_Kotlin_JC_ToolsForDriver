@@ -25,8 +25,8 @@ import java.util.Locale
 
 @Composable
 fun MyProfileScreen(
-    onNavIconClicked: () -> Unit,
-    onSignOutIconClicked: () -> Unit
+    onNavigateToHomeScreen: () -> Unit,
+    onNavigateToAuthScreen: () -> Unit
 ) {
     val viewModel: MyProfileViewModel = hiltViewModel()
     val users = viewModel.users.collectAsStateWithLifecycle(initialValue = emptyList()).value
@@ -63,7 +63,7 @@ fun MyProfileScreen(
                     TFDAppBar(
                         title = stringResource(id = R.string.my_profile),
                         navIcon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                        onNavIconClicked = { onNavIconClicked() },
+                        onNavIconClicked = { onNavigateToHomeScreen() },
                         actions = listOf(
                             Triple(
                                 Icons.AutoMirrored.Filled.Logout,
@@ -109,7 +109,7 @@ fun MyProfileScreen(
                             ),
                             onConfirm = {
                                 viewModel.showSignOutDialog(false)
-                                viewModel.onSignOutClick { onSignOutIconClicked() }
+                                viewModel.onSignOutClick { onNavigateToAuthScreen() }
                             },
                             onDismiss = { viewModel.showSignOutDialog(false) }
                         )

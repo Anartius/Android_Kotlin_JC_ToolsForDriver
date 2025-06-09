@@ -1,4 +1,4 @@
-package com.example.toolsfordriver.ui.common
+package com.example.toolsfordriver.ui.common.textfields
 
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
@@ -14,6 +14,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.example.toolsfordriver.R
+import com.example.toolsfordriver.ui.common.InputField
 
 @Composable
 fun PasswordInput(

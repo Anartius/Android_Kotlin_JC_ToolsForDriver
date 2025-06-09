@@ -7,13 +7,19 @@ import com.example.toolsfordriver.ui.screens.trip.content.TripContent
 import com.example.toolsfordriver.ui.screens.trip.content.TripListContent
 
 @Composable
-fun TripsScreen(onNavIconClicked: () -> Unit) {
+fun TripsScreen(
+    onNavigationToHomeScreen: () -> Unit,
+    onNavigationToTripsReportScreen: (String) -> Unit
+) {
     val viewModel: TripViewModel = hiltViewModel()
     val showTripContent = viewModel.uiState.collectAsStateWithLifecycle().value.showTripContent
 
     if (showTripContent) {
         TripContent { viewModel.showTripContent(false) }
     } else {
-        TripListContent { onNavIconClicked.invoke() }
+        TripListContent (
+            onNavIconClicked = onNavigationToHomeScreen,
+            onTripsReportClicked = onNavigationToTripsReportScreen
+        )
     }
 }

@@ -30,14 +30,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.example.toolsfordriver.R
-import com.example.toolsfordriver.ui.common.AppButton
+import com.example.toolsfordriver.ui.common.buttons.AppButton
 import com.example.toolsfordriver.ui.common.TFDAppBar
 
 @Composable
 fun HomeScreen(
-    onTripButtonClicked: () -> Unit,
-    onFreightButtonClicked: () -> Unit,
-    onAccountIconClicked: () -> Unit
+    onNavigateToTripsScreen: () -> Unit,
+    onNavigateToFreightsScreen: () -> Unit,
+    onNavigateToMyProfileScreen: () -> Unit
 ) {
     val viewModel: HomeViewModel = hiltViewModel()
     val context = LocalContext.current
@@ -56,7 +56,7 @@ fun HomeScreen(
                 title = stringResource(R.string.tfd_app),
                 avatarAction = {
                     IconButton(
-                        onClick = { onAccountIconClicked() },
+                        onClick = { onNavigateToMyProfileScreen() },
                         modifier = Modifier.padding(horizontal = 4.dp)
                     ) {
                         if (currentUser != null && currentUser.avatarUri.isNotEmpty()) {
@@ -109,7 +109,7 @@ fun HomeScreen(
                         .padding(horizontal = 0.dp, vertical = 8.dp),
                     buttonText = stringResource(id = R.string.trips)
                 ) {
-                    onTripButtonClicked()
+                    onNavigateToTripsScreen()
                 }
                 AppButton(
                     modifier = Modifier
@@ -117,7 +117,7 @@ fun HomeScreen(
                         .padding(horizontal = 0.dp, vertical = 8.dp),
                     buttonText = stringResource(id = R.string.freights)
                 ) {
-                    onFreightButtonClicked()
+                    onNavigateToFreightsScreen()
                 }
             }
         }

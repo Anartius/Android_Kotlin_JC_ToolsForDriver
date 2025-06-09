@@ -37,7 +37,7 @@ import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.dateAsString
 import com.example.toolsfordriver.data.model.Freight
 import com.example.toolsfordriver.ui.common.DeleteItemPopup
-import com.example.toolsfordriver.ui.common.FABContent
+import com.example.toolsfordriver.ui.common.buttons.FAB
 import com.example.toolsfordriver.ui.common.TFDAppBar
 import com.example.toolsfordriver.ui.screens.freight.FreightViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -78,7 +78,7 @@ fun FreightListContent(
             )
         },
         floatingActionButton = {
-            FABContent(fabDescription = stringResource(id = R.string.add_freight)) {
+            FAB(fabDescription = stringResource(id = R.string.add_freight)) {
                 viewModel.updateCurrentFreight(
                     Freight(userId = FirebaseAuth.getInstance().currentUser!!.uid)
                 )

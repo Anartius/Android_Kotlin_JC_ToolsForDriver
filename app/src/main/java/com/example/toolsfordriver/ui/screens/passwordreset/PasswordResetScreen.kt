@@ -27,14 +27,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.toolsfordriver.R
-import com.example.toolsfordriver.ui.common.AppButton
-import com.example.toolsfordriver.ui.common.PasswordInput
+import com.example.toolsfordriver.ui.common.buttons.AppButton
+import com.example.toolsfordriver.ui.common.textfields.PasswordInput
 import com.example.toolsfordriver.ui.common.TFDAppBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun PasswordResetScreen(oobCode: String, onNavIconClicked: () -> Unit) {
+fun PasswordResetScreen(oobCode: String, onNavigateToAuthScreen: () -> Unit) {
     val viewModel: PasswordResetScreenViewModel = hiltViewModel()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -67,7 +67,7 @@ fun PasswordResetScreen(oobCode: String, onNavIconClicked: () -> Unit) {
             TFDAppBar(
                 title = stringResource(R.string.password_reset),
                 navIcon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                onNavIconClicked = { onNavIconClicked() }
+                onNavIconClicked = { onNavigateToAuthScreen() }
             )
         }
     ) { paddingValues ->
@@ -91,7 +91,7 @@ fun PasswordResetScreen(oobCode: String, onNavIconClicked: () -> Unit) {
 
                 AppButton(buttonText = stringResource(R.string.confirm)) {
                     viewModel.resetPassword(oobCode, passwordState.value) {
-                        onNavIconClicked()
+                        onNavigateToAuthScreen()
                     }
                 }
             }

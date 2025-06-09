@@ -139,4 +139,7 @@
     <string name="october">Октябрь</string>
     <string name="november">Ноябрь</string>
     <string name="december">Декабрь</string>
+
+    <!-- TripsReport -->
+    <string name="trips_report">Отчёт о поездках</string>
 </resources>

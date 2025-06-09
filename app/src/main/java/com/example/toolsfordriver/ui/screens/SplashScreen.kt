@@ -20,14 +20,14 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
-    toAuthScreen: () -> Unit,
-    toHomeScreen: () -> Unit
+    onNavigateToAuthScreen: () -> Unit,
+    onNavigateToHomeScreen: () -> Unit
 ) {
     val viewModel: AuthScreenViewModel = hiltViewModel()
 
     LaunchedEffect(key1 = true) {
         delay(700L)
-        if (viewModel.isUserAuthenticated()) toHomeScreen() else toAuthScreen()
+        if (viewModel.isUserAuthenticated()) onNavigateToHomeScreen() else onNavigateToAuthScreen()
     }
 
     Surface(modifier = Modifier

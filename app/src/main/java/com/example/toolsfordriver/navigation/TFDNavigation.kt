@@ -14,6 +14,7 @@ import com.example.toolsfordriver.ui.screens.freight.FreightsScreen
 import com.example.toolsfordriver.ui.screens.home.HomeScreen
 import com.example.toolsfordriver.ui.screens.myprofile.MyProfileScreen
 import com.example.toolsfordriver.ui.screens.passwordreset.PasswordResetScreen
+import com.example.toolsfordriver.ui.screens.trip.TripsReportScreen
 import com.example.toolsfordriver.ui.screens.trip.TripsScreen
 
 @Composable
@@ -26,8 +27,8 @@ fun TFDNavigation() {
     ) {
         composable(TFDScreens.SplashScreen.name) {
             SplashScreen(
-                toAuthScreen = { navController.navigate(TFDScreens.AuthScreen.name) },
-                toHomeScreen = { navController.navigate(TFDScreens.HomeScreen.name) }
+                onNavigateToAuthScreen = { navController.navigate(TFDScreens.AuthScreen.name) },
+                onNavigateToHomeScreen = { navController.navigate(TFDScreens.HomeScreen.name) }
             )
         }
 
@@ -46,7 +47,7 @@ fun TFDNavigation() {
             deepLinks = listOf(
                 navDeepLink {
                     uriPattern = "https://tfdapp-b8464.firebaseapp.com/__/auth" +
-                                    "/action?mode=resetPassword&oobCode={oobCode}"
+                            "/action?mode=resetPassword&oobCode={oobCode}"
                     action = Intent.ACTION_VIEW
                 }
 
@@ -55,31 +56,60 @@ fun TFDNavigation() {
             val oobCode = backStackEntry.arguments?.getString("oobCode") ?: ""
             PasswordResetScreen(
                 oobCode = oobCode,
-                onNavIconClicked = { navController.navigate(TFDScreens.AuthScreen.name) }
+                onNavigateToAuthScreen = { navController.navigate(TFDScreens.AuthScreen.name) }
             )
         }
 
         composable(TFDScreens.MyProfileScreen.name) {
             MyProfileScreen(
-                onNavIconClicked = { navController.navigate(TFDScreens.HomeScreen.name) },
-                onSignOutIconClicked = { navController.navigate(TFDScreens.AuthScreen.name) }
+                onNavigateToHomeScreen = { navController.navigate(TFDScreens.HomeScreen.name) },
+                onNavigateToAuthScreen = { navController.navigate(TFDScreens.AuthScreen.name) }
             )
         }
 
         composable(TFDScreens.HomeScreen.name) {
             HomeScreen(
-                onAccountIconClicked = { navController.navigate(TFDScreens.MyProfileScreen.name) },
-                onTripButtonClicked = { navController.navigate(TFDScreens.TripsScreen.name) },
-                onFreightButtonClicked = { navController.navigate(TFDScreens.FreightsScreen.name) }
+                onNavigateToMyProfileScreen = {
+                    navController.navigate(TFDScreens.MyProfileScreen.name)
+                },
+                onNavigateToTripsScreen = {
+                    navController.navigate(TFDScreens.TripsScreen.name)
+                },
+                onNavigateToFreightsScreen = {
+                    navController.navigate(TFDScreens.FreightsScreen.name)
+                }
             )
         }
 
         composable(TFDScreens.TripsScreen.name) {
-            TripsScreen { navController.navigate(TFDScreens.HomeScreen.name) }
+            TripsScreen (
+                onNavigationToHomeScreen = {
+                    navController.navigate(TFDScreens.HomeScreen.name)
+                },
+                onNavigationToTripsReportScreen = {
+                    navController.navigate("${TFDScreens.TripsReportScreen.name}/$it")
+                }
+            )
         }
 
         composable(TFDScreens.FreightsScreen.name) {
             FreightsScreen { navController.navigate(TFDScreens.HomeScreen.name) }
+        }
+
+        composable(
+            route = "${TFDScreens.TripsReportScreen.name}/{yearMonth}",
+            arguments = listOf(
+                navArgument("yearMonth") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) {
+            val yearMonth = it.arguments?.getString("yearMonth") ?: ""
+            TripsReportScreen(
+                yearMonth = yearMonth,
+                onNavIconClicked = { navController.popBackStack() }
+            )
         }
     }
 }

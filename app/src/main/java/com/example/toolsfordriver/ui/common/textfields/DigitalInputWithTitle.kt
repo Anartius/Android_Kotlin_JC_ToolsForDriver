@@ -1,4 +1,4 @@
-package com.example.toolsfordriver.ui.common
+package com.example.toolsfordriver.ui.common.textfields
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.toolsfordriver.ui.common.DigitInputField
 import com.example.toolsfordriver.ui.screens.freight.content.ItemTitleRow
 
 @Composable

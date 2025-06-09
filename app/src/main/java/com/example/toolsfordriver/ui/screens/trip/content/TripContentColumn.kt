@@ -25,8 +25,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.dateAsString
 import com.example.toolsfordriver.common.timeAsString
-import com.example.toolsfordriver.ui.common.AppButton
 import com.example.toolsfordriver.ui.common.TextRow
+import com.example.toolsfordriver.ui.common.buttons.AppButton
 import com.example.toolsfordriver.ui.common.dialogs.DateTimeDialog
 import com.example.toolsfordriver.ui.screens.trip.TripViewModel
 import java.time.LocalDateTime

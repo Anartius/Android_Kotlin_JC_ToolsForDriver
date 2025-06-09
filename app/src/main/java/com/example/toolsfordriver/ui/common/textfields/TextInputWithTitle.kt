@@ -1,4 +1,4 @@
-package com.example.toolsfordriver.ui.common
+package com.example.toolsfordriver.ui.common.textfields
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.example.toolsfordriver.ui.common.InputField
 import com.example.toolsfordriver.ui.screens.freight.content.ItemTitleRow
 
 @Composable

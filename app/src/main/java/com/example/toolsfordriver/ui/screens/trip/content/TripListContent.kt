@@ -31,12 +31,12 @@ import com.example.toolsfordriver.common.getNameStrRes
 import com.example.toolsfordriver.data.model.Category
 import com.example.toolsfordriver.data.model.Trip
 import com.example.toolsfordriver.ui.common.ActionIcon
-import com.example.toolsfordriver.ui.common.CategoryHeader
 import com.example.toolsfordriver.ui.common.CustomSnackBar
-import com.example.toolsfordriver.ui.common.FABContent
 import com.example.toolsfordriver.ui.common.SwipeableItemWithActions
 import com.example.toolsfordriver.ui.common.TFDAppBar
+import com.example.toolsfordriver.ui.common.buttons.FAB
 import com.example.toolsfordriver.ui.common.dialogs.ActionConfirmDialog
+import com.example.toolsfordriver.ui.common.textfields.CategoryHeader
 import com.example.toolsfordriver.ui.screens.trip.TripViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
@@ -45,7 +45,10 @@ import java.time.YearMonth
 import java.time.ZoneId
 
 @Composable
-fun TripListContent(onNavIconClicked: () -> Unit) {
+fun TripListContent(
+    onNavIconClicked: () -> Unit,
+    onTripsReportClicked: (String) -> Unit
+) {
     val viewModel: TripViewModel = hiltViewModel()
 
     val context = LocalContext.current
@@ -66,6 +69,7 @@ fun TripListContent(onNavIconClicked: () -> Unit) {
 
         Category(
             name = month + " " + it.key.year,
+            yearMonth = it.key.toString(),
             items = it.value.asReversed()
         )
     }.asReversed()
@@ -96,7 +100,7 @@ fun TripListContent(onNavIconClicked: () -> Unit) {
             )
         },
         floatingActionButton = {
-            FABContent(fabDescription = stringResource(id = R.string.add_trip)) {
+            FAB(fabDescription = stringResource(id = R.string.add_trip)) {
                 viewModel.updateCurrentTrip(
                     Trip(userId = FirebaseAuth.getInstance().currentUser!!.uid)
                 )
@@ -130,7 +134,9 @@ fun TripListContent(onNavIconClicked: () -> Unit) {
         ) {
             categoryList.forEach { category ->
                 stickyHeader {
-                    CategoryHeader(text = category.name) { }
+                    CategoryHeader(text = category.name) {
+                        onTripsReportClicked(category.yearMonth)
+                    }
                 }
 
                 items(items = category.items) { item ->
