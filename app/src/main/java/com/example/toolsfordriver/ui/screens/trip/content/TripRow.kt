@@ -56,6 +56,7 @@ fun TripRow(
 
             ) {
             Column (
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -71,16 +72,17 @@ fun TripRow(
                 tint = colorResource(id = R.color.gray),
             )
             Column (
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 val endDateAsString = dateAsString(trip.endTime)
                 val endTimeAsString = timeAsString(trip.endTime)
                 Text(
-                    text = if (endDateAsString.isEmpty()) "__-__-____ " else endDateAsString
+                    text = if (endDateAsString.isEmpty()) "––.––.––––" else endDateAsString
                 )
                 Text(
-                    text = if (endTimeAsString.isEmpty()) "__:__ " else endTimeAsString,
+                    text = if (endTimeAsString.isEmpty()) "––:––" else endTimeAsString,
                     color = colorResource(id = R.color.gray)
                 )
             }

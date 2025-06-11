@@ -1,4 +1,4 @@
-package com.example.toolsfordriver.ui.screens.trip
+package com.example.toolsfordriver.ui.screens.tripsreport
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,41 +27,43 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
+import com.example.toolsfordriver.common.dateAsString
 import com.example.toolsfordriver.common.durationAsString
 import com.example.toolsfordriver.ui.common.TFDAppBar
 import com.example.toolsfordriver.ui.common.textfields.CenteredTextRow
 import com.example.toolsfordriver.ui.common.textfields.HeaderRow
 import java.time.Duration
-import java.time.YearMonth
+import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
+import java.util.Date
 
 @Composable
 fun TripsReportScreen(
-    yearMonth: String = "",
+    period: String = "",
     onNavIconClicked: () -> Unit
 ) {
     val timeZone = ZoneId.systemDefault()
-    val viewModel: TripViewModel = hiltViewModel()
+    val viewModel: TripsReportViewModel = hiltViewModel()
     val users = viewModel.users.collectAsStateWithLifecycle(initialValue = emptyList()).value
 
     if (users.isNotEmpty()) {
         val user = users.first()
 
-        val date = try {
-            YearMonth.parse(
-                if (yearMonth.isNotEmpty()) yearMonth else YearMonth.of(2025, 5).toString()
-            )
-        } catch (e: Exception) {
-            null
-        }
+        val startOfPeriod = LocalDate.parse(period.substringBefore(", ")).atStartOfDay(timeZone)
+        val startDate = Date.from(startOfPeriod.toInstant())
 
-        if (date != null) {
+        val endOfPeriod = LocalDate.parse(period.substringAfter(", "))
+            .atTime(LocalTime.MAX).atZone(timeZone)
+        val endDate = Date.from(endOfPeriod.toInstant())
+
+        if (startDate != null && endDate != null) {
             val tripList = viewModel.trips.collectAsStateWithLifecycle(emptyList()).value
             val trips = tripList.filter {
-                val start = it.startTime?.toInstant()?.atZone(timeZone)
-                start?.year == date.year && start.month == date.month
+                if (it.startTime != null && it.endTime != null) {
+                    it.startTime >= startDate && it.startTime < endDate
+                } else false
             }
-
             var dayPaymentDuration by remember { mutableStateOf(Duration.ZERO) }
             var hourPaymentDuration by remember { mutableStateOf(Duration.ZERO) }
 
@@ -95,7 +97,9 @@ fun TripsReportScreen(
                         verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        HeaderRow(date.toString())
+                        HeaderRow(
+                            text = "${dateAsString(startDate)} - ${dateAsString(endDate)}"
+                        )
 
                         HorizontalDivider(
                             modifier = Modifier.padding(horizontal = 24.dp),

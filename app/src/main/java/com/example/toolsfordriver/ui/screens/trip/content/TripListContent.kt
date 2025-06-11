@@ -28,6 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.getNameStrRes
+import com.example.toolsfordriver.common.getSpecificMonthPeriod
 import com.example.toolsfordriver.data.model.Category
 import com.example.toolsfordriver.data.model.Trip
 import com.example.toolsfordriver.ui.common.ActionIcon
@@ -69,7 +70,7 @@ fun TripListContent(
 
         Category(
             name = month + " " + it.key.year,
-            yearMonth = it.key.toString(),
+            yearMonth = it.key,
             items = it.value.asReversed()
         )
     }.asReversed()
@@ -135,7 +136,7 @@ fun TripListContent(
             categoryList.forEach { category ->
                 stickyHeader {
                     CategoryHeader(text = category.name) {
-                        onTripsReportClicked(category.yearMonth)
+                        onTripsReportClicked(getSpecificMonthPeriod(category.yearMonth))
                     }
                 }
 

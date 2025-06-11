@@ -8,100 +8,19 @@ import androidx.core.net.toUri
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Date
+import java.time.LocalDate
+import java.time.YearMonth
 import java.util.Locale
 
-fun dateAsString(dateTime: Long?): String {
-    val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.ROOT)
-    return if (dateTime != null) {
-        formatter.format(Date(dateTime))
-    } else ""
-}
+fun getSpecificMonthPeriod(yearMonth: YearMonth): String {
 
-fun dateAsString(dateTime: Date?): String {
-    val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.ROOT)
-    return if (dateTime != null) {
-        formatter.format(dateTime)
-    } else ""
-}
+    val start = LocalDate.of(yearMonth.year, yearMonth.month, 1)
 
-fun dateAsString(dateTime: LocalDateTime?): String {
-    val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ROOT)
-    return if (dateTime != null) {
-        formatter.format(dateTime)
-    } else ""
-}
+    val end = LocalDate.of(
+        yearMonth.year, yearMonth.month, yearMonth.month.length(yearMonth.isLeapYear)
+    )
 
-fun dateAsStringIso(dateTime: Long?): String {
-    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
-    return if (dateTime != null) {
-        formatter.format(Date(dateTime))
-    } else ""
-}
-
-fun timeAsString(dateTime: Long?): String {
-    val formatter = SimpleDateFormat("HH:mm", Locale.ROOT)
-    return if (dateTime != null) {
-        formatter.format(Date(dateTime))
-    } else ""
-}
-
-fun timeAsString(dateTime: Date?): String {
-    val formatter = SimpleDateFormat("HH:mm", Locale.ROOT)
-    return if (dateTime != null) {
-        formatter.format(dateTime)
-    } else ""
-}
-
-fun timeAsString(dateTime: LocalDateTime?): String {
-    val formatter = DateTimeFormatter.ofPattern("HH:mm", Locale.ROOT)
-    return if (dateTime != null) {
-        formatter.format(dateTime)
-    } else ""
-}
-
-fun calcDuration(
-    startDateTime: LocalDateTime?,
-    endDateTime: LocalDateTime?,
-    roundUpFromMinutes: Int
-): Duration? {
-    return if (startDateTime != null && endDateTime != null) {
-        val start = roundFromMinutes(startDateTime, roundUpFromMinutes)
-        val end = roundFromMinutes(endDateTime, roundUpFromMinutes)
-
-        Duration.between(start, end)
-    } else null
-}
-
-fun roundFromMinutes(value: LocalDateTime, roundFrom: Int): LocalDateTime {
-    val minute = value.minute.toLong()
-    val amountOfMinutes = if (minute >= roundFrom) 60 - minute  else -minute
-
-    return value.plusMinutes(amountOfMinutes)
-}
-
-fun durationAsString(duration: Duration): String {
-    val days = duration.toDays()
-    val hours = duration.toHours() % 24
-
-    return ((if (days != 0L) "$days d " else "") + "$hours h")
-}
-
-fun calcEarnings(
-    startDateTime: LocalDateTime?,
-    endDateTime: LocalDateTime?,
-    roundUpFromMinutes: Int,
-    moneyPerHour: Double
-): Double? {
-    return if (startDateTime != null && endDateTime != null) {
-        val duration = calcDuration(startDateTime, endDateTime, roundUpFromMinutes)!!.toHours()
-
-        moneyPerHour * duration
-    } else null
+    return "$start, $end"
 }
 
 fun saveBitmapToInternalStorage(bitmap: Bitmap, context: Context): Uri {

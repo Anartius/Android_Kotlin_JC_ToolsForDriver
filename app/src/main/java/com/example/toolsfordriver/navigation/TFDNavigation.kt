@@ -14,8 +14,8 @@ import com.example.toolsfordriver.ui.screens.freight.FreightsScreen
 import com.example.toolsfordriver.ui.screens.home.HomeScreen
 import com.example.toolsfordriver.ui.screens.myprofile.MyProfileScreen
 import com.example.toolsfordriver.ui.screens.passwordreset.PasswordResetScreen
-import com.example.toolsfordriver.ui.screens.trip.TripsReportScreen
 import com.example.toolsfordriver.ui.screens.trip.TripsScreen
+import com.example.toolsfordriver.ui.screens.tripsreport.TripsReportScreen
 
 @Composable
 fun TFDNavigation() {
@@ -97,17 +97,17 @@ fun TFDNavigation() {
         }
 
         composable(
-            route = "${TFDScreens.TripsReportScreen.name}/{yearMonth}",
+            route = "${TFDScreens.TripsReportScreen.name}/{period}",
             arguments = listOf(
-                navArgument("yearMonth") {
+                navArgument("period") {
                     type = NavType.StringType
                     defaultValue = ""
                 }
             )
         ) {
-            val yearMonth = it.arguments?.getString("yearMonth") ?: ""
+            val period = it.arguments?.getString("period") ?: ""
             TripsReportScreen(
-                yearMonth = yearMonth,
+                period = period,
                 onNavIconClicked = { navController.popBackStack() }
             )
         }
