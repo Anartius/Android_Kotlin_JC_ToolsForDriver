@@ -30,12 +30,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.example.toolsfordriver.R
-import com.example.toolsfordriver.ui.common.buttons.AppButton
 import com.example.toolsfordriver.ui.common.TFDAppBar
+import com.example.toolsfordriver.ui.common.buttons.AppButton
 
 @Composable
 fun HomeScreen(
     onNavigateToTripsScreen: () -> Unit,
+    onNavigateToTripsReportMenuScreen: () -> Unit,
     onNavigateToFreightsScreen: () -> Unit,
     onNavigateToMyProfileScreen: () -> Unit
 ) {
@@ -99,7 +100,7 @@ fun HomeScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(20.dp),
+                    .padding(24.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -111,6 +112,16 @@ fun HomeScreen(
                 ) {
                     onNavigateToTripsScreen()
                 }
+
+                AppButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 0.dp, vertical = 8.dp),
+                    buttonText = stringResource(id = R.string.trips_report)
+                ) {
+                    onNavigateToTripsReportMenuScreen()
+                }
+
                 AppButton(
                     modifier = Modifier
                         .fillMaxWidth()

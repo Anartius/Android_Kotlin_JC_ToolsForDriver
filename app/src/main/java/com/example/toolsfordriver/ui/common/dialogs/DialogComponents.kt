@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.TimePickerState
@@ -31,11 +34,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.os.ConfigurationCompat
 import androidx.core.os.LocaleListCompat
@@ -45,7 +50,10 @@ import com.example.toolsfordriver.ui.common.buttons.AppButton
 import java.util.Locale
 
 @Composable
-fun DialogTitle(title: String) {
+fun DialogTitle(
+    title: String,
+    modifier: Modifier = Modifier
+) {
     Row(
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.padding(top = 10.dp, bottom = 15.dp)
@@ -94,14 +102,23 @@ fun DatePickerRow(datePickerState: DatePickerState) {
                         showDatePickerDialog = false
                         dateRowText = dateAsString(datePickerState.selectedDateMillis!!)
                     }) {
-                        Text(text = stringResource(id = R.string.ok))
+                        Text(
+                            text = stringResource(id = R.string.ok),
+                            color = colorResource(id = R.color.light_blue)
+                        )
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showDatePickerDialog = false }) {
-                        Text(text = stringResource(id = R.string.cancel))
+                        Text(
+                            text = stringResource(id = R.string.cancel),
+                            color = colorResource(id = R.color.light_blue)
+                        )
                     }
-                }
+                },
+                colors = DatePickerDefaults.colors(
+                    containerColor = colorResource(id = R.color.dark_gray).copy(alpha = 0.8f)
+                )
             ) {
                 val config = Configuration().apply {
                     updateFrom(LocalConfiguration.current)
@@ -123,7 +140,54 @@ fun DatePickerRow(datePickerState: DatePickerState) {
                     LocalContext provides newContext,
                     LocalConfiguration provides config
                 ) {
-                    DatePicker(state = datePickerState)
+                    DatePicker(
+                        state = datePickerState,
+                        title = {
+                            Row(
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding(top = 16.dp),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = "Select date",
+                                    fontSize = 20.sp,
+                                    color = colorResource(R.color.light_blue)
+                                )
+                            }
+                        },
+                        headline = {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = dateAsString(datePickerState.selectedDateMillis),
+                                    fontSize = 22.sp,
+                                    color = colorResource(R.color.light_blue)
+                                )
+                            }
+                        },
+                        colors = DatePickerDefaults.colors(
+                            containerColor = Color.Transparent,
+                            subheadContentColor = colorResource(id = R.color.light_blue),
+                            headlineContentColor = colorResource(id = R.color.light_blue),
+                            selectedDayContainerColor = colorResource(id = R.color.light_blue),
+                            todayContentColor = colorResource(id = R.color.light_blue),
+                            todayDateBorderColor = colorResource(id = R.color.light_blue),
+                            dateTextFieldColors = TextFieldDefaults.colors(
+                                focusedIndicatorColor = colorResource(id = R.color.light_blue),
+                                focusedLabelColor = colorResource(id = R.color.light_blue),
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                errorContainerColor = Color.Transparent,
+                                cursorColor = colorResource(id = R.color.light_blue),
+                                selectionColors = TextSelectionColors(
+                                    handleColor = colorResource(id = R.color.light_blue),
+                                    backgroundColor = Color.Transparent
+                                )
+                            )
+                        )
+                    )
                 }
             }
         }

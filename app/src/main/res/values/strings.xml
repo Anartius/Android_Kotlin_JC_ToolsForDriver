@@ -29,6 +29,7 @@
     <string name="select">Select</string>
     <string name="select_date_and_time">Select date and time</string>
     <string name="selected_option">Selected option</string>
+    <string name="select_period">Select period</string>
     <string name="tfd_app">TFD App</string>
     <string name="time">Time</string>
     <string name="to_the_previous_screen">To the previous screen</string>
@@ -139,5 +140,7 @@
     <string name="december">December</string>
 
     <!-- TripsReport -->
+    <string name="current_month">Current month</string>
+    <string name="previous_month">Previous month</string>
     <string name="trips_report">Trips report</string>
 </resources>

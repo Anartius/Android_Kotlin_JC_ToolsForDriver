@@ -29,6 +29,7 @@
     <string name="select">Выбрать</string>
     <string name="select_date_and_time">Выберите дату и время</string>
     <string name="selected_option">Выбранный вариант</string>
+    <string name="select_period">Выберите период</string>
     <string name="tfd_app">TFD App</string>
     <string name="time">Время</string>
     <string name="to_the_previous_screen">На предыдущий экран</string>
@@ -141,5 +142,7 @@
     <string name="december">Декабрь</string>
 
     <!-- TripsReport -->
+    <string name="current_month">Текущий месяц</string>
+    <string name="previous_month">Предыдущий месяцh</string>
     <string name="trips_report">Отчёт о поездках</string>
 </resources>

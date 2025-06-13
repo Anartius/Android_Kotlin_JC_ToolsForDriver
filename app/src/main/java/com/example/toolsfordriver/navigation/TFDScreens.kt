@@ -8,7 +8,8 @@ enum class TFDScreens {
     PasswordResetScreen,
     SplashScreen,
     TripsScreen,
-    TripsReportScreen;
+    TripsReportScreen,
+    TripsReportMenuScreen;
 
     companion object {
         fun fromRoute(route: String?): TFDScreens =
@@ -20,6 +21,7 @@ enum class TFDScreens {
                 SplashScreen.name -> SplashScreen
                 TripsScreen.name -> TripsScreen
                 TripsReportScreen.name -> TripsReportScreen
+                TripsReportMenuScreen.name -> TripsReportMenuScreen
                 null -> HomeScreen
                 else ->throw (IllegalArgumentException("Route $route isn't recognised."))
             }

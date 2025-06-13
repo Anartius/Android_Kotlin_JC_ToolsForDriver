@@ -15,6 +15,7 @@ import com.example.toolsfordriver.ui.screens.home.HomeScreen
 import com.example.toolsfordriver.ui.screens.myprofile.MyProfileScreen
 import com.example.toolsfordriver.ui.screens.passwordreset.PasswordResetScreen
 import com.example.toolsfordriver.ui.screens.trip.TripsScreen
+import com.example.toolsfordriver.ui.screens.tripsreport.TripsReportMenuScreen
 import com.example.toolsfordriver.ui.screens.tripsreport.TripsReportScreen
 
 @Composable
@@ -75,6 +76,9 @@ fun TFDNavigation() {
                 onNavigateToTripsScreen = {
                     navController.navigate(TFDScreens.TripsScreen.name)
                 },
+                onNavigateToTripsReportMenuScreen = {
+                    navController.navigate(TFDScreens.TripsReportMenuScreen.name)
+                },
                 onNavigateToFreightsScreen = {
                     navController.navigate(TFDScreens.FreightsScreen.name)
                 }
@@ -83,33 +87,45 @@ fun TFDNavigation() {
 
         composable(TFDScreens.TripsScreen.name) {
             TripsScreen (
-                onNavigationToHomeScreen = {
+                onNavigateToHomeScreen = {
                     navController.navigate(TFDScreens.HomeScreen.name)
                 },
-                onNavigationToTripsReportScreen = {
+                onNavigateToTripsReportScreen = {
                     navController.navigate("${TFDScreens.TripsReportScreen.name}/$it")
                 }
             )
         }
 
-        composable(TFDScreens.FreightsScreen.name) {
-            FreightsScreen { navController.navigate(TFDScreens.HomeScreen.name) }
+
+        composable(TFDScreens.TripsReportMenuScreen.name) {
+            TripsReportMenuScreen (
+                onNavigateToHomeScreen = {
+                    navController.navigate(TFDScreens.HomeScreen.name)
+                },
+                onNavigateToTripsReportScreen = {
+                    navController.navigate("${TFDScreens.TripsReportScreen.name}/$it")
+                }
+            )
         }
 
         composable(
-            route = "${TFDScreens.TripsReportScreen.name}/{period}",
+            route = "${TFDScreens.TripsReportScreen.name}/{range}",
             arguments = listOf(
-                navArgument("period") {
+                navArgument("range") {
                     type = NavType.StringType
                     defaultValue = ""
                 }
             )
         ) {
-            val period = it.arguments?.getString("period") ?: ""
+            val range = it.arguments?.getString("range") ?: ""
             TripsReportScreen(
-                period = period,
-                onNavIconClicked = { navController.popBackStack() }
+                range = range,
+                onNavIconClicked = { navController.navigateUp() }
             )
+        }
+
+        composable(TFDScreens.FreightsScreen.name) {
+            FreightsScreen { navController.navigate(TFDScreens.HomeScreen.name) }
         }
     }
 }

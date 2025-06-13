@@ -8,8 +8,8 @@ import com.example.toolsfordriver.ui.screens.trip.content.TripListContent
 
 @Composable
 fun TripsScreen(
-    onNavigationToHomeScreen: () -> Unit,
-    onNavigationToTripsReportScreen: (String) -> Unit
+    onNavigateToHomeScreen: () -> Unit,
+    onNavigateToTripsReportScreen: (String) -> Unit
 ) {
     val viewModel: TripViewModel = hiltViewModel()
     val showTripContent = viewModel.uiState.collectAsStateWithLifecycle().value.showTripContent
@@ -18,8 +18,8 @@ fun TripsScreen(
         TripContent { viewModel.showTripContent(false) }
     } else {
         TripListContent (
-            onNavIconClicked = onNavigationToHomeScreen,
-            onTripsReportClicked = onNavigationToTripsReportScreen
+            onNavIconClicked = onNavigateToHomeScreen,
+            onNavigateToTripsReportScreen = onNavigateToTripsReportScreen
         )
     }
 }

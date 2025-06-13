@@ -8,17 +8,28 @@ import androidx.core.net.toUri
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.ZoneId
 import java.util.Locale
 
-fun getSpecificMonthPeriod(yearMonth: YearMonth): String {
+fun getSpecificMonthRange(yearMonth: YearMonth): String {
 
     val start = LocalDate.of(yearMonth.year, yearMonth.month, 1)
 
     val end = LocalDate.of(
         yearMonth.year, yearMonth.month, yearMonth.month.length(yearMonth.isLeapYear)
     )
+
+    return "$start, $end"
+}
+
+fun getRangeAsString(start: Long, end: Long): String {
+    val zoneId = ZoneId.systemDefault()
+
+    val start = Instant.ofEpochMilli(start).atZone(zoneId).toLocalDate()
+    val end = Instant.ofEpochMilli(end).atZone(zoneId).toLocalDate()
 
     return "$start, $end"
 }

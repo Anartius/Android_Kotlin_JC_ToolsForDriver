@@ -6,6 +6,8 @@ import com.example.toolsfordriver.data.model.Trip
 import com.example.toolsfordriver.data.model.User
 import com.example.toolsfordriver.data.model.service.FirestoreService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -16,8 +18,15 @@ import kotlin.collections.forEach
 class TripsReportViewModel @Inject constructor(
     private val firestoreService: FirestoreService
 ) : ViewModel() {
+
     val trips = firestoreService.trips
     val users = firestoreService.users
+    private val _uiState = MutableStateFlow(TripsReportUiState())
+    val uiState = _uiState.asStateFlow()
+
+    fun showDateRangePicker(value: Boolean) {
+        _uiState.value = _uiState.value.copy(showDateRangePicker = value)
+    }
 
     fun calcDayPaymentDuration(
         trips: List<Trip>,

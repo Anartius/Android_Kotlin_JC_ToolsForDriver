@@ -40,103 +40,99 @@ import java.util.Date
 
 @Composable
 fun TripsReportScreen(
-    period: String = "",
+    range: String = "",
     onNavIconClicked: () -> Unit
 ) {
     val timeZone = ZoneId.systemDefault()
     val viewModel: TripsReportViewModel = hiltViewModel()
-    val users = viewModel.users.collectAsStateWithLifecycle(initialValue = emptyList()).value
+    val users = viewModel.users.collectAsStateWithLifecycle(emptyList()).value
+    val user = if (users.isNotEmpty()) users.first() else null
 
-    if (users.isNotEmpty()) {
-        val user = users.first()
+    val startOfRange = LocalDate.parse(range.substringBefore(", ")).atStartOfDay(timeZone)
+    val startDate = Date.from(startOfRange.toInstant())
 
-        val startOfPeriod = LocalDate.parse(period.substringBefore(", ")).atStartOfDay(timeZone)
-        val startDate = Date.from(startOfPeriod.toInstant())
+    val endOfRange = LocalDate.parse(range.substringAfter(", "))
+        .atTime(LocalTime.MAX).atZone(timeZone)
+    val endDate = Date.from(endOfRange.toInstant())
 
-        val endOfPeriod = LocalDate.parse(period.substringAfter(", "))
-            .atTime(LocalTime.MAX).atZone(timeZone)
-        val endDate = Date.from(endOfPeriod.toInstant())
+    if (startDate != null && endDate != null && user != null) {
+        val tripList = viewModel.trips.collectAsStateWithLifecycle(emptyList()).value
+        val trips = tripList.filter {
+            if (it.startTime != null && it.endTime != null) {
+                it.startTime >= startDate && it.startTime < endDate
+            } else false
+        }
+        var dayPaymentDuration by remember { mutableStateOf(Duration.ZERO) }
+        var hourPaymentDuration by remember { mutableStateOf(Duration.ZERO) }
 
-        if (startDate != null && endDate != null) {
-            val tripList = viewModel.trips.collectAsStateWithLifecycle(emptyList()).value
-            val trips = tripList.filter {
-                if (it.startTime != null && it.endTime != null) {
-                    it.startTime >= startDate && it.startTime < endDate
-                } else false
+        var earnings by remember { mutableDoubleStateOf(0.0) }
+
+        LaunchedEffect(trips) {
+            dayPaymentDuration =
+                viewModel.calcDayPaymentDuration(trips, timeZone, user.roundUpFromMinutes)
+
+            hourPaymentDuration =
+                viewModel.calcHourPaymentDuration(trips, timeZone, user.roundUpFromMinutes)
+
+            earnings = viewModel.calcEarnings(dayPaymentDuration, hourPaymentDuration, user)
+        }
+
+        Scaffold(
+            topBar = {
+                TFDAppBar(
+                    title = stringResource(R.string.trips_report),
+                    navIcon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    onNavIconClicked = { onNavIconClicked() }
+                )
             }
-            var dayPaymentDuration by remember { mutableStateOf(Duration.ZERO) }
-            var hourPaymentDuration by remember { mutableStateOf(Duration.ZERO) }
+        ) { paddingValue ->
 
-            var earnings by remember { mutableDoubleStateOf(0.0) }
+            Surface(
+                modifier = Modifier.fillMaxSize()
+                    .padding(paddingValue)
+                    .padding(horizontal = 8.dp)
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    HeaderRow(
+                        text = "${dateAsString(startDate)} - ${dateAsString(endDate)}"
+                    )
 
-            LaunchedEffect(trips) {
-                dayPaymentDuration =
-                    viewModel.calcDayPaymentDuration(trips, timeZone, user.roundUpFromMinutes)
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        thickness = 0.5.dp,
+                        color = colorResource(R.color.light_blue)
+                    )
+                    CenteredTextRow(
+                        text = "Duration with payment per day",
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp, vertical = 16.dp)
+                    )
 
-                hourPaymentDuration =
-                    viewModel.calcHourPaymentDuration(trips, timeZone, user.roundUpFromMinutes)
+                    Text(durationAsString(dayPaymentDuration))
 
-                earnings = viewModel.calcEarnings(dayPaymentDuration, hourPaymentDuration, user)
-            }
+                    CenteredTextRow(
+                        text = "Duration with payment per hour",
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
+                    )
 
-            Scaffold(
-                topBar = {
-                    TFDAppBar(
-                        title = stringResource(R.string.trips_report),
-                        navIcon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                        onNavIconClicked = onNavIconClicked
+                    Text(durationAsString(hourPaymentDuration))
+
+                    CenteredTextRow(
+                        text = "Earnings",
+                        modifier = Modifier
+                            .padding(start = 24.dp, end = 24.dp, top = 44.dp, bottom = 24.dp)
+                    )
+
+                    Text(
+                        text = "$earnings PLN",
+                        fontSize = 24.sp,
+                        color = Color.Green
                     )
                 }
-            ) { paddingValue ->
-                Surface(
-                    modifier = Modifier.fillMaxSize()
-                        .padding(paddingValue)
-                        .padding(horizontal = 8.dp)
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        HeaderRow(
-                            text = "${dateAsString(startDate)} - ${dateAsString(endDate)}"
-                        )
-
-                        HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = 24.dp),
-                            thickness = 0.5.dp,
-                            color = colorResource(R.color.light_blue)
-                        )
-                        CenteredTextRow(
-                            text = "Duration with payment per day",
-                            modifier = Modifier
-                                .padding(horizontal = 24.dp, vertical = 16.dp)
-                        )
-
-                        Text(durationAsString(dayPaymentDuration))
-
-                        CenteredTextRow(
-                            text = "Duration with payment per hour",
-                            modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
-                        )
-
-                        Text(durationAsString(hourPaymentDuration))
-
-                        CenteredTextRow(
-                            text = "Earnings",
-                            modifier = Modifier
-                                .padding(start = 24.dp, end = 24.dp, top = 44.dp, bottom = 24.dp)
-                        )
-
-                        Text(
-                            text = "$earnings PLN",
-                            fontSize = 24.sp,
-                            color = Color.Green
-                        )
-                    }
-                }
             }
-        } else {
-            Text("No data has been send")
         }
     }
 }
