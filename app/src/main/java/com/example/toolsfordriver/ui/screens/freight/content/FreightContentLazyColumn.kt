@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.ui.common.DeleteItemPopup
 import com.example.toolsfordriver.ui.common.dialogs.ImageSourcePickerDialog
+import com.example.toolsfordriver.ui.common.text.TitleRowWithIcon
 import com.example.toolsfordriver.ui.screens.freight.FreightViewModel
 import kotlinx.datetime.LocalDateTime
 
@@ -65,9 +66,9 @@ fun FreightContentLazyColumn(viewModel: FreightViewModel) {
                 .wrapContentHeight()
         ) {
             item {
-                ItemTitleRow(
+                TitleRowWithIcon(
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
-                    title = stringResource(id = R.string.loads),
+                    text = stringResource(id = R.string.loads),
                     icon = Icons.Filled.Add,
                     showIcon = true,
                     iconDescription = stringResource(id = R.string.add_place_and_time)
@@ -96,9 +97,9 @@ fun FreightContentLazyColumn(viewModel: FreightViewModel) {
             }
 
             item {
-                ItemTitleRow(
+                TitleRowWithIcon(
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
-                    title = stringResource(id = R.string.unloads),
+                    text = stringResource(id = R.string.unloads),
                     icon = Icons.Filled.Add,
                     showIcon = true,
                     iconDescription = stringResource(id = R.string.add_place_and_time)
@@ -129,9 +130,9 @@ fun FreightContentLazyColumn(viewModel: FreightViewModel) {
             item { DistanceContent(viewModel = viewModel) }
 
             item {
-                ItemTitleRow(
+                TitleRowWithIcon(
                     modifier = Modifier.padding(start = 24.dp, bottom = 4.dp, end = 24.dp),
-                    title = stringResource(id = R.string.pictures),
+                    text = stringResource(id = R.string.pictures),
                     icon = Icons.Filled.Add,
                     showIcon = true,
                     iconDescription = stringResource(id = R.string.add_picture)

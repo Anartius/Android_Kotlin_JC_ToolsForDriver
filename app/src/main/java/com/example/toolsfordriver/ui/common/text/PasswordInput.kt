@@ -1,4 +1,4 @@
-package com.example.toolsfordriver.ui.common.textfields
+package com.example.toolsfordriver.ui.common.text
 
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable

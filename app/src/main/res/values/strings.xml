@@ -141,6 +141,9 @@
 
     <!-- TripsReport -->
     <string name="current_month">Current month</string>
+    <string name="hide_list_of_trips">hide list of trips</string>
     <string name="previous_month">Previous month</string>
+    <string name="show_list_of_trips">show list of trips</string>
+    <string name="summary">Summary</string>
     <string name="trips_report">Trips report</string>
 </resources>

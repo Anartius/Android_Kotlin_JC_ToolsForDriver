@@ -26,8 +26,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.LocaleManager
-import com.example.toolsfordriver.ui.common.textfields.DigitalInputWithTitle
-import com.example.toolsfordriver.ui.common.textfields.TextInputWithTitle
+import com.example.toolsfordriver.ui.common.text.DigitalInputWithTitle
+import com.example.toolsfordriver.ui.common.text.TextInputWithTitle
 import java.util.Locale
 
 @Composable

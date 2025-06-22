@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.ui.common.buttons.AppButton
-import com.example.toolsfordriver.ui.common.textfields.PasswordInput
+import com.example.toolsfordriver.ui.common.text.PasswordInput
 import com.example.toolsfordriver.ui.screens.auth.AuthScreenViewModel
 
 @Composable

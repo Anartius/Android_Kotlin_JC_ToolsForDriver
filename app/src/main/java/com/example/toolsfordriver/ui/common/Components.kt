@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
@@ -104,9 +105,11 @@ fun DeleteItemPopup(
 fun TextRow(
     valueDescription: String,
     value: String = "",
+    fontSize: TextUnit = TextUnit.Unspecified,
     firstTextColor: Color = colorResource(id = R.color.light_blue),
     clickable: Boolean = false,
     showIcon: Boolean = false,
+    modifier: Modifier = Modifier,
     onLongClick: () -> Unit = {},
     onClick: () -> Unit = {}
 ) {
@@ -124,6 +127,7 @@ fun TextRow(
     ) {
         Text(
             text = valueDescription,
+            fontSize = fontSize,
             color = firstTextColor,
             modifier = Modifier
                 .weight(1f)
@@ -132,7 +136,11 @@ fun TextRow(
             overflow = TextOverflow.Ellipsis
         )
 
-        Text(text = value, modifier = Modifier.padding(end =  5.dp))
+        Text(
+            text = value,
+            fontSize = fontSize,
+            modifier = Modifier.padding(end =  5.dp)
+        )
 
         if (showIcon) {
             Icon(

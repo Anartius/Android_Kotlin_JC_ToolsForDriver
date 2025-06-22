@@ -1,4 +1,4 @@
-package com.example.toolsfordriver.ui.common.textfields
+package com.example.toolsfordriver.ui.common.text
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -57,9 +57,4 @@ fun CategoryHeader(
             )
         }
     }
-
-    HorizontalDivider(
-        thickness = 8.dp,
-        color = MaterialTheme.colorScheme.background
-    )
 }

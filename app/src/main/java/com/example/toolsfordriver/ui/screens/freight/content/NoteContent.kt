@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
+import com.example.toolsfordriver.ui.common.text.TitleRowWithIcon
 import com.example.toolsfordriver.ui.screens.freight.FreightViewModel
 
 @Composable
@@ -25,8 +26,8 @@ fun NoteContent(
 ) {
     val freight = viewModel.uiState.collectAsStateWithLifecycle().value.currentFreight!!
 
-    ItemTitleRow(
-        title = stringResource(id = R.string.note),
+    TitleRowWithIcon(
+        text = stringResource(id = R.string.note),
         modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)
     )
 

@@ -1,4 +1,4 @@
-package com.example.toolsfordriver.ui.screens.freight.content
+package com.example.toolsfordriver.ui.common.text
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,9 +18,9 @@ import androidx.compose.ui.res.stringResource
 import com.example.toolsfordriver.R
 
 @Composable
-fun ItemTitleRow(
+fun TitleRowWithIcon(
     modifier: Modifier,
-    title: String,
+    text: String,
     icon: ImageVector = Icons.Filled.Edit,
     showIcon: Boolean = false,
     iconDescription: String = stringResource(id = R.string.icon),
@@ -32,7 +32,7 @@ fun ItemTitleRow(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = title,
+            text = text,
             style = MaterialTheme.typography.bodyLarge,
             color = colorResource(id = R.color.light_blue)
         )

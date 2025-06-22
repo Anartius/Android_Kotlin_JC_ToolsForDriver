@@ -3,23 +3,23 @@ package com.example.toolsfordriver.ui.screens.tripsreport
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -29,9 +29,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.dateAsString
 import com.example.toolsfordriver.common.durationAsString
+import com.example.toolsfordriver.common.getRangeAsString
 import com.example.toolsfordriver.ui.common.TFDAppBar
-import com.example.toolsfordriver.ui.common.textfields.CenteredTextRow
-import com.example.toolsfordriver.ui.common.textfields.HeaderRow
+import com.example.toolsfordriver.ui.common.TextRow
+import com.example.toolsfordriver.ui.common.dialogs.DateRangePickerDialog
+import com.example.toolsfordriver.ui.common.text.HeaderRow
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
@@ -40,41 +42,39 @@ import java.util.Date
 
 @Composable
 fun TripsReportScreen(
-    range: String = "",
+    rangeValue: String,
     onNavIconClicked: () -> Unit
 ) {
     val timeZone = ZoneId.systemDefault()
+    val screenHeight = LocalConfiguration.current.screenHeightDp
     val viewModel: TripsReportViewModel = hiltViewModel()
     val users = viewModel.users.collectAsStateWithLifecycle(emptyList()).value
     val user = if (users.isNotEmpty()) users.first() else null
 
-    val startOfRange = LocalDate.parse(range.substringBefore(", ")).atStartOfDay(timeZone)
-    val startDate = Date.from(startOfRange.toInstant())
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val showDateRangePicker = uiState.showDateRangePicker
+    val dailyPayDuration = uiState.dailyPaymentDuration
+    val hourlyPayDuration = uiState.hourlyPaymentDuration
+    val earnings = uiState.earnings
 
-    val endOfRange = LocalDate.parse(range.substringAfter(", "))
-        .atTime(LocalTime.MAX).atZone(timeZone)
-    val endDate = Date.from(endOfRange.toInstant())
+    var range by remember { mutableStateOf(rangeValue) }
+
+    val startLocalDate = LocalDate.parse(range.substringBefore(", "))
+    val startDate = Date.from(startLocalDate.atStartOfDay(timeZone).toInstant())
+
+    val endLocalDate = LocalDate.parse(range.substringAfter(", "))
+    val endDate = Date.from(endLocalDate.atTime(LocalTime.MAX).atZone(timeZone).toInstant())
 
     if (startDate != null && endDate != null && user != null) {
         val tripList = viewModel.trips.collectAsStateWithLifecycle(emptyList()).value
-        val trips = tripList.filter {
-            if (it.startTime != null && it.endTime != null) {
-                it.startTime >= startDate && it.startTime < endDate
-            } else false
-        }
-        var dayPaymentDuration by remember { mutableStateOf(Duration.ZERO) }
-        var hourPaymentDuration by remember { mutableStateOf(Duration.ZERO) }
+        val tripsMap = viewModel.getMappedTrips(tripList, startDate, endDate, timeZone)
+        val dailyTrips = tripsMap["d"]
+        val hourlyTrips = tripsMap["h"]
 
-        var earnings by remember { mutableDoubleStateOf(0.0) }
 
-        LaunchedEffect(trips) {
-            dayPaymentDuration =
-                viewModel.calcDayPaymentDuration(trips, timeZone, user.roundUpFromMinutes)
-
-            hourPaymentDuration =
-                viewModel.calcHourPaymentDuration(trips, timeZone, user.roundUpFromMinutes)
-
-            earnings = viewModel.calcEarnings(dayPaymentDuration, hourPaymentDuration, user)
+        LaunchedEffect(tripList, range) {
+            dailyTrips?.let { viewModel.updateDailyPayData(it, user, timeZone) }
+            hourlyTrips?.let { viewModel.updateHourlyPayData(it, user, timeZone) }
         }
 
         Scaffold(
@@ -86,18 +86,14 @@ fun TripsReportScreen(
                 )
             }
         ) { paddingValue ->
-
-            Surface(
-                modifier = Modifier.fillMaxSize()
-                    .padding(paddingValue)
-                    .padding(horizontal = 8.dp)
-            ) {
+            Surface(modifier = Modifier.fillMaxSize().padding(paddingValue)) {
                 Column(
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.padding(bottom = 24.dp).fillMaxSize(),
+                    verticalArrangement = Arrangement.Top
                 ) {
                     HeaderRow(
-                        text = "${dateAsString(startDate)} - ${dateAsString(endDate)}"
+                        text = "${dateAsString(startDate)} - ${dateAsString(endDate)}",
+                        onClick = { viewModel.showDateRangePicker(true) }
                     )
 
                     HorizontalDivider(
@@ -105,31 +101,63 @@ fun TripsReportScreen(
                         thickness = 0.5.dp,
                         color = colorResource(R.color.light_blue)
                     )
-                    CenteredTextRow(
-                        text = "Duration with payment per day",
-                        modifier = Modifier
-                            .padding(horizontal = 24.dp, vertical = 16.dp)
+
+                    Column(
+                        modifier = Modifier.padding(top = 16.dp)
+                            .heightIn(max = (screenHeight - 330).dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        if (dailyPayDuration != Duration.ZERO) {
+                            TripSReportDurationItem(
+                                title = stringResource(R.string.payment_per_day),
+                                value = durationAsString(dailyPayDuration),
+                                tripList = dailyTrips
+                            )
+                        }
+
+                        if (hourlyPayDuration != Duration.ZERO) {
+                            TripSReportDurationItem(
+                                title = stringResource(R.string.payment_per_hour),
+                                value = durationAsString(hourlyPayDuration),
+                                tripList = hourlyTrips,
+                                modifier = Modifier.padding(top = 32.dp)
+                            )
+                        }
+                    }
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 16.dp),
+                        thickness = 0.5.dp,
+                        color = colorResource(R.color.light_blue)
                     )
 
-                    Text(durationAsString(dayPaymentDuration))
-
-                    CenteredTextRow(
-                        text = "Duration with payment per hour",
-                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
+                    TextRow(
+                        valueDescription = stringResource(R.string.earnings),
+                        value = "$earnings PLN",
+                        fontSize = 20.sp
                     )
+                }
 
-                    Text(durationAsString(hourPaymentDuration))
+                if (showDateRangePicker) {
+                    val pickerStartDate = Date
+                        .from(
+                            startLocalDate.atStartOfDay(ZoneId.of("UTC")).toInstant()
+                        ).time
 
-                    CenteredTextRow(
-                        text = "Earnings",
-                        modifier = Modifier
-                            .padding(start = 24.dp, end = 24.dp, top = 44.dp, bottom = 24.dp)
-                    )
+                    val pickerEndDate = Date
+                        .from(
+                            endLocalDate.atTime(LocalTime.MAX).atZone(ZoneId.of("UTC"))
+                                .toInstant()
+                        ).time
 
-                    Text(
-                        text = "$earnings PLN",
-                        fontSize = 24.sp,
-                        color = Color.Green
+                    DateRangePickerDialog(
+                        initialStartDate = pickerStartDate,
+                        initialEndDate = pickerEndDate,
+                        onConfirmButtonClicked = { start, end ->
+                            viewModel.showDateRangePicker(false)
+                            range = getRangeAsString(start, end)
+                        },
+                        hideDialog = { viewModel.showDateRangePicker(false) }
                     )
                 }
             }

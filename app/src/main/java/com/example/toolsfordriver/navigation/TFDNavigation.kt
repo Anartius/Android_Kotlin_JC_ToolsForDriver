@@ -119,7 +119,7 @@ fun TFDNavigation() {
         ) {
             val range = it.arguments?.getString("range") ?: ""
             TripsReportScreen(
-                range = range,
+                rangeValue = range,
                 onNavIconClicked = { navController.navigateUp() }
             )
         }

@@ -1,4 +1,4 @@
-package com.example.toolsfordriver.ui.common.textfields
+package com.example.toolsfordriver.ui.common.text
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -9,25 +9,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.sp
 import com.example.toolsfordriver.R
 
 @Composable
-fun CenteredTextRow (
+fun TitleTextRow (
     text: String,
-    fontSize: TextUnit = 18.sp,
     textColor: Int = R.color.light_blue,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = horizontalArrangement
     ) {
         Text(
             text = text,
-            fontSize = fontSize,
             style = MaterialTheme.typography.bodyLarge,
             color = colorResource(id = textColor)
         )

@@ -31,6 +31,9 @@ fun TripsReportMenuScreen(
     onNavigateToTripsReportScreen: (String) -> Unit = {}
 ) {
     val viewModel: TripsReportViewModel = hiltViewModel()
+    viewModel.trips.collectAsStateWithLifecycle(emptyList())
+    viewModel.users.collectAsStateWithLifecycle(emptyList())
+
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val showDateRangePicker = uiState.showDateRangePicker
 

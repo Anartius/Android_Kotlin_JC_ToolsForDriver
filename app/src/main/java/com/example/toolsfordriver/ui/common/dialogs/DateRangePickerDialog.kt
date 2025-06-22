@@ -39,10 +39,15 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateRangePickerDialog(
+    initialStartDate: Long? = null,
+    initialEndDate: Long? = null,
     onConfirmButtonClicked: (Long, Long) -> Unit,
     hideDialog: () -> Unit
 ) {
-    val dateRangeState = rememberDateRangePickerState()
+    val dateRangeState = rememberDateRangePickerState(
+        initialSelectedStartDateMillis = initialStartDate,
+        initialSelectedEndDateMillis = initialEndDate
+    )
 
     val config = Configuration().apply {
         updateFrom(LocalConfiguration.current)
@@ -77,6 +82,7 @@ fun DateRangePickerDialog(
                         dateRangeState.selectedEndDateMillis!!
                     )
 
+                    dateRangeState.setSelection(startDateMillis = null, endDateMillis = null)
                     hideDialog()
                 },
                 enabled = isPeriodSelected

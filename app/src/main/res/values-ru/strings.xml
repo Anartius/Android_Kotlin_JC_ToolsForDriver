@@ -143,6 +143,9 @@
 
     <!-- TripsReport -->
     <string name="current_month">Текущий месяц</string>
+    <string name="hide_list_of_trips">скрыть список поездок</string>
     <string name="previous_month">Предыдущий месяцh</string>
+    <string name="show_list_of_trips">показать список поездок</string>
+    <string name="summary">Итого</string>
     <string name="trips_report">Отчёт о поездках</string>
 </resources>

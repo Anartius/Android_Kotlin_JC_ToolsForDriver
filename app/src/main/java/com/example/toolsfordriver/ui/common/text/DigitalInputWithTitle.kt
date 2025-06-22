@@ -1,4 +1,4 @@
-package com.example.toolsfordriver.ui.common.textfields
+package com.example.toolsfordriver.ui.common.text
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -15,7 +15,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.toolsfordriver.ui.common.DigitInputField
-import com.example.toolsfordriver.ui.screens.freight.content.ItemTitleRow
 
 @Composable
 fun DigitalInputWithTitle(
@@ -29,8 +28,8 @@ fun DigitalInputWithTitle(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
-    ItemTitleRow(
-        title = title,
+    TitleRowWithIcon(
+        text = title,
         modifier = Modifier.padding(horizontal = 24.dp)
     )
 

@@ -37,7 +37,7 @@ import com.example.toolsfordriver.ui.common.SwipeableItemWithActions
 import com.example.toolsfordriver.ui.common.TFDAppBar
 import com.example.toolsfordriver.ui.common.buttons.FAB
 import com.example.toolsfordriver.ui.common.dialogs.ActionConfirmDialog
-import com.example.toolsfordriver.ui.common.textfields.CategoryHeader
+import com.example.toolsfordriver.ui.common.text.CategoryHeader
 import com.example.toolsfordriver.ui.screens.trip.TripViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay

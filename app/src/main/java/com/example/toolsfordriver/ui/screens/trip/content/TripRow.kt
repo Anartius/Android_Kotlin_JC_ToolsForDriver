@@ -35,7 +35,7 @@ fun TripRow(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .padding(horizontal = 16.dp, vertical = 4.dp)
             .combinedClickable(
                 enabled = true,
                 onClick = { onClick() },
@@ -49,7 +49,7 @@ fun TripRow(
     ) {
         Row(
             modifier = Modifier
-                .padding(vertical = 10.dp, horizontal = 10.dp)
+                .padding(vertical = 4.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround,
