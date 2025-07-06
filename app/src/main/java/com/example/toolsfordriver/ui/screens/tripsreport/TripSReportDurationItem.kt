@@ -28,10 +28,10 @@ import com.example.toolsfordriver.ui.common.text.TitleTextRow
 
 @Composable
 fun TripSReportDurationItem(
+    modifier: Modifier = Modifier,
     title: String,
     value: String,
-    tripList: List<Trip>? = null,
-    modifier: Modifier = Modifier
+    tripList: List<Trip>? = null
 ) {
     var showTripList by remember { mutableStateOf(true) }
 
@@ -75,9 +75,10 @@ fun RangeTextRow(trip: Trip) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         AutoResizeableText(
-            text = "${dateAsString(trip.startTime)} ${timeAsString(trip.startTime)}" +
-                    "  -  " +
-                    "${dateAsString(trip.endTime)} ${timeAsString(trip.endTime)}",
+            text = "${dateAsString(trip.startTime)} " +
+                    "${timeAsString(trip.startTime)}  -  " +
+                    "${dateAsString(trip.endTime)} " +
+                    timeAsString(trip.endTime),
             modifier = Modifier.padding(vertical = 4.dp)
         )
     }
