@@ -1,7 +1,6 @@
 package com.example.toolsfordriver.ui.screens.freight
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -17,19 +16,16 @@ fun FreightsScreen(onNavIconClicked: () -> Unit) {
 
     val users = viewModel.users.collectAsStateWithLifecycle(initialValue = emptyList()).value
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    val currentUser = uiState.user
     val showCamera = uiState.showCamera
     val showFreightContent = uiState.showFreightContent
     val showZoomableImage = uiState.showZoomableImageDialog
     val zoomableImageUri = uiState.zoomableImageUri
 
-    LaunchedEffect(key1 = users) {
-        if (users.isNotEmpty()) { viewModel.updateCurrentUser(users.first()) }
-    }
+    if (users.isNotEmpty()) {
+        val user = users.first()
 
-    if (currentUser != null) {
         if (showCamera) {
-            Camera(user = currentUser) { bitmap ->
+            Camera(user = user) { bitmap ->
                 viewModel.showCamera(false)
                 viewModel.addImageToCurrentFreight(bitmap = bitmap, context = context)
             }
@@ -39,14 +35,14 @@ fun FreightsScreen(onNavIconClicked: () -> Unit) {
                 viewModel.showFreightContent(true)
             }
         } else if (showFreightContent) {
-            FreightContent(viewModel = viewModel) {
+            FreightContent {
                 viewModel.showFreightContent(false)
                 viewModel.clearCacheDirectory(context)
                 viewModel.clearUnusedImages()
             }
 
         } else {
-            FreightListContent(viewModel = viewModel) { onNavIconClicked() }
+            FreightListContent { onNavIconClicked() }
         }
     }
 }

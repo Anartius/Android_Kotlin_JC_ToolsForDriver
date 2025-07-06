@@ -17,13 +17,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.ui.common.TFDAppBar
-import com.example.toolsfordriver.ui.screens.freight.FreightViewModel
 
 @Composable
-fun FreightContent(
-    viewModel: FreightViewModel,
-    onNavIconClicked: () -> Unit
-) {
+fun FreightContent(onNavIconClicked: () -> Unit) {
     Scaffold(
         topBar = {
             TFDAppBar(
@@ -32,7 +28,7 @@ fun FreightContent(
                 onNavIconClicked = onNavIconClicked
             )
         },
-        floatingActionButton = { FreightContentFAB(viewModel = viewModel) { onNavIconClicked() } },
+        floatingActionButton = { FreightContentFAB { onNavIconClicked() } },
         floatingActionButtonPosition = FabPosition.Center
     ) { paddingValue ->
 
@@ -48,7 +44,7 @@ fun FreightContent(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
-                FreightContentLazyColumn(viewModel = viewModel)
+                FreightContentLazyColumn()
             }
         }
     }

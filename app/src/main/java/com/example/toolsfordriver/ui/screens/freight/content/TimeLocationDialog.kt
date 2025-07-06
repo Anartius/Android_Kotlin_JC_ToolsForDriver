@@ -1,7 +1,5 @@
 package com.example.toolsfordriver.ui.screens.freight.content
 
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,17 +13,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -39,182 +38,163 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
-import com.example.toolsfordriver.common.dateAsStringIso
 import com.example.toolsfordriver.ui.common.InputField
 import com.example.toolsfordriver.ui.common.dialogs.DatePickerRow
 import com.example.toolsfordriver.ui.common.dialogs.DialogButtons
 import com.example.toolsfordriver.ui.common.dialogs.DialogTitle
 import com.example.toolsfordriver.ui.common.dialogs.TimePickerRow
 import com.example.toolsfordriver.ui.screens.freight.FreightViewModel
-import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimeLocationDialog(
-    isLoadDialog: MutableState<Boolean>,
-    showDialog: MutableState<Boolean>,
+    isLoadDialog: Boolean,
     location: MutableState<String>,
-    dateTime: MutableState<LocalDateTime?>,
-    viewModel: FreightViewModel,
-    context: Context
+    dateTime: ZonedDateTime?,
+    onDismiss: () -> Unit = {},
+    onConfirm: () -> Unit = {}
 ) {
-    if (showDialog.value) {
-        val countryCode = rememberSaveable {
-            mutableStateOf(
-                if (location.value.contains('#')) {
-                    location.value.split("#").first()
-                } else  ""
-            )
-        }
+    val zoneId = ZoneId.systemDefault()
+    val viewModel: FreightViewModel = hiltViewModel()
+    val freight = viewModel.uiState.collectAsStateWithLifecycle().value.currentFreight!!
 
-        val city = rememberSaveable {
-            mutableStateOf(
-                if (location.value.contains('#')) {
-                    location.value.split("#").last()
-                } else  ""
-            )
-        }
+    val dateTimeMillis = dateTime?.toInstant()?.toEpochMilli()
 
-        val initDate = rememberSaveable {
-            mutableStateOf(
-                if (dateTime.value != null) {
-                    dateTime.value!!.toInstant(TimeZone.currentSystemDefault())
-                        .toEpochMilliseconds()
-                } else null
-            )
-        }
+    val currentDateTime = LocalDateTime.now()
+    val currentDate = currentDateTime.toInstant(ZoneOffset.UTC).toEpochMilli()
 
-        val currentDate = Clock.System.now().toEpochMilliseconds()
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = initDate.value ?: currentDate,
-            initialDisplayedMonthMillis = initDate.value ?: currentDate
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = dateTimeMillis ?: currentDate,
+        initialDisplayedMonthMillis = dateTimeMillis ?: currentDate
+    )
+
+    val timePickerState = rememberTimePickerState(
+        initialHour = dateTime?.hour ?: currentDateTime.hour,
+        initialMinute = dateTime?.minute ?: currentDateTime.minute
+    )
+
+    var selectedDateTime by rememberSaveable { mutableStateOf<ZonedDateTime?>(null)}
+
+    val countryCode = rememberSaveable {
+        mutableStateOf(
+            if (location.value.contains('#')) {
+                location.value.split("#").first()
+            } else  ""
         )
+    }
 
-        val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-        val timePickerState = rememberTimePickerState(
-            initialHour = dateTime.value?.hour ?: currentTime.hour,
-            initialMinute = dateTime.value?.minute ?: currentTime.minute
+    val city = rememberSaveable {
+        mutableStateOf(
+            if (location.value.contains('#')) {
+                location.value.split("#").last()
+            } else  ""
         )
+    }
 
-        Dialog(onDismissRequest = {}) {
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier
-                    .padding(5.dp)
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
-                colors = CardDefaults.cardColors(
-                    containerColor = colorResource(id = R.color.dark_gray).copy(alpha = 0.8f)
-                ),
-                elevation = CardDefaults.cardElevation(8.dp)
+    Dialog(onDismissRequest = {}) {
+
+        LaunchedEffect(
+            datePickerState.selectedDateMillis,
+            timePickerState.minute,
+            timePickerState.hour
+        ) {
+            val timeZone = ZoneId.systemDefault()
+
+            selectedDateTime = ZonedDateTime.of(
+                    Instant.ofEpochMilli(datePickerState.selectedDateMillis!!)
+                        .atZone(zoneId).toLocalDate(),
+                    LocalTime.of(timePickerState.hour, timePickerState.minute),
+                    timeZone
+            )
+        }
+
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .padding(5.dp)
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            colors = CardDefaults.cardColors(
+                containerColor = colorResource(id = R.color.dark_gray).copy(alpha = 0.8f)
+            ),
+            elevation = CardDefaults.cardElevation(8.dp)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    DialogTitle(title = stringResource(R.string.select_location_date_and_time))
+                DialogTitle(title = stringResource(R.string.select_location_date_and_time))
 
-                    LocationContent(
-                        countryCode = countryCode,
-                        city = city
-                    )
+                LocationContent(
+                    countryCode = countryCode,
+                    city = city
+                )
 
-                    Column(modifier = Modifier.padding(vertical = 0.dp, horizontal = 20.dp)) {
-                        DatePickerRow(datePickerState = datePickerState)
-                        TimePickerRow(timePickerState = timePickerState)
-                    }
-
-                    DialogButtonsContent(
-                        isLoadDialog = isLoadDialog,
-                        showDialog = showDialog,
-                        viewModel = viewModel,
-                        location = location,
-                        countryCode = countryCode,
-                        city = city,
-                        initDate = initDate,
-                        dateTime = dateTime,
-                        datePickerState = datePickerState,
-                        timePickerState = timePickerState,
-                        context = context
-                    )
+                Column(modifier = Modifier.padding(vertical = 0.dp, horizontal = 20.dp)) {
+                    DatePickerRow(datePickerState = datePickerState)
+                    TimePickerRow(timePickerState = timePickerState)
                 }
+
+                DialogButtons(
+                    confirmButtonIsEnabled = countryCode.value.isNotEmpty() &&
+                            city.value.isNotEmpty() && selectedDateTime != null,
+                    onConfirm = {
+                        val location = "${countryCode.value.trim()}#${city.value.trim()}"
+
+                        val loadsUnloads =
+                            (if (isLoadDialog) freight.loads else freight.unloads).toMutableMap()
+
+                        if (dateTimeMillis != null) {
+                            if (loadsUnloads.contains(dateTime.toString())) {
+                                loadsUnloads.remove(dateTime.toString())
+                            }
+                        }
+
+                        loadsUnloads[selectedDateTime.toString()] = location
+
+                        val loads = if (isLoadDialog) loadsUnloads  else freight.loads
+                        val unloads = if(!isLoadDialog) loadsUnloads else freight.unloads
+
+                        var firstLoadDateTime: Date? = null
+                        var lastUnloadDateTime: Date? = null
+
+                        if (isLoadDialog && loads.isNotEmpty()) {
+                            firstLoadDateTime = Date.from(
+                                ZonedDateTime.parse(loads.keys.min()).toInstant()
+                            )
+                        }
+                        if (!isLoadDialog && unloads.isNotEmpty()) {
+                            lastUnloadDateTime = Date.from(
+                                ZonedDateTime.parse(unloads.keys.max()).toInstant()
+                            )
+                        }
+
+                        viewModel.updateCurrentFreight(
+                            freight.copy(
+                                loads = loads,
+                                unloads = unloads,
+                                firstLoadTime = firstLoadDateTime,
+                                lastUnloadTime = lastUnloadDateTime
+                            )
+                        )
+
+                        onConfirm()
+                    },
+                    onDismiss = onDismiss
+                )
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DialogButtonsContent(
-    isLoadDialog: MutableState<Boolean>,
-    showDialog: MutableState<Boolean>,
-    location: MutableState<String>,
-    countryCode: MutableState<String>,
-    city: MutableState<String>,
-    initDate: MutableState<Long?>,
-    dateTime: MutableState<LocalDateTime?>,
-    datePickerState: DatePickerState,
-    timePickerState: TimePickerState,
-    viewModel: FreightViewModel,
-    context: Context
-) {
-    val freight = viewModel.uiState.collectAsStateWithLifecycle().value.currentFreight!!
-
-    DialogButtons(
-        onConfirm = {
-            if (countryCode.value.isNotEmpty() && city.value.isNotEmpty()) {
-                showDialog.value = false
-
-                dateTime.value = LocalDateTime(
-                    LocalDate.parse(
-                        dateAsStringIso(datePickerState.selectedDateMillis!!)
-                    ),
-                    LocalTime(timePickerState.hour, timePickerState.minute)
-                )
-
-                location.value = "${countryCode.value.trim()}#${city.value.trim()}"
-                val time = dateTime.value!!
-                    .toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
-
-                val loadsUnloads = (if (isLoadDialog.value) {
-                    freight.loads
-                } else freight.unloads).toMutableMap()
-
-                if (initDate.value != null) {
-                    if (loadsUnloads.contains(initDate.value.toString())) {
-                        loadsUnloads.remove(initDate.value.toString())
-                    }
-                }
-                loadsUnloads[time.toString()] = location.value
-
-                viewModel.updateCurrentFreight(
-                    freight.copy(
-                        loads = if (isLoadDialog.value) {
-                            loadsUnloads.toMap()
-                        } else freight.loads,
-                        unloads = if (!isLoadDialog.value) {
-                            loadsUnloads.toMap()
-                        } else freight.unloads
-                    )
-                )
-            } else {
-                Toast.makeText(
-                    context,
-                    "Not enough data",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        },
-        onDismiss = { showDialog.value = false }
-    )
 }
 
 @Composable
@@ -285,9 +265,9 @@ fun LocationPickerRow(
 
         Text(text = "$description:")
 
-        LocationInputText(
-            text = inputText,
-            modifier = modifier,
+        InputField(
+            modifier = modifier.wrapContentWidth(align = Alignment.End),
+            textValueState = inputText,
             placeholder = {
                 Text(
                     text = placeholderText,
@@ -295,36 +275,13 @@ fun LocationPickerRow(
                     textAlign = TextAlign.End
                 )
             },
+            isOutlined = false,
+            enabled = true,
             isSingleLine = isSingleLine,
             maxLines = maxLines,
+            inputTextAlign = TextAlign.End,
+            trailingIconVisibility = true,
             keyboardOptions = keyboardOptions
-        ) {
-            onAction.invoke()
-        }
+        ) { onAction() }
     }
-}
-
-@Composable
-fun LocationInputText(
-    text: MutableState<String>,
-    modifier: Modifier = Modifier,
-    placeholder: @Composable () -> Unit,
-    isSingleLine: Boolean,
-    maxLines: Int,
-    keyboardOptions: KeyboardOptions,
-    onAction: () -> Unit
-) {
-    InputField(
-        modifier = modifier.wrapContentWidth(align = Alignment.End),
-        textValueState = text,
-        placeholder = placeholder,
-        isOutlined = false,
-        enabled = true,
-        isSingleLine = isSingleLine,
-        maxLines = maxLines,
-        inputTextAlign = TextAlign.End,
-        trailingIconVisibility = true,
-        keyboardOptions = keyboardOptions,
-        onAction = onAction
-    )
 }

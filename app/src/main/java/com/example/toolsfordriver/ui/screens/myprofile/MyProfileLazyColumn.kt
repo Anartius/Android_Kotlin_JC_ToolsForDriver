@@ -167,8 +167,8 @@ fun MyProfileLazyColumn(localeOptions: Map<Locale, String>) {
                 DigitalInputWithTitle(
                     title = "Whole hour after",
                     valueState = minMinutesToWholeHourState,
-                    placeholder = "0" + stringResource(R.string.min),
-                    suffix = stringResource(id = R.string.min),
+                    placeholder = "0 " + stringResource(R.string.min),
+                    suffix = " " + stringResource(id = R.string.min),
                     onFocusChanged = { viewModel.updateUser(currentUser) }
                 ) { }
             }

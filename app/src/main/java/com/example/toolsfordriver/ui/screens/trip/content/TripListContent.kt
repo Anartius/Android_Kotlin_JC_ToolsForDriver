@@ -29,8 +29,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.getNameStrRes
 import com.example.toolsfordriver.common.getSpecificMonthRange
-import com.example.toolsfordriver.data.model.Category
 import com.example.toolsfordriver.data.model.Trip
+import com.example.toolsfordriver.data.model.TripDateCategory
 import com.example.toolsfordriver.ui.common.ActionIcon
 import com.example.toolsfordriver.ui.common.CustomSnackBar
 import com.example.toolsfordriver.ui.common.SwipeableItemWithActions
@@ -51,8 +51,8 @@ fun TripListContent(
     onNavigateToTripsReportScreen: (String) -> Unit
 ) {
     val viewModel: TripViewModel = hiltViewModel()
-
     val context = LocalContext.current
+
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val swipedItemId = uiState.swipedItemId
     val showDeleteConfDialog = uiState.showDeleteItemConfDialog
@@ -68,7 +68,7 @@ fun TripListContent(
     val categoryList = groupedTripMap.map {
         val month = it.key.month.getNameStrRes()?.let { stringResource(it) } ?: ""
 
-        Category(
+        TripDateCategory(
             name = month + " " + it.key.year,
             yearMonth = it.key,
             items = it.value.asReversed()
@@ -135,13 +135,17 @@ fun TripListContent(
         ) {
             categoryList.forEach { category ->
                 stickyHeader {
-                    CategoryHeader(text = category.name) {
+                    CategoryHeader(
+                        text = category.name,
+                        showIcon = true,
+                        iconDescription = "Get month summary"
+                    ) {
                         onNavigateToTripsReportScreen(getSpecificMonthRange(category.yearMonth))
                     }
                 }
 
                 items(items = category.items) { item ->
-                    var isRevealed = swipedItemId == item.id
+                    val isRevealed = swipedItemId == item.id
 
                     SwipeableItemWithActions(
                         isRevealed = isRevealed,
@@ -171,26 +175,26 @@ fun TripListContent(
                             }
                         )
                     }
-
-                    if (showDeleteConfDialog) {
-                        ActionConfirmDialog(
-                            title = stringResource(R.string.trip_delete),
-                            message = stringResource(R.string.ask_to_trip_delete),
-                            onConfirm = {
-                                viewModel.deleteTrip(
-                                    context.getString(R.string.trip) +
-                                            " " + context.getString(R.string.deleted)
-                                )
-                                viewModel.updateSwipedItemId("")
-                            },
-                            onDismiss = {
-                                viewModel.showDeleteItemConfDialog(false)
-                                viewModel.updateSwipedItemId("")
-                            }
-                        )
-                    }
                 }
             }
+        }
+
+        if (showDeleteConfDialog) {
+            ActionConfirmDialog(
+                title = stringResource(R.string.trip_delete),
+                message = stringResource(R.string.ask_to_trip_delete),
+                onConfirm = {
+                    viewModel.deleteTrip(
+                        context.getString(R.string.trip) +
+                                " " + context.getString(R.string.deleted)
+                    )
+                    viewModel.updateSwipedItemId("")
+                },
+                onDismiss = {
+                    viewModel.showDeleteItemConfDialog(false)
+                    viewModel.updateSwipedItemId("")
+                }
+            )
         }
     }
 }

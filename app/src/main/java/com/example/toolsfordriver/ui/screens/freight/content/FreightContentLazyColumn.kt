@@ -12,24 +12,28 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.ui.common.DeleteItemPopup
 import com.example.toolsfordriver.ui.common.dialogs.ImageSourcePickerDialog
 import com.example.toolsfordriver.ui.common.text.TitleRowWithIcon
 import com.example.toolsfordriver.ui.screens.freight.FreightViewModel
-import kotlinx.datetime.LocalDateTime
+import java.time.ZonedDateTime
 
 @Composable
-fun FreightContentLazyColumn(viewModel: FreightViewModel) {
+fun FreightContentLazyColumn() {
+    val viewModel: FreightViewModel = hiltViewModel()
 
     BackHandler { viewModel.showFreightContent(false) }
 
@@ -40,9 +44,9 @@ fun FreightContentLazyColumn(viewModel: FreightViewModel) {
         val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
         val selectedItemLocation = remember { mutableStateOf("") }
-        val selectedItemDateTime = remember { mutableStateOf<LocalDateTime?>(null) }
+        val selectedItemDateTime = remember { mutableStateOf<ZonedDateTime?>(null) }
 
-        val showTimeLocationDialog = rememberSaveable { mutableStateOf(false) }
+        var showTimeLocationDialog by rememberSaveable { mutableStateOf(false) }
         val showNoteDialog = rememberSaveable { mutableStateOf(false) }
         val showSourcePickerDialog = rememberSaveable { mutableStateOf(false) }
         val showDeleteItemPopup = uiState.showDeleteItemPopup
@@ -55,9 +59,9 @@ fun FreightContentLazyColumn(viewModel: FreightViewModel) {
             showSourcePickerDialog.value = false
         }
 
-        val isLoadDialog = rememberSaveable { mutableStateOf(true) }
+        var isLoadDialog by rememberSaveable { mutableStateOf(true) }
         val isLoadContent = rememberSaveable { mutableStateOf(true) }
-        val deleteItemKey = rememberSaveable { mutableStateOf<Long?>(null) }
+        val deleteItemKey = rememberSaveable { mutableStateOf<String?>(null) }
         val imageUriToDelete = rememberSaveable { mutableStateOf<Uri?>(null) }
 
         LazyColumn(
@@ -75,25 +79,31 @@ fun FreightContentLazyColumn(viewModel: FreightViewModel) {
                 ) {
                     selectedItemDateTime.value = null
                     selectedItemLocation.value = ""
-                    isLoadDialog.value = true
-                    showTimeLocationDialog.value = true
+                    isLoadDialog = true
+                    showTimeLocationDialog = true
                 }
             }
 
             items(items = freight.loads.toList().sortedBy { it.first }) { item ->
+
                 isLoadContent.value = true
+                val location = freight.loads[item.first].toString()
 
                 LoadUnloadRow(
-                    isLoad = true,
-                    isLoadContent = isLoadContent,
-                    time = item.first.toLong(),
-                    isLoadDialog = isLoadDialog,
-                    showTimeLocationDialog = showTimeLocationDialog,
-                    selectedItemLocation = selectedItemLocation,
-                    selectedItemDateTime = selectedItemDateTime,
-                    deleteItemKey = deleteItemKey,
-                    viewModel = viewModel
-                ) { viewModel.showDeleteItemPopup(true) }
+                    item = item,
+                    location = location,
+                    onClick = {
+                        isLoadDialog = true
+                        selectedItemDateTime.value = ZonedDateTime.parse(item.first)
+                        selectedItemLocation.value = location
+                        showTimeLocationDialog = true
+                    },
+                    onLongClick = {
+                        isLoadContent.value = true
+                        deleteItemKey.value = item.first
+                        viewModel.showDeleteItemPopup(true)
+                    }
+                )
             }
 
             item {
@@ -106,28 +116,34 @@ fun FreightContentLazyColumn(viewModel: FreightViewModel) {
                 ) {
                     selectedItemDateTime.value = null
                     selectedItemLocation.value = ""
-                    isLoadDialog.value = false
-                    showTimeLocationDialog.value = true
+                    isLoadDialog = false
+                    showTimeLocationDialog = true
                 }
             }
 
             items(items = freight.unloads.toList().sortedBy { it.first }) { item ->
+
                 isLoadContent.value = false
+                val location = freight.unloads[item.first].toString()
 
                 LoadUnloadRow(
-                    isLoad = false,
-                    isLoadContent = isLoadContent,
-                    time = item.first.toLong(),
-                    isLoadDialog = isLoadDialog,
-                    showTimeLocationDialog = showTimeLocationDialog,
-                    selectedItemLocation = selectedItemLocation,
-                    selectedItemDateTime = selectedItemDateTime,
-                    deleteItemKey = deleteItemKey,
-                    viewModel = viewModel
-                ) { viewModel.showDeleteItemPopup(true) }
+                    item = item,
+                    location = location,
+                    onClick = {
+                        isLoadDialog = false
+                        selectedItemDateTime.value = ZonedDateTime.parse(item.first)
+                        selectedItemLocation.value = location
+                        showTimeLocationDialog = true
+                    },
+                    onLongClick = {
+                        isLoadContent.value = false
+                        deleteItemKey.value = item.first
+                        viewModel.showDeleteItemPopup(true)
+                    }
+                )
             }
 
-            item { DistanceContent(viewModel = viewModel) }
+            item { DistanceContent() }
 
             item {
                 TitleRowWithIcon(
@@ -165,14 +181,16 @@ fun FreightContentLazyColumn(viewModel: FreightViewModel) {
             }
         }
 
-        TimeLocationDialog(
-            isLoadDialog = isLoadDialog,
-            showDialog = showTimeLocationDialog,
-            location = selectedItemLocation,
-            dateTime = selectedItemDateTime,
-            viewModel = viewModel,
-            context = context
-        )
+        if (showTimeLocationDialog) {
+            TimeLocationDialog(
+                isLoadDialog = isLoadDialog,
+                location = selectedItemLocation,
+                dateTime = selectedItemDateTime.value,
+                onDismiss = { showTimeLocationDialog = false }
+            ) {
+                showTimeLocationDialog = false
+            }
+        }
 
         TextInputDialog(
             viewModel = viewModel,
@@ -181,7 +199,9 @@ fun FreightContentLazyColumn(viewModel: FreightViewModel) {
 
         if (showDeleteItemPopup) {
             DeleteItemPopup(
-                itemName = stringResource(id = if (isLoadContent.value) R.string.load else R.string.unload),
+                itemName = stringResource(
+                    id = if (isLoadContent.value) R.string.load else R.string.unload
+                ),
                 onDismiss = { viewModel.showDeleteItemPopup(false) }
             ) {
                 deleteItemKey.value?.let {
@@ -189,7 +209,7 @@ fun FreightContentLazyColumn(viewModel: FreightViewModel) {
                         freight.loads
                     } else freight.unloads).toMutableMap()
 
-                    itemMap.remove(deleteItemKey.value.toString())
+                    itemMap.remove(deleteItemKey.value)
 
                     viewModel.updateCurrentFreight(
                         freight.copy(

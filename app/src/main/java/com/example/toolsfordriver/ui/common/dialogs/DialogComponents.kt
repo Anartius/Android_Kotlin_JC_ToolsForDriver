@@ -50,10 +50,7 @@ import com.example.toolsfordriver.ui.common.buttons.AppButton
 import java.util.Locale
 
 @Composable
-fun DialogTitle(
-    title: String,
-    modifier: Modifier = Modifier
-) {
+fun DialogTitle(title: String) {
     Row(
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.padding(top = 10.dp, bottom = 15.dp)
@@ -287,6 +284,7 @@ fun AppTimePickerDialog(
 @Composable
 fun DialogButtons(
     showConfirmButton: Boolean = true,
+    confirmButtonIsEnabled: Boolean = true,
     onConfirm: () -> Unit = {},
     onDismiss: () -> Unit = {}
 ) {
@@ -305,6 +303,7 @@ fun DialogButtons(
         if (showConfirmButton) {
             AppButton(
                 buttonText = stringResource(id = R.string.ok),
+                isEnabled = confirmButtonIsEnabled,
                 modifier = Modifier.padding(10.dp)
             ) { onConfirm() }
         }

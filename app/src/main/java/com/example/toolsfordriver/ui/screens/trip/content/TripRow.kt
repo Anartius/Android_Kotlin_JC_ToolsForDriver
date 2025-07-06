@@ -2,7 +2,7 @@ package com.example.toolsfordriver.ui.screens.trip.content
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,18 +29,13 @@ import com.example.toolsfordriver.data.model.Trip
 @Composable
 fun TripRow(
     trip: Trip,
-    onClick: () -> Unit = {},
-    onLongClick: () -> Unit = {}
+    onClick: () -> Unit = {}
 ) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
-            .combinedClickable(
-                enabled = true,
-                onClick = { onClick() },
-                onLongClick = { onLongClick() }
-            ),
+            .clickable { onClick() },
         border = BorderStroke(
             width = 0.5.dp,
             color = colorResource(id = R.color.light_blue).copy(alpha = 0.6f)
@@ -52,9 +47,8 @@ fun TripRow(
                 .padding(vertical = 4.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround,
-
-            ) {
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
             Column (
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center,
@@ -79,10 +73,10 @@ fun TripRow(
                 val endDateAsString = dateAsString(trip.endTime)
                 val endTimeAsString = timeAsString(trip.endTime)
                 Text(
-                    text = if (endDateAsString.isEmpty()) "––.––.––––" else endDateAsString
+                    text = endDateAsString.ifEmpty { "––.––.––––" }
                 )
                 Text(
-                    text = if (endTimeAsString.isEmpty()) "––:––" else endTimeAsString,
+                    text = endTimeAsString.ifEmpty { "––:––" },
                     color = colorResource(id = R.color.gray)
                 )
             }

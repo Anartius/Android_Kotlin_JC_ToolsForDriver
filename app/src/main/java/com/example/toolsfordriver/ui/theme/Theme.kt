@@ -56,8 +56,20 @@ fun ToolsForDriverTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.background.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            val color = colorScheme.background.toArgb()
+
+            if (Build.VERSION.SDK_INT >= 35) {
+                window.decorView.setOnApplyWindowInsetsListener { view, insets ->
+                    //val statusBarInsets = insets.getInsets(WindowInsets.Type.statusBars())
+                    view.setBackgroundColor(color)
+                    //view.setPadding(0, statusBarInsets.top, 0, 0)
+                    insets
+                }
+            } else {
+                @Suppress("DEPRECATION")
+                window.statusBarColor = color
+                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            }
         }
     }
 

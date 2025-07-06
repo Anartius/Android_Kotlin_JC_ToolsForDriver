@@ -102,7 +102,8 @@ fun TripContentColumn() {
 
         TextRow(
             valueDescription = stringResource(R.string.start),
-            value = dateAsString(startDateTime.value) + " " + timeAsString(startDateTime.value),
+            value = dateAsString(startDateTime.value)
+                    + " " + timeAsString(startDateTime.value),
             clickable = true,
             showIcon = true,
             firstTextColor = colorResource(R.color.light_blue)
@@ -148,7 +149,7 @@ fun TripContentColumn() {
             buttonText = stringResource(
                 id = if (isNewTrip) R.string.add_trip else R.string.update_trip
             ),
-            enabled = (trip != tripBeforeChange) &&
+            isEnabled = (trip != tripBeforeChange) &&
                     (isStartDateTimeExist && !isEndDateTimeExist ||
                     isStartDateTimeExist && (trip.startTime!! < trip.endTime!!))
         ) {

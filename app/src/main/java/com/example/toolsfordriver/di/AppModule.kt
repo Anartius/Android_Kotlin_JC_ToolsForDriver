@@ -36,10 +36,10 @@ object AppModule {
     @Provides
     fun provideAppDatabase(@ApplicationContext context: Context): TFDRoomDB =
         Room.databaseBuilder(
-            context,
-            TFDRoomDB::class.java,
-            "tfd_db"
-        ).fallbackToDestructiveMigration().build()
+                context,
+                TFDRoomDB::class.java,
+                "tfd_db"
+            ).fallbackToDestructiveMigration(false).build()
 }
 
 @Module

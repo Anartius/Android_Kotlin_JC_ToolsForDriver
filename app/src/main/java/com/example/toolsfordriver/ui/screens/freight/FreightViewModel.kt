@@ -3,6 +3,7 @@ package com.example.toolsfordriver.ui.screens.freight
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,7 +11,6 @@ import com.example.toolsfordriver.common.UiText
 import com.example.toolsfordriver.common.saveBitmapToInternalStorage
 import com.example.toolsfordriver.common.saveImageToInternalStorage
 import com.example.toolsfordriver.data.model.Freight
-import com.example.toolsfordriver.data.model.User
 import com.example.toolsfordriver.data.model.service.AccountService
 import com.example.toolsfordriver.data.model.service.FirestoreService
 import com.example.toolsfordriver.data.model.service.StorageService
@@ -31,7 +31,6 @@ class FreightViewModel @Inject constructor(
     private val firestoreService: FirestoreService,
     private val storageService: StorageService
 ) : ViewModel() {
-
     val userId = accountService.currentUserId
     private val snackbarChannel = Channel<UiText>()
     val snackbarMessages = snackbarChannel.receiveAsFlow()
@@ -40,62 +39,10 @@ class FreightViewModel @Inject constructor(
     val freights = firestoreService.freights
     val users = firestoreService.users
 
-    fun updateCurrentUser (user: User) {
-        _uiState.value = _uiState.value.copy(user = user)
-    }
-    fun showFreightContent(value: Boolean) {
-        _uiState.update { it.copy(showFreightContent = value) }
-    }
-
     fun addFreight(freight: Freight) {
         launchCatching {
             firestoreService.saveFreight(freight)
         }
-    }
-
-    fun updateFreight(freight: Freight) {
-        viewModelScope.launch { firestoreService.updateFreight(freight) }
-    }
-
-
-    fun setCurrentFreightAsNew(value: Boolean) {
-        _uiState.update { it.copy(isNewFreight = value) }
-    }
-
-    fun updateCurrentFreight(freight: Freight) {
-        _uiState.update { it.copy(currentFreight = freight) }
-    }
-
-    fun deleteFreight() {
-        launchCatching {
-            _uiState.value.freightToDelete?.let { firestoreService.deleteFreight(it.id) }
-            _uiState.value = _uiState.value.copy(freightToDelete = null)
-            showDeletePopup(false)
-        }
-    }
-
-    fun addFreightToDelete(freight: Freight) {
-        _uiState.value = _uiState.value.copy(freightToDelete = freight)
-    }
-
-    fun showDeletePopup(value: Boolean) {
-        _uiState.value = _uiState.value.copy(showDeletePopup = value)
-    }
-
-    fun showDeleteItemPopup(value: Boolean) {
-        _uiState.value = _uiState.value.copy(showDeleteItemPopup = value)
-    }
-
-    fun showDeleteImagePopup(value: Boolean) {
-        _uiState.value = _uiState.value.copy(showDeleteImagePopup = value)
-    }
-
-    fun showZoomableImage(value: Boolean) {
-        _uiState.value = _uiState.value.copy(showZoomableImageDialog = value)
-    }
-
-    fun showCamera(value: Boolean) {
-        _uiState.value = _uiState.value.copy(showCamera = value)
     }
 
     fun addImageToCurrentFreight(
@@ -138,6 +85,36 @@ class FreightViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(imageUriToDeleteList = uriList)
     }
 
+    fun addFreightToDelete(freight: Freight) {
+        _uiState.value = _uiState.value.copy(freightToDelete = freight)
+    }
+
+    fun clearAddedUriList() {
+        _uiState.value = _uiState.value.copy(addedUriList = emptyList())
+    }
+
+    fun clearCacheDirectory(context: Context) {
+        val cacheDir = context.cacheDir
+        if (cacheDir?.exists() == true) {
+            cacheDir.deleteRecursively()
+        }
+    }
+
+    fun clearUnusedImages() = launchCatching{
+        val addedUriList = _uiState.value.addedUriList.toMutableList()
+
+        addedUriList.forEach { storageService.deleteFile(it.toUri()) }
+    }
+
+    fun deleteFreight(successMsg: String) {
+        launchCatching {
+            _uiState.value.freightToDelete?.let { firestoreService.deleteFreight(it.id) }
+            _uiState.value = _uiState.value.copy(freightToDelete = null)
+            showDeleteItemConfDialog(false)
+            snackbarChannel.send(UiText.DynamicString(successMsg))
+        }
+    }
+
     fun deleteImagesAndUpdateFreight() = launchCatching {
         _uiState.value.imageUriToDeleteList.forEach { uri ->
             val result = storageService.deleteFile(uri)
@@ -151,15 +128,70 @@ class FreightViewModel @Inject constructor(
         }
     }
 
-    fun clearAddedUriList() {
-        _uiState.value = _uiState.value.copy(addedUriList = emptyList())
+    private fun launchCatching(block: suspend CoroutineScope.() -> Unit) {
+        viewModelScope.launch(
+            CoroutineExceptionHandler{ _, throwable ->
+                viewModelScope.launch {
+                    Log.e("Error", throwable.message.toString())
+                    snackbarChannel.send(UiText.DynamicString(throwable.message.toString()))
+                }
+            },
+            block = block
+        )
     }
 
-    fun clearUnusedImages() = launchCatching{
-        val addedUriList = _uiState.value.addedUriList.toMutableList()
-
-        addedUriList.forEach { storageService.deleteFile(it.toUri()) }
+    fun setCurrentFreightAsNew(value: Boolean) {
+        _uiState.update { it.copy(isNewFreight = value) }
     }
+
+    fun setZoomableImageUri(uri: Uri?) {
+        _uiState.value = _uiState.value.copy(zoomableImageUri = uri)
+    }
+
+    fun showCamera(value: Boolean) {
+        _uiState.value = _uiState.value.copy(showCamera = value)
+    }
+
+    fun showDeleteImagePopup(value: Boolean) {
+        _uiState.value = _uiState.value.copy(showDeleteImagePopup = value)
+    }
+
+    fun showDeleteItemConfDialog(value: Boolean) {
+        _uiState.value = _uiState.value.copy(showDeleteItemConfDialog = value)
+    }
+
+    fun showDeleteItemPopup(value: Boolean) {
+        _uiState.value = _uiState.value.copy(showDeleteItemPopup = value)
+    }
+
+    fun showFreightContent(value: Boolean) {
+        _uiState.update { it.copy(showFreightContent = value) }
+    }
+
+    fun showZoomableImage(value: Boolean) {
+        _uiState.value = _uiState.value.copy(showZoomableImageDialog = value)
+    }
+
+    fun updateCurrentFreight(freight: Freight) {
+        launchCatching {
+            _uiState.update { it.copy(currentFreight = freight) }
+        }
+    }
+
+    fun updateCurrentFreightBeforeChange(freight: Freight) {
+        _uiState.update { it.copy(currentFreightBeforeChange = freight) }
+    }
+
+    fun updateFreight(freight: Freight) {
+        viewModelScope.launch { firestoreService.updateFreight(freight) }
+    }
+
+    fun updateSwipedItemId(id: String) {
+        _uiState.update { it.copy(swipedItemId = id) }
+    }
+}
+
+
 //    fun saveImageToCloud(uri: Uri) = launchCatching {
 //        val downloadUri = storageService.saveImage(
 //            fileUri = uri,
@@ -169,26 +201,3 @@ class FreightViewModel @Inject constructor(
 //        uriList.add(downloadUri)
 //        _uiState.value = _uiState.value.copy(cloudUriList = uriList)
 //    }
-
-    fun setZoomableImageUri(uri: Uri?) {
-        _uiState.value = _uiState.value.copy(zoomableImageUri = uri)
-    }
-
-    private fun launchCatching(block: suspend CoroutineScope.() -> Unit) {
-        viewModelScope.launch(
-            CoroutineExceptionHandler{ _, throwable ->
-                viewModelScope.launch {
-                    snackbarChannel.send(UiText.DynamicString(throwable.message.toString()))
-                }
-            },
-            block = block
-        )
-    }
-
-    fun clearCacheDirectory(context: Context) {
-        val cacheDir = context.cacheDir
-        if (cacheDir?.exists() == true) {
-            cacheDir.deleteRecursively()
-        }
-    }
-}

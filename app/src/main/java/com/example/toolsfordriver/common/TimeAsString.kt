@@ -3,6 +3,7 @@ package com.example.toolsfordriver.common
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
@@ -28,17 +29,10 @@ fun dateAsString(dateTime: LocalDateTime?): String {
     } else ""
 }
 
-fun dateAsStringIso(dateTime: Long?): String {
-    val formatter = SimpleDateFormat("yyyy.MM.dd", Locale.ROOT)
+fun dateAsString(dateTime: ZonedDateTime?): String {
+    val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.ROOT)
     return if (dateTime != null) {
-        formatter.format(Date(dateTime))
-    } else ""
-}
-
-fun timeAsString(dateTime: Long?): String {
-    val formatter = SimpleDateFormat("HH:mm", Locale.ROOT)
-    return if (dateTime != null) {
-        formatter.format(Date(dateTime))
+        formatter.format(dateTime)
     } else ""
 }
 
@@ -50,6 +44,13 @@ fun timeAsString(dateTime: Date?): String {
 }
 
 fun timeAsString(dateTime: LocalDateTime?): String {
+    val formatter = DateTimeFormatter.ofPattern("HH:mm", Locale.ROOT)
+    return if (dateTime != null) {
+        formatter.format(dateTime)
+    } else ""
+}
+
+fun timeAsString(dateTime: ZonedDateTime?): String {
     val formatter = DateTimeFormatter.ofPattern("HH:mm", Locale.ROOT)
     return if (dateTime != null) {
         formatter.format(dateTime)

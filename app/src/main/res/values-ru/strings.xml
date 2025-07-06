@@ -56,6 +56,7 @@
     <string name="recovery_email_sent">Ссылка для сброса пароля отправлена на ваш адрес
         электронной почты</string>
     <string name="reset">Сбросить</string>
+    <string name="user_not_found">Пользователь не найден</string>
     <string name="send_recovery_email_failed">Отправка письма для сброса пароля не удалась</string>
     <string name="sign_up">Создать</string>
     <string name="wrong_login_or_password">Логин или пароль неверны</string>
@@ -104,6 +105,7 @@
     <string name="add_note">Добавить заметку</string>
     <string name="add_picture">Добавить изображение</string>
     <string name="add_place_and_time">Добавить место и время</string>
+    <string name="ask_to_freight_delete">Вы уверены, что хотите удалить эту перевозку?</string>
     <string name="city">Город</string>
     <string name="code">Код</string>
     <string name="country">Страна</string>
@@ -112,6 +114,7 @@
     <string name="failed_to_delete_attached_images">Ошибка при удалении
         прикрепленных изображений</string>
     <string name="freight">Перевозка</string>
+    <string name="freight_delete">Удаление перевозки</string>
     <string name="freights">Перевозки</string>
     <string name="image">Изображение</string>
     <string name="images">Изображения</string>

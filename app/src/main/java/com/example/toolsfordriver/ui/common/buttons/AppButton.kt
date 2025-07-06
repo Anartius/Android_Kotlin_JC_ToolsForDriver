@@ -3,11 +3,9 @@ package com.example.toolsfordriver.ui.common.buttons
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,18 +21,17 @@ fun AppButton(
     modifier: Modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 50.dp, vertical = 0.dp),
-    enabled: Boolean = true,
-    load: Boolean = false,
+    isEnabled: Boolean = true,
     onClick: () -> Unit
 ) {
     Button(
         onClick = onClick,
-        enabled = enabled,
+        enabled = isEnabled,
         modifier = modifier,
         shape = RoundedCornerShape(15.dp),
         border = BorderStroke(
             width = 0.5.dp,
-            color = if (enabled) {
+            color = if (isEnabled) {
                 colorResource(id = R.color.light_blue).copy(0.6f)
             } else colorResource(id = R.color.gray)
         ),
@@ -44,13 +41,9 @@ fun AppButton(
             disabledContainerColor = Color.Transparent
         )
     ) {
-        if (load) {
-            CircularProgressIndicator(modifier = Modifier.size(25.dp))
-        } else {
-            Text(
-                text = buttonText,
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
+        Text(
+            text = buttonText,
+            style = MaterialTheme.typography.titleMedium
+        )
     }
 }

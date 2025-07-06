@@ -25,6 +25,8 @@ import com.example.toolsfordriver.R
 @Composable
 fun CategoryHeader(
     text: String,
+    showIcon: Boolean = false,
+    iconDescription: String = "",
     onClick: () -> Unit = {}
 ) {
     HorizontalDivider(
@@ -49,12 +51,14 @@ fun CategoryHeader(
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
-            Icon(
-                imageVector = Lucide.ChartNoAxesCombined,
-                contentDescription = "Get month summary",
-                tint = colorResource(R.color.light_blue),
-                modifier = Modifier.padding(end = 16.dp).size(20.dp)
-            )
+            if (showIcon) {
+                Icon(
+                    imageVector = Lucide.ChartNoAxesCombined,
+                    contentDescription = iconDescription,
+                    tint = colorResource(R.color.light_blue),
+                    modifier = Modifier.padding(end = 16.dp).size(20.dp)
+                )
+            }
         }
     }
 }

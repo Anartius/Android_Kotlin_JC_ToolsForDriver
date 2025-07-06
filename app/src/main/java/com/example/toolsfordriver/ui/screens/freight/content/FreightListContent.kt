@@ -1,200 +1,171 @@
 package com.example.toolsfordriver.ui.screens.freight.content
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material3.Icon
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
-import com.example.toolsfordriver.common.dateAsString
+import com.example.toolsfordriver.common.getNameStrRes
 import com.example.toolsfordriver.data.model.Freight
-import com.example.toolsfordriver.ui.common.DeleteItemPopup
-import com.example.toolsfordriver.ui.common.buttons.FAB
+import com.example.toolsfordriver.data.model.FreightDateCategory
+import com.example.toolsfordriver.ui.common.ActionIcon
+import com.example.toolsfordriver.ui.common.SwipeableItemWithActions
 import com.example.toolsfordriver.ui.common.TFDAppBar
+import com.example.toolsfordriver.ui.common.buttons.FAB
+import com.example.toolsfordriver.ui.common.dialogs.ActionConfirmDialog
+import com.example.toolsfordriver.ui.common.text.CategoryHeader
 import com.example.toolsfordriver.ui.screens.freight.FreightViewModel
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.YearMonth
+import java.time.ZoneId
 
 @Composable
-fun FreightListContent(
-    viewModel: FreightViewModel,
-    onNavIconClicked: () -> Unit
-) {
+fun FreightListContent(onNavIconClicked: () -> Unit) {
+
+    val viewModel: FreightViewModel = hiltViewModel()
+    val users = viewModel.users.collectAsStateWithLifecycle(initialValue = emptyList()).value
     val freightList = viewModel.freights.collectAsStateWithLifecycle(emptyList()).value
-    val showDeletePopup = viewModel.uiState.collectAsStateWithLifecycle().value.showDeletePopup
-    val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
 
-    BackHandler(enabled = true) { onNavIconClicked.invoke() }
+    if (users.isNotEmpty()) {
+        val context = LocalContext.current
+        val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(viewModel.snackbarMessages) {
-        viewModel.snackbarMessages.collect { snackbarMessage ->
-            val job = launch {
-                snackbarHostState.showSnackbar(
-                    message = snackbarMessage.asString(context),
-                    duration = SnackbarDuration.Indefinite
-                )
-            }
-            delay(5000)
-            job.cancel()
-        }
-    }
+        val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+        val swipedItemId = uiState.swipedItemId
+        val showDeleteConfDialog = uiState.showDeleteItemConfDialog
 
-    Scaffold(
-        topBar = {
-            TFDAppBar(
-                title = stringResource(id = R.string.freights),
-                navIcon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                onNavIconClicked = onNavIconClicked
-            )
-        },
-        floatingActionButton = {
-            FAB(fabDescription = stringResource(id = R.string.add_freight)) {
-                viewModel.updateCurrentFreight(
-                    Freight(userId = FirebaseAuth.getInstance().currentUser!!.uid)
-                )
-                viewModel.setCurrentFreightAsNew(true)
-                viewModel.showFreightContent(true)
-            }
-        }
-    ) { paddingValue ->
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValue)
-        ) {
-            LazyColumn {
-                items(items = freightList) { item ->
-                    FreightRow(
-                        freight = item,
-                        viewModel = viewModel
+        BackHandler(enabled = true) { onNavIconClicked() }
+
+        LaunchedEffect(viewModel.snackbarMessages) {
+            viewModel.snackbarMessages.collect { snackbarMessage ->
+                val job = launch {
+                    snackbarHostState.showSnackbar(
+                        message = snackbarMessage.asString(context),
+                        duration = SnackbarDuration.Indefinite
                     )
                 }
+                delay(5000)
+                job.cancel()
             }
         }
 
-        if (showDeletePopup) {
-            DeleteItemPopup(
-                itemName = stringResource(id = R.string.freight),
-                onDismiss = { viewModel.showDeletePopup(false) }
-            ) { viewModel.deleteFreight() }
-        }
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun FreightRow(
-    freight: Freight,
-    viewModel: FreightViewModel
-) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 15.dp, vertical = 6.dp)
-            .combinedClickable(
-                enabled = true,
-                onClick = {
-                    viewModel.updateCurrentFreight(freight)
-                    viewModel.setCurrentFreightAsNew(false)
+        Scaffold(
+            topBar = {
+                TFDAppBar(
+                    title = stringResource(id = R.string.freights),
+                    navIcon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    onNavIconClicked = onNavIconClicked
+                )
+            },
+            floatingActionButton = {
+                FAB(fabDescription = stringResource(id = R.string.add_freight)) {
+                    viewModel.updateCurrentFreight(
+                        Freight(userId = viewModel.userId)
+                    )
+                    viewModel.setCurrentFreightAsNew(true)
                     viewModel.showFreightContent(true)
-                },
-                onLongClick = {
-                    viewModel.addFreightToDelete(freight)
-                    viewModel.showDeletePopup(true)
                 }
-            ),
-        border = BorderStroke(
-            width = 0.5.dp,
-            color = colorResource(id = R.color.light_blue).copy(alpha = 0.6f)
-        ),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 30.dp, vertical = 10.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                val startDate = dateAsString(freight.loads.keys.minOf { it }.toLong())
-                val endDate = dateAsString(freight.unloads.keys.maxOf { it }.toLong())
+            }
+        ) { paddingValue ->
+            LaunchedEffect(swipedItemId) { }
 
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+            if (freightList.isNotEmpty()) {
+                val groupedFreightMap = freightList.groupBy {
+                    YearMonth.from(it.firstLoadTime?.toInstant()?.atZone(ZoneId.systemDefault()))
+                }.toSortedMap()
+
+                val categoryList = groupedFreightMap.map {
+                    val month = it.key.month.getNameStrRes()?.let { stringResource(it) } ?: ""
+
+                    FreightDateCategory(
+                        name = month + " " + it.key.year,
+                        yearMonth = it.key,
+                        items = it.value.asReversed()
+                    )
+                }.asReversed()
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValue)
                 ) {
-                    Text(
-                        text = startDate,
-                        maxLines = 1
-                    )
-                    Text(
-                        text = freight.loads[freight.loads.keys.minOf { it }]
-                            ?.replace("#", ", ")?.trimEnd() ?: "",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    categoryList.forEach { category ->
+                        stickyHeader {
+                            CategoryHeader(text = category.name)
+                        }
+
+                        items(items = category.items) { item ->
+                            val isRevealed = swipedItemId == item.id
+
+                            SwipeableItemWithActions(
+                                isRevealed = isRevealed,
+                                actions = {
+                                    ActionIcon(
+                                        icon = Icons.Outlined.Delete,
+                                        iconDescription = stringResource(R.string.delete) +
+                                                stringResource(R.string.freight),
+                                        modifier = Modifier
+                                            .fillMaxHeight()
+                                            .padding(start = 30.dp),
+                                        tint = Color.Red
+                                    ) {
+                                        viewModel.addFreightToDelete(freight = item)
+                                        viewModel.showDeleteItemConfDialog(true)
+                                    }
+                                },
+                                onExpanded = { viewModel.updateSwipedItemId(item.id) },
+                                onCollapsed = { viewModel.updateSwipedItemId("") },
+                                onSwipeDetected = { viewModel.updateSwipedItemId("") }
+                            ) {
+                                FreightRow(freight = item) {
+                                    viewModel.updateCurrentFreight(item)
+                                    viewModel.updateCurrentFreightBeforeChange(item)
+                                    viewModel.setCurrentFreightAsNew(false)
+                                    viewModel.showFreightContent(true)
+                                }
+                            }
+                        }
+                    }
                 }
 
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = "Arrow Forward",
-                    modifier = Modifier.weight(0.5f),
-                    tint = colorResource(id = R.color.gray),
-                )
-
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = endDate,
-                        maxLines = 1
-                    )
-                    Text(
-                        text = freight.unloads[freight.unloads.keys.maxOf { it }]
-                            ?.replace("#", ", ")?.trimEnd() ?: "",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                if (showDeleteConfDialog) {
+                    ActionConfirmDialog(
+                        title = stringResource(R.string.freight_delete),
+                        message = stringResource(R.string.ask_to_freight_delete),
+                        onConfirm = {
+                            viewModel.deleteFreight(
+                                context.getString(R.string.freight) + " " +
+                                        context.getString(R.string.deleted)
+                            )
+                            viewModel.updateSwipedItemId("")
+                        },
+                        onDismiss = {
+                            viewModel.showDeleteItemConfDialog(false)
+                            viewModel.updateSwipedItemId("")
+                        }
                     )
                 }
             }
         }
-    }
+    } else Text(stringResource(R.string.user_not_found))
 }
