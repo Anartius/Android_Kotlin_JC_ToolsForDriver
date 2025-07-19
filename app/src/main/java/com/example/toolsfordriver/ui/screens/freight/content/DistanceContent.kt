@@ -19,7 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.ui.common.DigitInputField
-import com.example.toolsfordriver.ui.common.text.TitleRowWithIcon
+import com.example.toolsfordriver.ui.common.text.TitleRowWithIcons
 import com.example.toolsfordriver.ui.screens.freight.FreightViewModel
 
 @Composable
@@ -28,7 +28,7 @@ fun DistanceContent() {
     val freight = viewModel.uiState.collectAsStateWithLifecycle().value.currentFreight!!
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    TitleRowWithIcon(
+    TitleRowWithIcons(
         modifier = Modifier.padding(start = 24.dp, top = 12.dp, end = 24.dp),
         text = stringResource(id = R.string.distance)
     )

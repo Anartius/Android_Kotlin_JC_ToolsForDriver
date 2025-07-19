@@ -16,7 +16,7 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
-import com.example.toolsfordriver.common.LocaleManager
+import com.example.toolsfordriver.common.TFDLocaleManager
 import com.example.toolsfordriver.ui.common.Camera
 import com.example.toolsfordriver.ui.common.TFDAppBar
 import com.example.toolsfordriver.ui.common.dialogs.ActionConfirmDialog
@@ -90,7 +90,7 @@ fun MyProfileScreen(
                     MyProfileLazyColumn(localeOptions = localeOptions)
 
                     if (showSelectLocaleDialog) {
-                        val locale = LocaleManager.getSavedLocale(context)
+                        val locale = TFDLocaleManager.getSavedLocale(context)
 
                         SelectLocaleDialog(
                             localeOptions = localeOptions,

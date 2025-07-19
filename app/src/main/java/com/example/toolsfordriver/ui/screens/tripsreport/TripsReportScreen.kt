@@ -19,7 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -46,7 +46,7 @@ fun TripsReportScreen(
     onNavIconClicked: () -> Unit
 ) {
     val timeZone = ZoneId.systemDefault()
-    val screenHeight = LocalConfiguration.current.screenHeightDp
+    val screenHeight = LocalWindowInfo.current.containerSize.height
     val viewModel: TripsReportViewModel = hiltViewModel()
     val users = viewModel.users.collectAsStateWithLifecycle(emptyList()).value
     val user = if (users.isNotEmpty()) users.first() else null
@@ -63,18 +63,20 @@ fun TripsReportScreen(
     val startDate = Date.from(startLocalDate.atStartOfDay(timeZone).toInstant())
 
     val endLocalDate = LocalDate.parse(range.substringAfter(", "))
-    val endDate = Date.from(endLocalDate.atTime(LocalTime.MAX).atZone(timeZone).toInstant())
+    val endDate =
+        Date.from(endLocalDate.atTime(LocalTime.MAX).atZone(timeZone).toInstant())
 
     if (startDate != null && endDate != null && user != null) {
         val tripList = viewModel.trips.collectAsStateWithLifecycle(emptyList()).value
-        val tripsMap = viewModel.getMappedTrips(tripList, startDate, endDate, timeZone)
+        val tripsMap = viewModel.getMappedTrips(
+            tripList, startDate, endDate, timeZone, user)
         val dailyTrips = tripsMap["d"]
         val hourlyTrips = tripsMap["h"]
 
 
         LaunchedEffect(tripList, range) {
-            dailyTrips?.let { viewModel.updateDailyPayData(it, user, timeZone) }
-            hourlyTrips?.let { viewModel.updateHourlyPayData(it, user, timeZone) }
+            dailyTrips?.let { viewModel.updateDailyPayData(it, user) }
+            hourlyTrips?.let { viewModel.updateHourlyPayData(it, user) }
         }
 
         Scaffold(

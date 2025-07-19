@@ -28,7 +28,7 @@ fun DigitalInputWithTitle(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
-    TitleRowWithIcon(
+    TitleRowWithIcons(
         text = title,
         modifier = Modifier.padding(horizontal = 24.dp)
     )

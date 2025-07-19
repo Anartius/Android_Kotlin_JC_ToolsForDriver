@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
-import com.example.toolsfordriver.common.LocaleManager
+import com.example.toolsfordriver.common.TFDLocaleManager
 import com.example.toolsfordriver.ui.common.text.DigitalInputWithTitle
 import com.example.toolsfordriver.ui.common.text.TextInputWithTitle
 import java.util.Locale
@@ -41,7 +41,7 @@ fun MyProfileLazyColumn(localeOptions: Map<Locale, String>) {
     val paymentPerDay = currentUser?.paymentPerDay
     val paymentPerHour = currentUser?.paymentPerHour
     val minMinutesToWholeHour = currentUser?.roundUpFromMinutes
-    val locale = LocaleManager.getSavedLocale(context)
+    val locale = TFDLocaleManager.getSavedLocale(context)
 
     val firstNameState = remember { mutableStateOf(firstName) }
     val lastNameState = remember { mutableStateOf(lastName) }

@@ -27,7 +27,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.ui.common.DeleteItemPopup
 import com.example.toolsfordriver.ui.common.dialogs.ImageSourcePickerDialog
-import com.example.toolsfordriver.ui.common.text.TitleRowWithIcon
+import com.example.toolsfordriver.ui.common.text.TitleRowWithIcons
 import com.example.toolsfordriver.ui.screens.freight.FreightViewModel
 import java.time.ZonedDateTime
 
@@ -70,12 +70,12 @@ fun FreightContentLazyColumn() {
                 .wrapContentHeight()
         ) {
             item {
-                TitleRowWithIcon(
+                TitleRowWithIcons(
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
                     text = stringResource(id = R.string.loads),
-                    icon = Icons.Filled.Add,
-                    showIcon = true,
-                    iconDescription = stringResource(id = R.string.add_place_and_time)
+                    primIcon = Icons.Filled.Add,
+                    showPrimIcon = true,
+                    primIconDescription = stringResource(id = R.string.add_place_and_time)
                 ) {
                     selectedItemDateTime.value = null
                     selectedItemLocation.value = ""
@@ -107,12 +107,12 @@ fun FreightContentLazyColumn() {
             }
 
             item {
-                TitleRowWithIcon(
+                TitleRowWithIcons(
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
                     text = stringResource(id = R.string.unloads),
-                    icon = Icons.Filled.Add,
-                    showIcon = true,
-                    iconDescription = stringResource(id = R.string.add_place_and_time)
+                    primIcon = Icons.Filled.Add,
+                    showPrimIcon = true,
+                    primIconDescription = stringResource(id = R.string.add_place_and_time)
                 ) {
                     selectedItemDateTime.value = null
                     selectedItemLocation.value = ""
@@ -146,12 +146,12 @@ fun FreightContentLazyColumn() {
             item { DistanceContent() }
 
             item {
-                TitleRowWithIcon(
+                TitleRowWithIcons(
                     modifier = Modifier.padding(start = 24.dp, bottom = 4.dp, end = 24.dp),
                     text = stringResource(id = R.string.pictures),
-                    icon = Icons.Filled.Add,
-                    showIcon = true,
-                    iconDescription = stringResource(id = R.string.add_picture)
+                    primIcon = Icons.Filled.Add,
+                    showPrimIcon = true,
+                    primIconDescription = stringResource(id = R.string.add_picture)
                 ) {
                     showSourcePickerDialog.value = true
                 }

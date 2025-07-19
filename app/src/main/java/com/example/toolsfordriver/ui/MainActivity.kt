@@ -9,7 +9,7 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.toolsfordriver.common.LocaleManager
+import com.example.toolsfordriver.common.TFDLocaleManager
 import com.example.toolsfordriver.ui.theme.ToolsForDriverTheme
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,11 +19,6 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-//        val intent = intent
-//        val action = intent.action
-//        val data = intent.data
-//        Log.e("MainActivity", "Action: $action, Data: $data")
 
         FirebaseFirestore.getInstance().clearPersistence()
         if (!hasRequiredPermissions()) {
@@ -37,7 +32,6 @@ class MainActivity : ComponentActivity() {
                 } else arrayOf(android.Manifest.permission.CAMERA),
                 0
             )
-
         }
 
         setContent {
@@ -63,10 +57,8 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun attachBaseContext(newBase: Context) {
-        val savedLocale = LocaleManager.getSavedLocale(newBase)
-
-        val context = LocaleManager.setLocale(newBase, savedLocale)
-
+        val savedLocale = TFDLocaleManager.getSavedLocale(newBase)
+        val context = TFDLocaleManager.setLocale(newBase, savedLocale)
         super.attachBaseContext(context)
     }
 }

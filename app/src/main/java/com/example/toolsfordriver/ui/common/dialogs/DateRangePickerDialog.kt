@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.os.ConfigurationCompat
 import androidx.core.os.LocaleListCompat
 import com.example.toolsfordriver.R
+import com.example.toolsfordriver.common.TFDLocaleManager
 import com.example.toolsfordriver.common.dateAsString
 import java.util.Locale
 
@@ -49,6 +50,7 @@ fun DateRangePickerDialog(
         initialSelectedEndDateMillis = initialEndDate
     )
 
+    val locale = TFDLocaleManager.getSavedLocale(LocalContext.current)
     val config = Configuration().apply {
         updateFrom(LocalConfiguration.current)
 
@@ -56,8 +58,8 @@ fun DateRangePickerDialog(
             this,
             LocaleListCompat.create(
                 Locale.Builder()
-                    .setRegion("GB")
-                    .setLanguage("EN")
+                    .setRegion("PL")
+                    .setLanguage(locale.language)
                     .setUnicodeLocaleKeyword("fw", "mon")
                     .build()
             )

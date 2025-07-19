@@ -45,6 +45,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.core.os.ConfigurationCompat
 import androidx.core.os.LocaleListCompat
 import com.example.toolsfordriver.R
+import com.example.toolsfordriver.common.TFDLocaleManager
 import com.example.toolsfordriver.common.dateAsString
 import com.example.toolsfordriver.ui.common.buttons.AppButton
 import java.util.Locale
@@ -117,6 +118,7 @@ fun DatePickerRow(datePickerState: DatePickerState) {
                     containerColor = colorResource(id = R.color.dark_gray).copy(alpha = 0.8f)
                 )
             ) {
+                val locale = TFDLocaleManager.getSavedLocale(LocalContext.current)
                 val config = Configuration().apply {
                     updateFrom(LocalConfiguration.current)
 
@@ -124,8 +126,8 @@ fun DatePickerRow(datePickerState: DatePickerState) {
                         this,
                         LocaleListCompat.create(
                             Locale.Builder()
-                                .setRegion("GB")
-                                .setLanguage("EN")
+                                .setRegion("PL")
+                                .setLanguage(locale.language)
                                 .setUnicodeLocaleKeyword("fw", "mon")
                                 .build()
                         )
@@ -141,12 +143,13 @@ fun DatePickerRow(datePickerState: DatePickerState) {
                         state = datePickerState,
                         title = {
                             Row(
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier
+                                    .fillMaxWidth()
                                     .padding(top = 16.dp),
                                 horizontalArrangement = Arrangement.Center
                             ) {
                                 Text(
-                                    text = "Select date",
+                                    text = stringResource(R.string.select_date),
                                     fontSize = 20.sp,
                                     color = colorResource(R.color.light_blue)
                                 )
@@ -154,7 +157,9 @@ fun DatePickerRow(datePickerState: DatePickerState) {
                         },
                         headline = {
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp),
                                 horizontalArrangement = Arrangement.Center
                             ) {
                                 Text(

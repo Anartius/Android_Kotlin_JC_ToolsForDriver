@@ -154,7 +154,9 @@ fun TripListContent(
                                 icon = Icons.Outlined.Delete,
                                 iconDescription = stringResource(R.string.delete)
                                         + stringResource(R.string.trip),
-                                modifier = Modifier.fillMaxHeight().padding(start = 30.dp),
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .padding(start = 30.dp),
                                 tint = Color.Red
                             ) {
                                 viewModel.addTripToDelete(trip = item)
@@ -185,8 +187,7 @@ fun TripListContent(
                 message = stringResource(R.string.ask_to_trip_delete),
                 onConfirm = {
                     viewModel.deleteTrip(
-                        context.getString(R.string.trip) +
-                                " " + context.getString(R.string.deleted)
+                        context.getString(R.string.trip_deleted_successfully)
                     )
                     viewModel.updateSwipedItemId("")
                 },

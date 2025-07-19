@@ -3,10 +3,11 @@ package com.example.toolsfordriver.common
 import android.content.Context
 import android.content.res.Configuration
 import android.os.LocaleList
+import androidx.core.content.edit
 import com.example.toolsfordriver.data.enums.Locales
 import java.util.Locale
 
-object LocaleManager {
+object TFDLocaleManager {
     fun setLocale(context: Context, locale: Locale): Context {
         val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
@@ -17,7 +18,7 @@ object LocaleManager {
 
     fun saveLocale(context: Context, locale: Locale) {
         val sharedPreferences = context.getSharedPreferences("LocalePrefs", Context.MODE_PRIVATE)
-        sharedPreferences.edit().putString("language", locale.language).apply()
+        sharedPreferences.edit { putString("language", locale.language) }
     }
 
     fun getSavedLocale(context: Context): Locale {
@@ -40,7 +41,8 @@ object LocaleManager {
         }
 
         return try {
-            Locale(sharedPreferences.getString("language", Locales.LOCALE_EN.locale.language)!!)
+            Locale(sharedPreferences.getString(
+                "language", Locales.LOCALE_EN.locale.language)!!)
         } catch (e: Exception) {
             Locales.LOCALE_EN.locale
         }

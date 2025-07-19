@@ -27,6 +27,7 @@
     <string name="pln">" PLN"</string>
     <string name="request_permission">Запаросить разрешение</string>
     <string name="select">Выбрать</string>
+    <string name="select_date">Выберите дату</string>
     <string name="select_date_and_time">Выберите дату и время</string>
     <string name="selected_option">Выбранный вариант</string>
     <string name="select_period">Выберите период</string>
@@ -95,6 +96,7 @@
     <string name="per_hour">за час</string>
     <string name="trip">Поездка</string>
     <string name="trip_delete">Удаление поездки</string>
+    <string name="trip_deleted_successfully">Поездка успешно удалена</string>
     <string name="trips">Поездки</string>
     <string name="update_trip">Обновить поездку</string>
     <string name="start">Начало</string>
@@ -115,6 +117,7 @@
         прикрепленных изображений</string>
     <string name="freight">Перевозка</string>
     <string name="freight_delete">Удаление перевозки</string>
+    <string name="freight_deleted_successfully">Перевозка успешно удалена</string>
     <string name="freights">Перевозки</string>
     <string name="image">Изображение</string>
     <string name="images">Изображения</string>
@@ -146,8 +149,10 @@
 
     <!-- TripsReport -->
     <string name="current_month">Текущий месяц</string>
+    <string name="hide_every_trip_duration">Скрыть продолжительность каждой поездки</string>
     <string name="hide_list_of_trips">скрыть список поездок</string>
-    <string name="previous_month">Предыдущий месяцh</string>
+    <string name="previous_month">Предыдущий месяц</string>
+    <string name="show_every_trip_duration">Показать продолжительность каждой поездки</string>
     <string name="show_list_of_trips">показать список поездок</string>
     <string name="summary">Итого</string>
     <string name="trips_report">Отчёт о поездках</string>

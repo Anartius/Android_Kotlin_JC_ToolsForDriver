@@ -1,39 +1,40 @@
 [versions]
-androidGradlePlugin = "8.11.0"
-kotlin = "2.2.0"
-composeBom = "2025.06.01"
-activityCompose = "1.10.1"
-navigationCompose = "2.9.1"
-lifecycleVersion = "2.9.1"
-kotlinCoroutines = "1.10.2"
-kotlinSerialisation = "1.9.0"
-kotlinDateTime = "0.7.0"
-googleServices = "4.4.3"
 accompanistPermissions = "0.37.3"
-daggerHiltVersion = "2.56.2"
-androidHiltVersion = "1.2.0"
-daggerHilt = "2.56.2"
-roomVersion = "2.7.2"
-firebaseBom = "33.16.0"
+activityCompose = "1.10.1"
+androidHilt = "1.2.0"
+androidGradlePlugin = "8.11.1"
+camera = "1.4.2"
+coil = "2.7.0"
+composeBom = "2025.07.00"
+daggerHilt = "2.57"
+desugar = "2.1.5"
+espressoCore = "3.6.1"
 firebaseAuth = "23.2.1"
+firebaseBom = "33.16.0"
 firebaseFirestore = "25.1.4"
 firebaseStorage = "21.0.2"
-ksp = "2.2.0-2.0.2"
-ktx = "1.16.0"
+googleServices = "4.4.3"
 gson = "2.13.1"
-coil = "2.7.0"
-camera = "1.4.2"
+iconsLucide = "1.1.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
-espressoCore = "3.6.1"
-iconsLucide = "1.1.0"
+kotlin = "2.2.0"
+kotlinCoroutines = "1.10.2"
+kotlinDateTime = "0.7.1"
+kotlinSerialisation = "1.9.0"
+ksp = "2.2.0-2.0.2"
+ktx = "1.16.0"
+lifecycleVersion = "2.9.2"
+navigationCompose = "2.9.2"
+roomVersion = "2.7.2"
 
 [libraries]
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "ktx" }
+android-desugar = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar"}
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose"}
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "ktx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
-google-accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermissions" }
 composables-icons = { group = "com.composables", name = "icons-lucide", version.ref = "iconsLucide"}
+google-accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermissions" }
 
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3"}
@@ -56,10 +57,10 @@ kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "ko
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerialisation" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinDateTime" }
 
-google-dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "daggerHiltVersion" }
-google-dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "daggerHiltVersion" }
-androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "androidHiltVersion" }
-androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidHiltVersion" }
+google-dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "daggerHilt" }
+google-dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "daggerHilt" }
+androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "androidHilt" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidHilt" }
 
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomVersion" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }

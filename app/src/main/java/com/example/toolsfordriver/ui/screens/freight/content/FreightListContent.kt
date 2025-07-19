@@ -154,8 +154,8 @@ fun FreightListContent(onNavIconClicked: () -> Unit) {
                         message = stringResource(R.string.ask_to_freight_delete),
                         onConfirm = {
                             viewModel.deleteFreight(
-                                context.getString(R.string.freight) + " " +
-                                        context.getString(R.string.deleted)
+                                context.getString(
+                                    R.string.freight_deleted_successfully)
                             )
                             viewModel.updateSwipedItemId("")
                         },

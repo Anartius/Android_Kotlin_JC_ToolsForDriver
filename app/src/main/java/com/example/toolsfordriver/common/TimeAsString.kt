@@ -57,9 +57,9 @@ fun timeAsString(dateTime: ZonedDateTime?): String {
     } else ""
 }
 
-fun durationAsString(duration: Duration): String {
-    val days = duration.toDays()
-    val hours = duration.toHours() % 24
+fun durationAsString(duration: Duration?): String {
+    val days = duration?.toDays() ?: 0L
+    val hours = if (duration == null || duration.isZero) 0L else duration.toHours() % 24
 
     return ((if (days != 0L) "$days d " else "") + "$hours h")
 }

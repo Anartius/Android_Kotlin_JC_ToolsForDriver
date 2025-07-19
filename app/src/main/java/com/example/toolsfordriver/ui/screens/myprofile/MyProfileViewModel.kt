@@ -8,7 +8,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.toolsfordriver.R
-import com.example.toolsfordriver.common.LocaleManager
+import com.example.toolsfordriver.common.TFDLocaleManager
 import com.example.toolsfordriver.common.UiText
 import com.example.toolsfordriver.common.saveBitmapToInternalStorage
 import com.example.toolsfordriver.common.saveImageToInternalStorage
@@ -44,9 +44,9 @@ class MyProfileViewModel @Inject constructor(
     fun updateUser(user: User) = launchCatching { firestoreService.updateUser(user) }
 
     fun updateLocale(locale: Locale, context: Context) {
-        LocaleManager.saveLocale(context, locale)
-        val updatedLocale = LocaleManager.getSavedLocale(context)
-        LocaleManager.setLocale(context, updatedLocale)
+        TFDLocaleManager.saveLocale(context, locale)
+        val updatedLocale = TFDLocaleManager.getSavedLocale(context)
+        TFDLocaleManager.setLocale(context, updatedLocale)
         (context as Activity).recreate()
     }
 

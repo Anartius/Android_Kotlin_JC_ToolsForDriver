@@ -27,6 +27,7 @@
     <string name="pln">" PLN"</string>
     <string name="request_permission">Request permission</string>
     <string name="select">Select</string>
+    <string name="select_date">Select date</string>
     <string name="select_date_and_time">Select date and time</string>
     <string name="selected_option">Selected option</string>
     <string name="select_period">Select period</string>
@@ -94,6 +95,7 @@
     <string name="per_hour">per hour</string>
     <string name="trip">Trip</string>
     <string name="trip_delete">Trip delete</string>
+    <string name="trip_deleted_successfully">Trip deleted successfully</string>
     <string name="trips">Trips</string>
     <string name="update_trip">Update trip</string>
     <string name="start">Start</string>
@@ -113,6 +115,7 @@
     <string name="failed_to_delete_attached_images">Failed to delete attached images</string>
     <string name="freight">Freight</string>
     <string name="freight_delete">Freight delete</string>
+    <string name="freight_deleted_successfully">Freight deleted successfully</string>
     <string name="freights">Freights</string>
     <string name="image">Image</string>
     <string name="images">Images</string>
@@ -144,8 +147,10 @@
 
     <!-- TripsReport -->
     <string name="current_month">Current month</string>
+    <string name="hide_every_trip_duration">Hide every trip duration</string>
     <string name="hide_list_of_trips">hide list of trips</string>
     <string name="previous_month">Previous month</string>
+    <string name="show_every_trip_duration">Show every trip duration</string>
     <string name="show_list_of_trips">show list of trips</string>
     <string name="summary">Summary</string>
     <string name="trips_report">Trips report</string>
