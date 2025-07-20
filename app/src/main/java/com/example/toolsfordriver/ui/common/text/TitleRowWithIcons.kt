@@ -57,7 +57,7 @@ fun TitleRowWithIcons(
                 Icon(
                     imageVector = secIcon,
                     contentDescription = secIconDescription,
-                    modifier = Modifier.padding(end = 8.dp).size(secIconSize)
+                    modifier = Modifier.padding(end = 12.dp).size(secIconSize)
                         .clickable { onSecIconClick() },
                     tint = colorResource(id = R.color.light_blue)
                 )

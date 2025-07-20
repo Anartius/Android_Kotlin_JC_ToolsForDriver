@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.composables.icons.lucide.ChevronsDownUp
@@ -38,6 +39,7 @@ fun TripSReportDurationItem(
     value: String,
     tripList: List<Pair<Trip, Duration?>>? = null
 ) {
+    val context = LocalContext.current
     var showTripList by remember { mutableStateOf(true) }
     var showEveryTripDuration by remember { mutableStateOf(false) }
 
@@ -71,7 +73,7 @@ fun TripSReportDurationItem(
                 trip.forEach {
                     RangeTextRow(it.first)
                     if (showEveryTripDuration) {
-                        Text(text = durationAsString(it.second))
+                        Text(text = durationAsString(it.second, context))
                     }
                 }
             }

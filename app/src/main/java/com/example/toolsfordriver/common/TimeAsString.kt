@@ -1,5 +1,7 @@
 package com.example.toolsfordriver.common
 
+import android.content.Context
+import com.example.toolsfordriver.R
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDateTime
@@ -57,9 +59,10 @@ fun timeAsString(dateTime: ZonedDateTime?): String {
     } else ""
 }
 
-fun durationAsString(duration: Duration?): String {
+fun durationAsString(duration: Duration?, context: Context): String {
     val days = duration?.toDays() ?: 0L
     val hours = if (duration == null || duration.isZero) 0L else duration.toHours() % 24
 
-    return ((if (days != 0L) "$days d " else "") + "$hours h")
+    return (if (days != 0L) "$days ${context.getString(R.string.d)} " else "") +
+            "$hours ${context.getString(R.string.h)}"
 }

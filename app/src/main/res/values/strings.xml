@@ -9,6 +9,7 @@
     <string name="cancel">Cancel</string>
     <string name="choose_source">Choose source</string>
     <string name="confirm">Confirm</string>
+    <string name="d">d</string> <!--days-->
     <string name="date">Date</string>
     <string name="delete">Delete</string>
     <string name="deleted">deleted</string>
@@ -16,6 +17,7 @@
     <string name="edit">Edit</string>
     <string name="gallery">Gallery</string>
     <string name="generic_error">Something wrong happened. Please try again.</string>
+    <string name="h">h</string> <!--hours-->
     <string name="icon">Icon</string>
     <string name="image_was_not_saved">Image wasn\'t saved</string>
     <string name="notification_permission_description">The notification permission is important
@@ -147,6 +149,7 @@
 
     <!-- TripsReport -->
     <string name="current_month">Current month</string>
+    <string name="data_copied_to_clipboard">Data copied to clipboard</string>
     <string name="hide_every_trip_duration">Hide every trip duration</string>
     <string name="hide_list_of_trips">hide list of trips</string>
     <string name="previous_month">Previous month</string>

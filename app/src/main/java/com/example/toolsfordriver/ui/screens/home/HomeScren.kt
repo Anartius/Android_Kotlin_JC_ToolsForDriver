@@ -55,7 +55,7 @@ fun HomeScreen(
         topBar = {
             TFDAppBar(
                 title = stringResource(R.string.tfd_app),
-                avatarAction = {
+                actionWithImage = {
                     IconButton(
                         onClick = { onNavigateToMyProfileScreen() },
                         modifier = Modifier.padding(horizontal = 4.dp)

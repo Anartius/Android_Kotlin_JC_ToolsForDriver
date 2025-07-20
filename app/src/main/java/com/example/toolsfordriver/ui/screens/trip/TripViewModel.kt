@@ -1,5 +1,6 @@
 package com.example.toolsfordriver.ui.screens.trip
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -81,11 +82,12 @@ class TripViewModel @Inject constructor(
     fun updateTripDuration(
         start: LocalDateTime?,
         end: LocalDateTime?,
-        roundUpFromMinutes: Int
+        roundUpFromMinutes: Int,
+        context: Context
     ) {
         val duration = calcDuration(start, end, roundUpFromMinutes)
         _uiState.value = _uiState.value.copy(
-            tripDuration = if (duration != null) durationAsString(duration) else ""
+            tripDuration = if (duration != null) durationAsString(duration, context) else ""
         )
     }
 

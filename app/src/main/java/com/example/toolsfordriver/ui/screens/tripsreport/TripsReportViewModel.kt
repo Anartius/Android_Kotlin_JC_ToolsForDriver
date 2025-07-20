@@ -1,13 +1,26 @@
 package com.example.toolsfordriver.ui.screens.tripsreport
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.toolsfordriver.R
+import com.example.toolsfordriver.common.UiText
 import com.example.toolsfordriver.common.calcDuration
+import com.example.toolsfordriver.common.dateAsString
+import com.example.toolsfordriver.common.durationAsString
+import com.example.toolsfordriver.common.timeAsString
 import com.example.toolsfordriver.data.model.Trip
 import com.example.toolsfordriver.data.model.User
 import com.example.toolsfordriver.data.model.service.FirestoreService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -22,6 +35,10 @@ class TripsReportViewModel @Inject constructor(
 
     val trips = firestoreService.trips
     val users = firestoreService.users
+
+    private val snackbarChannel = Channel<UiText>()
+    val snackbarMessages = snackbarChannel.receiveAsFlow()
+
     private val _uiState = MutableStateFlow(TripsReportUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -115,5 +132,71 @@ class TripsReportViewModel @Inject constructor(
     private fun calcEarnings(daysDuration: Duration, hoursDuration: Duration, user: User): Double {
         return hoursDuration.toHours() * user.paymentPerHour +
                 daysDuration.toHours() * user.paymentPerDay / 24
+    }
+
+    fun copyDataToClipboard(
+        tripsMap: Map<String, List<Pair<Trip, Duration?>>>,
+        context: Context
+    ): String {
+        var result = ""
+        var duration = Duration.ZERO
+
+        launchCatching {
+            val dailyTrips = tripsMap["d"]
+            val hourlyTrips = tripsMap["h"]
+
+            dailyTrips?.let { trips ->
+                result += "${context.getString(R.string.payment_per_day)}:\n"
+
+                trips.forEach { trip ->
+                    duration += trip.second ?: Duration.ZERO
+
+                    result += "${dateAsString(trip.first.startTime)} " +
+                            timeAsString(trip.first.startTime) +
+                            " - ${dateAsString(trip.first.endTime)} " +
+                            timeAsString(trip.first.endTime) +
+                            "  ${durationAsString(trip.second, context)}\n"
+                }
+            }
+
+            hourlyTrips?.let { trips ->
+                result += "${context.getString(R.string.payment_per_hour)}:\n"
+
+                trips.forEach { trip ->
+                    duration += trip.second ?: Duration.ZERO
+
+                    result += "${dateAsString(trip.first.startTime)} " +
+                            timeAsString(trip.first.startTime) +
+                            " - ${dateAsString(trip.first.endTime)} " +
+                            timeAsString(trip.first.endTime) +
+                            "  ${durationAsString(trip.second, context)}\n"
+                }
+            }
+
+            if (result.isNotEmpty()) {
+                result += "${context.getString(R.string.summary)}: " +
+                        durationAsString(duration, context)
+
+                snackbarChannel.send(
+                    UiText.StringResource(R.string.data_copied_to_clipboard)
+                )
+            }
+        }
+
+        return result
+    }
+
+    private fun launchCatching(block: suspend CoroutineScope.() -> Unit) {
+        viewModelScope.launch(
+            CoroutineExceptionHandler{ _, throwable ->
+                viewModelScope.launch {
+                    Log.e("Error", throwable.message.toString())
+                    snackbarChannel.send(
+                        UiText.DynamicString(throwable.message.toString())
+                    )
+                }
+            },
+            block = block
+        )
     }
 }

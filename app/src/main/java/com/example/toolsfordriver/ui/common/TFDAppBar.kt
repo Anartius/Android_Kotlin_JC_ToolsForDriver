@@ -19,17 +19,17 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import com.example.toolsfordriver.R
-
+import com.example.toolsfordriver.data.model.IconWithAction
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TFDAppBar(
+    modifier: Modifier = Modifier,
     title: String,
     navIcon: ImageVector? = null,
     navIconDescription: String = stringResource(id = R.string.to_the_previous_screen),
-    modifier: Modifier = Modifier,
-    avatarAction: (@Composable () -> Unit)? = null,
-    actions: List<Triple<ImageVector, String, () -> Unit>> = emptyList(),
+    actionWithImage: (@Composable () -> Unit)? = null,
+    actions: List<IconWithAction> = emptyList(),
     onNavIconClicked:() -> Unit = {}
 ) {
     Column(modifier = modifier) {
@@ -59,14 +59,15 @@ fun TFDAppBar(
                 }
             },
             actions = {
-                if (avatarAction != null) {
-                    avatarAction()
+                if (actionWithImage != null) {
+                    actionWithImage()
                 }
                 actions.forEach { action ->
-                    IconButton(onClick = { action.third.invoke() }) {
+                    IconButton(onClick = { action.onClick() }) {
                         Icon(
-                            imageVector = action.first,
-                            contentDescription = action.second
+                            imageVector = action.icon,
+                            contentDescription = action.description,
+                            tint = action.tint
                         )
                     }
                 }

@@ -140,7 +140,8 @@ fun TripListContent(
                         showIcon = true,
                         iconDescription = "Get month summary"
                     ) {
-                        onNavigateToTripsReportScreen(getSpecificMonthRange(category.yearMonth))
+                        onNavigateToTripsReportScreen(
+                            getSpecificMonthRange(category.yearMonth))
                     }
                 }
 

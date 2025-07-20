@@ -133,7 +133,9 @@ class FreightViewModel @Inject constructor(
             CoroutineExceptionHandler{ _, throwable ->
                 viewModelScope.launch {
                     Log.e("Error", throwable.message.toString())
-                    snackbarChannel.send(UiText.DynamicString(throwable.message.toString()))
+                    snackbarChannel.send(
+                        UiText.DynamicString(throwable.message.toString())
+                    )
                 }
             },
             block = block

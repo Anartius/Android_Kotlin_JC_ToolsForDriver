@@ -16,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -36,8 +37,9 @@ import java.util.Date
 
 @Composable
 fun TripContentColumn() {
-    val viewModel: TripViewModel = hiltViewModel()
     val timeZoneId = ZoneId.systemDefault()
+    val context = LocalContext.current
+    val viewModel: TripViewModel = hiltViewModel()
     val showDatePickerDialog = rememberSaveable { mutableStateOf(false) }
     var isStartDatePickerDialog by remember { mutableStateOf(true) }
 
@@ -80,7 +82,10 @@ fun TripContentColumn() {
 
         LaunchedEffect(startDateTime, endDateTime, paymentPerHour) {
             viewModel.updateTripDuration(
-                startDateTime.value, endDateTime.value, roundUpFromMinutes
+                start = startDateTime.value,
+                end = endDateTime.value,
+                roundUpFromMinutes = roundUpFromMinutes,
+                context = context
             )
             viewModel.updateTripEarnings(
                 startDateTime.value, endDateTime.value, roundUpFromMinutes, paymentPerHour)

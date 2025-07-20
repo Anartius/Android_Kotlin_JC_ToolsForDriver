@@ -17,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.TFDLocaleManager
+import com.example.toolsfordriver.data.model.IconWithAction
 import com.example.toolsfordriver.ui.common.Camera
 import com.example.toolsfordriver.ui.common.TFDAppBar
 import com.example.toolsfordriver.ui.common.dialogs.ActionConfirmDialog
@@ -65,9 +66,9 @@ fun MyProfileScreen(
                         navIcon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                         onNavIconClicked = { onNavigateToHomeScreen() },
                         actions = listOf(
-                            Triple(
-                                Icons.AutoMirrored.Filled.Logout,
-                                stringResource(id = R.string.sign_out)
+                            IconWithAction(
+                                icon = Icons.AutoMirrored.Filled.Logout,
+                                description = stringResource(id = R.string.sign_out)
                             ) { viewModel.showSignOutDialog(true) }
                         )
                     )

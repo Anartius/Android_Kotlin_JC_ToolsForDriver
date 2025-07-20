@@ -3,6 +3,7 @@ package com.example.toolsfordriver.common
 import android.content.Context
 import android.content.res.Configuration
 import android.os.LocaleList
+import android.util.Log
 import androidx.core.content.edit
 import com.example.toolsfordriver.data.enums.Locales
 import java.util.Locale
@@ -44,6 +45,7 @@ object TFDLocaleManager {
             Locale(sharedPreferences.getString(
                 "language", Locales.LOCALE_EN.locale.language)!!)
         } catch (e: Exception) {
+            Log.e("Locale", e.message.toString())
             Locales.LOCALE_EN.locale
         }
     }

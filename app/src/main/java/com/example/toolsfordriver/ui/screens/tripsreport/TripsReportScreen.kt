@@ -1,16 +1,22 @@
 package com.example.toolsfordriver.ui.screens.tripsreport
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,10 +24,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,10 +41,14 @@ import com.example.toolsfordriver.R
 import com.example.toolsfordriver.common.dateAsString
 import com.example.toolsfordriver.common.durationAsString
 import com.example.toolsfordriver.common.getRangeAsString
+import com.example.toolsfordriver.data.model.IconWithAction
+import com.example.toolsfordriver.ui.common.CustomSnackBar
 import com.example.toolsfordriver.ui.common.TFDAppBar
 import com.example.toolsfordriver.ui.common.TextRow
 import com.example.toolsfordriver.ui.common.dialogs.DateRangePickerDialog
 import com.example.toolsfordriver.ui.common.text.HeaderRow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
@@ -46,7 +61,9 @@ fun TripsReportScreen(
     onNavIconClicked: () -> Unit
 ) {
     val timeZone = ZoneId.systemDefault()
+    val context = LocalContext.current
     val screenHeight = LocalWindowInfo.current.containerSize.height
+
     val viewModel: TripsReportViewModel = hiltViewModel()
     val users = viewModel.users.collectAsStateWithLifecycle(emptyList()).value
     val user = if (users.isNotEmpty()) users.first() else null
@@ -73,6 +90,22 @@ fun TripsReportScreen(
         val dailyTrips = tripsMap["d"]
         val hourlyTrips = tripsMap["h"]
 
+        val clipboardManager = LocalClipboardManager.current
+
+        val snackbarHostState = remember { SnackbarHostState() }
+
+        LaunchedEffect(viewModel.snackbarMessages) {
+            viewModel.snackbarMessages.collect { snackbarMessage ->
+                val job = launch {
+                    snackbarHostState.showSnackbar(
+                        message = snackbarMessage.asString(context),
+                        duration = SnackbarDuration.Indefinite
+                    )
+                }
+                delay(3000)
+                job.cancel()
+            }
+        }
 
         LaunchedEffect(tripList, range) {
             dailyTrips?.let { viewModel.updateDailyPayData(it, user) }
@@ -84,8 +117,32 @@ fun TripsReportScreen(
                 TFDAppBar(
                     title = stringResource(R.string.trips_report),
                     navIcon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                    onNavIconClicked = { onNavIconClicked() }
+                    onNavIconClicked = { onNavIconClicked() },
+                    actions = listOf(
+                        IconWithAction(
+                            icon = Icons.Filled.ContentCopy,
+                            description = "Copy data",
+                            tint = colorResource(R.color.light_blue)
+                        ) {
+                            val dataAsText = viewModel.copyDataToClipboard(tripsMap, context)
+                            clipboardManager.setText(AnnotatedString(dataAsText))
+                        }
+                    )
                 )
+            },
+            snackbarHost = {
+                Box(
+                    modifier = Modifier.wrapContentSize().padding(vertical = 24.dp),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    SnackbarHost(hostState = snackbarHostState) { data ->
+                        CustomSnackBar(
+                            msg = data.visuals.message,
+                            textColor = colorResource(R.color.light_gray),
+                            containerColor = Color.Black
+                        )
+                    }
+                }
             }
         ) { paddingValue ->
             Surface(modifier = Modifier.fillMaxSize().padding(paddingValue)) {
@@ -112,7 +169,7 @@ fun TripsReportScreen(
                         if (dailyPayDuration != Duration.ZERO) {
                             TripSReportDurationItem(
                                 title = stringResource(R.string.payment_per_day),
-                                value = durationAsString(dailyPayDuration),
+                                value = durationAsString(dailyPayDuration, context),
                                 tripList = dailyTrips
                             )
                         }
@@ -120,7 +177,7 @@ fun TripsReportScreen(
                         if (hourlyPayDuration != Duration.ZERO) {
                             TripSReportDurationItem(
                                 title = stringResource(R.string.payment_per_hour),
-                                value = durationAsString(hourlyPayDuration),
+                                value = durationAsString(hourlyPayDuration, context),
                                 tripList = hourlyTrips,
                                 modifier = Modifier.padding(top = 32.dp)
                             )
