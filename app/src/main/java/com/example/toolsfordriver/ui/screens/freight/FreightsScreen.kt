@@ -1,5 +1,6 @@
 package com.example.toolsfordriver.ui.screens.freight
 
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -10,7 +11,10 @@ import com.example.toolsfordriver.ui.screens.freight.content.FreightContent
 import com.example.toolsfordriver.ui.screens.freight.content.FreightListContent
 
 @Composable
-fun FreightsScreen(onNavIconClicked: () -> Unit) {
+fun FreightsScreen(
+    adaptiveInfo: WindowAdaptiveInfo,
+    onNavigateToHomeScreen: () -> Unit
+) {
     val context = LocalContext.current
     val viewModel: FreightViewModel = hiltViewModel()
 
@@ -42,7 +46,7 @@ fun FreightsScreen(onNavIconClicked: () -> Unit) {
             }
 
         } else {
-            FreightListContent { onNavIconClicked() }
+            FreightListContent { onNavigateToHomeScreen() }
         }
     }
 }

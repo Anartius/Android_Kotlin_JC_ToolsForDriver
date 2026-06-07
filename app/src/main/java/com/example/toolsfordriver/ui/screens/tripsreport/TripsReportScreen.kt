@@ -18,6 +18,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,6 +58,7 @@ import java.util.Date
 
 @Composable
 fun TripsReportScreen(
+    adaptiveInfo: WindowAdaptiveInfo,
     rangeValue: String,
     onNavIconClicked: () -> Unit
 ) {
@@ -89,6 +91,7 @@ fun TripsReportScreen(
             tripList, startDate, endDate, timeZone, user)
         val dailyTrips = tripsMap["d"]
         val hourlyTrips = tripsMap["h"]
+        val dateFormat = user.tripReportDateFormat
 
         val clipboardManager = LocalClipboardManager.current
 
@@ -121,10 +124,12 @@ fun TripsReportScreen(
                     actions = listOf(
                         IconWithAction(
                             icon = Icons.Filled.ContentCopy,
-                            description = "Copy data",
+                            description = stringResource(R.string.copy_data),
                             tint = colorResource(R.color.light_blue)
                         ) {
-                            val dataAsText = viewModel.copyDataToClipboard(tripsMap, context)
+                            val dataAsText = viewModel.copyDataToClipboard(
+                                tripsMap, context, dateFormat
+                            )
                             clipboardManager.setText(AnnotatedString(dataAsText))
                         }
                     )
@@ -132,7 +137,9 @@ fun TripsReportScreen(
             },
             snackbarHost = {
                 Box(
-                    modifier = Modifier.wrapContentSize().padding(vertical = 24.dp),
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(vertical = 24.dp),
                     contentAlignment = Alignment.BottomCenter
                 ) {
                     SnackbarHost(hostState = snackbarHostState) { data ->
@@ -145,13 +152,18 @@ fun TripsReportScreen(
                 }
             }
         ) { paddingValue ->
-            Surface(modifier = Modifier.fillMaxSize().padding(paddingValue)) {
+            Surface(modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValue)) {
                 Column(
-                    modifier = Modifier.padding(bottom = 24.dp).fillMaxSize(),
+                    modifier = Modifier
+                        .padding(bottom = 24.dp)
+                        .fillMaxSize(),
                     verticalArrangement = Arrangement.Top
                 ) {
                     HeaderRow(
-                        text = "${dateAsString(startDate)} - ${dateAsString(endDate)}",
+                        text = "${dateAsString(startDate)} - " +
+                                dateAsString(endDate),
                         onClick = { viewModel.showDateRangePicker(true) }
                     )
 
@@ -162,7 +174,8 @@ fun TripsReportScreen(
                     )
 
                     Column(
-                        modifier = Modifier.padding(top = 16.dp)
+                        modifier = Modifier
+                            .padding(top = 16.dp)
                             .heightIn(max = (screenHeight - 330).dp)
                             .verticalScroll(rememberScrollState())
                     ) {
@@ -170,7 +183,8 @@ fun TripsReportScreen(
                             TripSReportDurationItem(
                                 title = stringResource(R.string.payment_per_day),
                                 value = durationAsString(dailyPayDuration, context),
-                                tripList = dailyTrips
+                                tripList = dailyTrips,
+                                dateFormat = user.tripReportDateFormat
                             )
                         }
 
@@ -179,7 +193,8 @@ fun TripsReportScreen(
                                 title = stringResource(R.string.payment_per_hour),
                                 value = durationAsString(hourlyPayDuration, context),
                                 tripList = hourlyTrips,
-                                modifier = Modifier.padding(top = 32.dp)
+                                modifier = Modifier.padding(top = 32.dp),
+                                dateFormat = dateFormat
                             )
                         }
                     }
@@ -192,7 +207,7 @@ fun TripsReportScreen(
 
                     TextRow(
                         valueDescription = stringResource(R.string.earnings),
-                        value = "$earnings PLN",
+                        value = "$earnings ${user.currency}",
                         fontSize = 20.sp
                     )
                 }
@@ -200,13 +215,14 @@ fun TripsReportScreen(
                 if (showDateRangePicker) {
                     val pickerStartDate = Date
                         .from(
-                            startLocalDate.atStartOfDay(ZoneId.of("UTC")).toInstant()
+                            startLocalDate.atStartOfDay(
+                                ZoneId.of("UTC")).toInstant()
                         ).time
 
                     val pickerEndDate = Date
                         .from(
-                            endLocalDate.atTime(LocalTime.MAX).atZone(ZoneId.of("UTC"))
-                                .toInstant()
+                            endLocalDate.atTime(LocalTime.MAX)
+                                .atZone(ZoneId.of("UTC")).toInstant()
                         ).time
 
                     DateRangePickerDialog(
@@ -216,7 +232,7 @@ fun TripsReportScreen(
                             viewModel.showDateRangePicker(false)
                             range = getRangeAsString(start, end)
                         },
-                        hideDialog = { viewModel.showDateRangePicker(false) }
+                        onHideDialog = { viewModel.showDateRangePicker(false) }
                     )
                 }
             }

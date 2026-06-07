@@ -75,6 +75,8 @@ fun MyProfileScreen(
                 }
             ) { paddingValues ->
 
+                val showSelectCurrencyDialog = uiState.showSelectCurrencyDialog
+                val showSelectDataFormatDialog = uiState.showSelectDateFormatDialog
                 val showSelectLocaleDialog = uiState.showSelectLocaleDialog
                 val showSignOutDialog = uiState.showSignOutDialog
 
@@ -89,6 +91,30 @@ fun MyProfileScreen(
                     )
 
                     MyProfileLazyColumn(localeOptions = localeOptions)
+
+                    if (showSelectCurrencyDialog) {
+                        val currency = currentUser.currency
+
+                        SelectCurrencyDialog(
+                            currency = currency
+                        ) { selectedCurrency ->
+                            viewModel.showSelectCurrencyDialog(false)
+                            viewModel.updateUser(currentUser.copy(currency = selectedCurrency))
+                        }
+                    }
+
+                    if (showSelectDataFormatDialog) {
+                        val dateFormat = currentUser.tripReportDateFormat
+
+                        SelectDateFormatDialog(
+                            dateFormat = dateFormat
+                        ) { selectedDateFormat ->
+                            viewModel.showSelectDateFormatDialog(false)
+                            viewModel.updateUser(currentUser.copy(
+                                tripReportDateFormat = selectedDateFormat)
+                            )
+                        }
+                    }
 
                     if (showSelectLocaleDialog) {
                         val locale = TFDLocaleManager.getSavedLocale(context)

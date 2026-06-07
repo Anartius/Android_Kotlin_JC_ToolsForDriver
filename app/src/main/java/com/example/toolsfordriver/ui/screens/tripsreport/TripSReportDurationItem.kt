@@ -37,7 +37,8 @@ fun TripSReportDurationItem(
     modifier: Modifier = Modifier,
     title: String,
     value: String,
-    tripList: List<Pair<Trip, Duration?>>? = null
+    tripList: List<Pair<Trip, Duration?>>? = null,
+    dateFormat: String
 ) {
     val context = LocalContext.current
     var showTripList by remember { mutableStateOf(true) }
@@ -71,7 +72,7 @@ fun TripSReportDurationItem(
         if (showTripList) {
             tripList?.let { trip ->
                 trip.forEach {
-                    RangeTextRow(it.first)
+                    RangeTextRow(trip = it.first, dateFormat = dateFormat)
                     if (showEveryTripDuration) {
                         Text(text = durationAsString(it.second, context))
                     }
@@ -88,15 +89,15 @@ fun TripSReportDurationItem(
 }
 
 @Composable
-fun RangeTextRow(trip: Trip) {
+fun RangeTextRow(trip: Trip, dateFormat: String) {
     Row(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
         AutoResizeableText(
-            text = "${dateAsString(trip.startTime)} " +
+            text = "${dateAsString(trip.startTime, dateFormat)} " +
                     "${timeAsString(trip.startTime)}  -  " +
-                    "${dateAsString(trip.endTime)} " +
+                    "${dateAsString(trip.endTime, dateFormat)} " +
                     timeAsString(trip.endTime),
             modifier = Modifier.padding(vertical = 4.dp)
         )

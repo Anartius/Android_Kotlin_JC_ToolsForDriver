@@ -6,20 +6,19 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.toolsfordriver.navigation.TFDNavigation
 import com.example.toolsfordriver.ui.common.dialogs.PermissionDialog
 import com.example.toolsfordriver.ui.common.dialogs.RationaleDialog
-import com.example.toolsfordriver.ui.utils.TFDContentType
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 
 @Composable
-fun TFDApp(windowSize: WindowWidthSizeClass) {
+fun TFDApp(adaptiveInfo: WindowAdaptiveInfo) {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         RequestNotificationPermissionDialog()
@@ -29,29 +28,7 @@ fun TFDApp(windowSize: WindowWidthSizeClass) {
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        val contentType: TFDContentType
-
-        when (windowSize) {
-            WindowWidthSizeClass.Compact -> {
-                contentType = TFDContentType.LIST_ONLY
-                TFDNavigation()
-            }
-
-            WindowWidthSizeClass.Medium -> {
-                contentType = TFDContentType.LIST_ONLY
-                TFDNavigation()
-            }
-
-            WindowWidthSizeClass.Expanded -> {
-                contentType = TFDContentType.LIST_AND_DETAIL
-                TFDNavigation()
-            }
-
-            else -> {
-                contentType = TFDContentType.LIST_ONLY
-                TFDNavigation()
-            }
-        }
+        TFDNavigation(adaptiveInfo = adaptiveInfo)
     }
 }
 

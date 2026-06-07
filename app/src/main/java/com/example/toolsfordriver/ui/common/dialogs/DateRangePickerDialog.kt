@@ -43,7 +43,7 @@ fun DateRangePickerDialog(
     initialStartDate: Long? = null,
     initialEndDate: Long? = null,
     onConfirmButtonClicked: (Long, Long) -> Unit,
-    hideDialog: () -> Unit
+    onHideDialog: () -> Unit
 ) {
     val dateRangeState = rememberDateRangePickerState(
         initialSelectedStartDateMillis = initialStartDate,
@@ -75,7 +75,7 @@ fun DateRangePickerDialog(
     }
 
     DatePickerDialog(
-        onDismissRequest = { hideDialog() },
+        onDismissRequest = { onHideDialog() },
         confirmButton = {
             TextButton(
                 onClick = {
@@ -85,7 +85,7 @@ fun DateRangePickerDialog(
                     )
 
                     dateRangeState.setSelection(startDateMillis = null, endDateMillis = null)
-                    hideDialog()
+                    onHideDialog()
                 },
                 enabled = isPeriodSelected
             ) {
@@ -98,7 +98,7 @@ fun DateRangePickerDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = { hideDialog() }) {
+            TextButton(onClick = { onHideDialog() }) {
                 Text(
                     text = stringResource(id = R.string.cancel),
                     color = colorResource(id = R.color.light_blue)

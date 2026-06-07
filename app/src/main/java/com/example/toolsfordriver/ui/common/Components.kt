@@ -103,13 +103,14 @@ fun DeleteItemPopup(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TextRow(
+    modifier: Modifier = Modifier,
     valueDescription: String,
     value: String = "",
     fontSize: TextUnit = TextUnit.Unspecified,
     firstTextColor: Color = colorResource(id = R.color.light_blue),
+    secondTextColor: Color = Color.Unspecified,
     clickable: Boolean = false,
     showIcon: Boolean = false,
-    modifier: Modifier = Modifier,
     onLongClick: () -> Unit = {},
     onClick: () -> Unit = {}
 ) {
@@ -138,6 +139,7 @@ fun TextRow(
 
         Text(
             text = value,
+            color = secondTextColor,
             fontSize = fontSize,
             modifier = Modifier.padding(end =  5.dp)
         )

@@ -1,5 +1,6 @@
 package com.example.toolsfordriver.data.model
 
+import com.example.toolsfordriver.data.enums.Currencies
 import com.google.firebase.firestore.DocumentId
 
 data class User(
@@ -12,4 +13,6 @@ data class User(
     val paymentPerHour: Double = 26.0,
     val roundUpFromMinutes: Int = 20,
     val locale: String = "en",
+    val currency: String = Currencies.PLN.name,
+    val tripReportDateFormat: String = "dd.MM"
 )

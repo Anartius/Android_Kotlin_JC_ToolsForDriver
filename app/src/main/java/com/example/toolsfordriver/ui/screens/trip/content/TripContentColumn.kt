@@ -80,15 +80,21 @@ fun TripContentColumn() {
             )
         }
 
+        val currentDateTime = LocalDateTime.now()
+
         LaunchedEffect(startDateTime, endDateTime, paymentPerHour) {
             viewModel.updateTripDuration(
                 start = startDateTime.value,
-                end = endDateTime.value,
+                end = endDateTime.value?: currentDateTime,
                 roundUpFromMinutes = roundUpFromMinutes,
                 context = context
             )
             viewModel.updateTripEarnings(
-                startDateTime.value, endDateTime.value, roundUpFromMinutes, paymentPerHour)
+                start = startDateTime.value,
+                end = endDateTime.value ?: currentDateTime,
+                roundUpFromMinutes = roundUpFromMinutes,
+                moneyPerHour = paymentPerHour
+            )
         }
 
         var isStartDateTimeExist by remember(startDateTime) {
@@ -107,8 +113,8 @@ fun TripContentColumn() {
 
         TextRow(
             valueDescription = stringResource(R.string.start),
-            value = dateAsString(startDateTime.value)
-                    + " " + timeAsString(startDateTime.value),
+            value = "${dateAsString(startDateTime.value)} " +
+                    timeAsString(startDateTime.value),
             clickable = true,
             showIcon = true,
             firstTextColor = colorResource(R.color.light_blue)
@@ -119,11 +125,17 @@ fun TripContentColumn() {
 
         TextRow(
             valueDescription = stringResource(R.string.end),
-            value = dateAsString(endDateTime.value) + " " + timeAsString(endDateTime.value),
+            value = "${dateAsString(endDateTime.value ?: currentDateTime)} " +
+                    timeAsString(endDateTime.value ?: currentDateTime),
             clickable = isStartDateTimeExist,
             firstTextColor = colorResource(
                 if (isStartDateTimeExist) R.color.light_blue else R.color.gray
             ),
+            secondTextColor = if (!isStartDateTimeExist) {
+                Color.Transparent
+            } else if (isStartDateTimeExist && isEndDateTimeExist) {
+                Color.Unspecified
+            } else colorResource(R.color.gray),
             showIcon = isStartDateTimeExist
         ) {
             isStartDatePickerDialog = false
@@ -137,6 +149,9 @@ fun TripContentColumn() {
             value = tripDuration,
             firstTextColor = if (isStartDateTimeExist && isEndDateTimeExist) {
                 colorResource(R.color.light_blue)
+            } else colorResource(R.color.gray),
+            secondTextColor = if (isStartDateTimeExist && isEndDateTimeExist) {
+                Color.Unspecified
             } else colorResource(R.color.gray)
         )
 
@@ -145,6 +160,9 @@ fun TripContentColumn() {
             value = tripEarnings,
             firstTextColor = if (isStartDateTimeExist && isEndDateTimeExist) {
                 colorResource(R.color.light_blue)
+            } else colorResource(R.color.gray),
+            secondTextColor = if (isStartDateTimeExist && isEndDateTimeExist) {
+                Color.Unspecified
             } else colorResource(R.color.gray)
         )
 
@@ -181,7 +199,8 @@ fun TripContentColumn() {
             showDialog = showDatePickerDialog,
             dateTime = if (isStartDatePickerDialog) startDateTime else endDateTime,
             minDate = if (!isStartDatePickerDialog) {
-                startDateTime.value?.minusDays(1L)?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
+                startDateTime.value?.minusDays(1L)
+                    ?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
             } else null
         ) {
             viewModel.updateCurrentTrip(

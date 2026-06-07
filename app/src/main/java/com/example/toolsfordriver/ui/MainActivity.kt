@@ -5,8 +5,8 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.toolsfordriver.common.TFDLocaleManager
@@ -36,8 +36,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ToolsForDriverTheme {
-                val windowSize = calculateWindowSizeClass(activity = this)
-                TFDApp(windowSize = windowSize.widthSizeClass)
+                val adaptiveInfo = currentWindowAdaptiveInfo()
+                TFDApp(adaptiveInfo = adaptiveInfo)
             }
         }
     }

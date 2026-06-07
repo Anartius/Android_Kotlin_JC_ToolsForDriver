@@ -35,6 +35,7 @@ fun MyProfileLazyColumn(localeOptions: Map<Locale, String>) {
     val viewModel: MyProfileViewModel = hiltViewModel()
     val currentUser = viewModel.uiState.collectAsStateWithLifecycle().value.user
     val context = LocalContext.current
+    val itemSpacerHeight = 4.dp
 
     val firstName = currentUser?.firstName ?: ""
     val lastName = currentUser?.lastName ?: ""
@@ -116,7 +117,7 @@ fun MyProfileLazyColumn(localeOptions: Map<Locale, String>) {
             }
 
             item {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(itemSpacerHeight))
 
                 TextInputWithTitle(
                     title = stringResource(R.string.first_name),
@@ -127,7 +128,7 @@ fun MyProfileLazyColumn(localeOptions: Map<Locale, String>) {
             }
 
             item {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(itemSpacerHeight))
 
                 TextInputWithTitle(
                     title = stringResource(R.string.last_name),
@@ -138,31 +139,50 @@ fun MyProfileLazyColumn(localeOptions: Map<Locale, String>) {
             }
 
             item {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(itemSpacerHeight))
 
                 DigitalInputWithTitle(
                     title = stringResource(R.string.payment_per_day),
                     valueState = paymentPerDayState,
-                    placeholder = "0" + stringResource(id = R.string.pln),
-                    suffix = stringResource(id = R.string.pln),
+                    placeholder = "0" + currentUser.currency,
+                    suffix = " " + currentUser.currency,
                     onFocusChanged = { viewModel.updateUser(currentUser) }
                 ) { }
             }
 
             item {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(itemSpacerHeight))
 
                 DigitalInputWithTitle(
                     title = stringResource(R.string.payment_per_hour),
                     valueState = paymentPerHourState,
-                    placeholder = "0" + stringResource(id = R.string.pln),
-                    suffix = stringResource(id = R.string.pln),
+                    placeholder = "0" + currentUser.currency,
+                    suffix = " " + currentUser.currency,
                     onFocusChanged = { viewModel.updateUser(currentUser) }
                 ) { }
             }
 
             item {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(itemSpacerHeight))
+
+                Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+                    Text(
+                        text = stringResource(R.string.currency),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = colorResource(id = R.color.light_blue)
+                    )
+
+                    Text(
+                        text = currentUser.currency,
+                        modifier = Modifier
+                            .padding(vertical = 20.dp)
+                            .clickable { viewModel.showSelectCurrencyDialog(true) },
+                    )
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(itemSpacerHeight))
 
                 DigitalInputWithTitle(
                     title = "Whole hour after",
@@ -174,7 +194,26 @@ fun MyProfileLazyColumn(localeOptions: Map<Locale, String>) {
             }
 
             item {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(itemSpacerHeight))
+
+                Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+                    Text(
+                        text = stringResource(R.string.trips_report_date_format),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = colorResource(id = R.color.light_blue)
+                    )
+
+                    Text(
+                        text = currentUser.tripReportDateFormat,
+                        modifier = Modifier
+                            .padding(vertical = 20.dp)
+                            .clickable { viewModel.showSelectDateFormatDialog(true) },
+                    )
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(itemSpacerHeight))
 
                 Column(modifier = Modifier.padding(horizontal = 24.dp)) {
                     Text(

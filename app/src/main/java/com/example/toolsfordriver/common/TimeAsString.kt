@@ -10,29 +10,29 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
-fun dateAsString(dateTime: Long?): String {
-    val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.ROOT)
+fun dateAsString(dateTime: Long?, pattern: String = "dd.MM.yyyy"): String {
+    val formatter = SimpleDateFormat(pattern, Locale.ROOT)
     return if (dateTime != null) {
         formatter.format(Date(dateTime))
     } else ""
 }
 
-fun dateAsString(dateTime: Date?): String {
-    val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.ROOT)
+fun dateAsString(dateTime: Date?, pattern: String = "dd.MM.yyyy"): String {
+    val formatter = SimpleDateFormat(pattern, Locale.ROOT)
     return if (dateTime != null) {
         formatter.format(dateTime)
     } else ""
 }
 
-fun dateAsString(dateTime: LocalDateTime?): String {
-    val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.ROOT)
+fun dateAsString(dateTime: LocalDateTime?, pattern: String = "dd.MM.yyyy"): String {
+    val formatter = DateTimeFormatter.ofPattern(pattern, Locale.ROOT)
     return if (dateTime != null) {
         formatter.format(dateTime)
     } else ""
 }
 
-fun dateAsString(dateTime: ZonedDateTime?): String {
-    val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.ROOT)
+fun dateAsString(dateTime: ZonedDateTime?, pattern: String = "dd.MM.yyyy"): String {
+    val formatter = DateTimeFormatter.ofPattern(pattern, Locale.ROOT)
     return if (dateTime != null) {
         formatter.format(dateTime)
     } else ""

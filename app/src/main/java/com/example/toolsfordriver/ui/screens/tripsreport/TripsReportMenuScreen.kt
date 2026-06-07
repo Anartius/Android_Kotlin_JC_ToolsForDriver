@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,8 +28,9 @@ import java.time.YearMonth
 
 @Composable
 fun TripsReportMenuScreen(
+    adaptiveInfo: WindowAdaptiveInfo,
     onNavigateToHomeScreen: () -> Unit = {},
-    onNavigateToTripsReportScreen: (String) -> Unit = {}
+    onNavigateToTripsReportScreen: (String) -> Unit = {},
 ) {
     val viewModel: TripsReportViewModel = hiltViewModel()
     viewModel.trips.collectAsStateWithLifecycle(emptyList())
@@ -95,7 +97,7 @@ fun TripsReportMenuScreen(
                             viewModel.showDateRangePicker(false)
                             onNavigateToTripsReportScreen(getRangeAsString(start, end))
                         },
-                        hideDialog = { viewModel.showDateRangePicker(false) }
+                        onHideDialog = { viewModel.showDateRangePicker(false) }
                     )
                 }
             }

@@ -53,10 +53,12 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.adaptive.android)
     coreLibraryDesugaring(libs.android.desugar)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.material3.adaptive)
     implementation(libs.google.accompanist.permissions)
     implementation(libs.kotlinx.serialization.json)
 
@@ -98,10 +100,9 @@ dependencies {
 
     // Firebase/firestore
     implementation(platform(libs.google.firebase.bom))
-    implementation(libs.google.firebase.auth.ktx)
+    implementation(libs.google.firebase.auth)
     implementation(libs.google.firebase.firestore)
-    implementation(libs.google.firebase.firestore.ktx)
-    implementation(libs.google.firebase.storage.ktx)
+    implementation(libs.google.firebase.storage)
 
     // Gson
     implementation(libs.google.code.gson)

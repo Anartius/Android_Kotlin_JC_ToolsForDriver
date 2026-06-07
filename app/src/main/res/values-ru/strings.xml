@@ -74,6 +74,7 @@
     <string name="add_last_name">Добавить фамилию</string>
     <string name="app_language">Язык приложения</string>
     <string name="ask_for_log_out_ensure">Вы действительно хотите выйти из аккаунта?</string>
+    <string name="currency">Валюта</string>
     <string name="english">English</string>
     <string name="first_name">Имя</string>
     <string name="last_name">Фамилия</string>
@@ -83,6 +84,9 @@
     <string name="payment_per_hour">Оплата за час</string>
     <string name="russian">Русский</string>
     <string name="select_language">Выберите язык</string>
+    <string name="select_currency">Выберите валюту</string>
+    <string name="select_date_format">Выберите формат даты</string>
+    <string name="trips_report_date_format">Формат даты для отчёта о поездках</string>
     <string name="sign_out">Выйти из системы</string>
     <string name="update_user_profile_photo">Обновить фото профиля</string>
 
@@ -150,6 +154,7 @@
     <string name="december">Декабрь</string>
 
     <!-- TripsReport -->
+    <string name="copy_data">Скопировать данные</string>
     <string name="current_month">Текущий месяц</string>
     <string name="data_copied_to_clipboard">Данные скопированы в буфер обмена</string>
     <string name="hide_every_trip_duration">Скрыть продолжительность каждой поездки</string>

@@ -92,6 +92,14 @@ class MyProfileViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(showZoomableImageDialog = value)
     }
 
+    fun showSelectCurrencyDialog(value: Boolean) {
+        _uiState.value = _uiState.value.copy(showSelectCurrencyDialog = value)
+    }
+
+    fun showSelectDateFormatDialog(value: Boolean) {
+        _uiState.value = _uiState.value.copy(showSelectDateFormatDialog = value)
+    }
+
     fun showSelectLocaleDialog(value: Boolean) {
         _uiState.value = _uiState.value.copy(showSelectLocaleDialog = value)
     }

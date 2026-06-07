@@ -13,7 +13,7 @@ class HomeViewModel @Inject constructor(storageService: FirestoreService) : View
     private val _homeUiState = MutableStateFlow(HomeUiState())
     val homeUiState = _homeUiState.asStateFlow()
     val users = storageService.users
-
+    
     fun updateCurrentUser (user: User) {
         _homeUiState.value = _homeUiState.value.copy(user = user)
     }

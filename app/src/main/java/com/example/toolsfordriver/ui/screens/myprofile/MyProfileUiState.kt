@@ -8,6 +8,8 @@ data class MyProfileUiState(
     val showCamera: Boolean = false,
     val temporaryImageUri: Uri? = null,
     val showZoomableImageDialog: Boolean = false,
+    val showSelectDateFormatDialog: Boolean = false,
+    val showSelectCurrencyDialog: Boolean = false,
     val showSelectLocaleDialog: Boolean = false,
     val showSignOutDialog: Boolean = false
 )

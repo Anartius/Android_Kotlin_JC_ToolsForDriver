@@ -73,6 +73,7 @@
     <string name="add_user_profile_photo">Add user profile photo</string>
     <string name="app_language">App language</string>
     <string name="ask_for_log_out_ensure">You will be logged out of the app. Are You sure?</string>
+    <string name="currency">Currency</string>
     <string name="english">English</string>
     <string name="first_name">First name</string>
     <string name="last_name">Last name</string>
@@ -80,9 +81,12 @@
     <string name="my_profile">My profile</string>
     <string name="payment_per_day">Payment per day</string>
     <string name="payment_per_hour">Payment per hour</string>
-    <string name="russian">Русский</string>
+    <string name="russian">Russian</string>
     <string name="select_language">Select language</string>
+    <string name="select_currency">Select currency</string>
+    <string name="select_date_format">Select date format</string>
     <string name="sign_out">Sign out</string>
+    <string name="trips_report_date_format">Trips report date format</string>
     <string name="update_user_profile_photo">Update user profile photo</string>
 
     <!-- Trip -->
@@ -148,6 +152,7 @@
     <string name="december">December</string>
 
     <!-- TripsReport -->
+    <string name="copy_data">Copy data</string>
     <string name="current_month">Current month</string>
     <string name="data_copied_to_clipboard">Data copied to clipboard</string>
     <string name="hide_every_trip_duration">Hide every trip duration</string>

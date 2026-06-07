@@ -1,6 +1,7 @@
 package com.example.toolsfordriver.navigation
 
 import android.content.Intent
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -19,7 +20,7 @@ import com.example.toolsfordriver.ui.screens.tripsreport.TripsReportMenuScreen
 import com.example.toolsfordriver.ui.screens.tripsreport.TripsReportScreen
 
 @Composable
-fun TFDNavigation() {
+fun TFDNavigation(adaptiveInfo: WindowAdaptiveInfo) {
     val navController = rememberNavController()
 
     NavHost(
@@ -87,6 +88,7 @@ fun TFDNavigation() {
 
         composable(TFDScreens.TripsScreen.name) {
             TripsScreen (
+                adaptiveInfo = adaptiveInfo,
                 onNavigateToHomeScreen = {
                     navController.navigate(TFDScreens.HomeScreen.name)
                 },
@@ -99,6 +101,7 @@ fun TFDNavigation() {
 
         composable(TFDScreens.TripsReportMenuScreen.name) {
             TripsReportMenuScreen (
+                adaptiveInfo = adaptiveInfo,
                 onNavigateToHomeScreen = {
                     navController.navigate(TFDScreens.HomeScreen.name)
                 },
@@ -119,13 +122,16 @@ fun TFDNavigation() {
         ) {
             val range = it.arguments?.getString("range") ?: ""
             TripsReportScreen(
+                adaptiveInfo = adaptiveInfo,
                 rangeValue = range,
                 onNavIconClicked = { navController.navigateUp() }
             )
         }
 
         composable(TFDScreens.FreightsScreen.name) {
-            FreightsScreen { navController.navigate(TFDScreens.HomeScreen.name) }
+            FreightsScreen(
+                adaptiveInfo = adaptiveInfo
+            ) { navController.navigate(TFDScreens.HomeScreen.name) }
         }
     }
 }

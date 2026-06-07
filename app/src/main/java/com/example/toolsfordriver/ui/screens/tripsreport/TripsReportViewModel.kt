@@ -42,42 +42,67 @@ class TripsReportViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TripsReportUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun showDateRangePicker(value: Boolean) {
-        _uiState.value = _uiState.value.copy(showDateRangePicker = value)
+    private fun calcEarnings(daysDuration: Duration, hoursDuration: Duration, user: User): Double {
+        return hoursDuration.toHours() * user.paymentPerHour +
+                daysDuration.toHours() * user.paymentPerDay / 24
     }
 
-    fun updateDailyPayData(trips: List<Pair<Trip, Duration?>>, user: User) {
-        _uiState.value = _uiState.value.copy(
-            dailyPaymentDuration = {
-                var duration = Duration.ZERO
-                trips.forEach { trip -> trip.second?.let { duration += it } }
-                duration
-            }.invoke()
-        )
-        _uiState.value = _uiState.value.copy(
-            earnings = calcEarnings(
-                _uiState.value.dailyPaymentDuration,
-                _uiState.value.hourlyPaymentDuration,
-                user
-            )
-        )
-    }
+    fun copyDataToClipboard(
+        tripsMap: Map<String, List<Pair<Trip, Duration?>>>,
+        context: Context, pattern: String = "dd.MM.yyyy"
+    ): String {
+        var result = ""
+        var duration = Duration.ZERO
 
-    fun updateHourlyPayData(trips: List<Pair<Trip, Duration?>>, user: User) {
-        _uiState.value = _uiState.value.copy(
-            hourlyPaymentDuration = {
-                var duration = Duration.ZERO
-                trips.forEach { trip -> trip.second?.let { duration += it } }
-                duration
-            }.invoke()
-        )
-        _uiState.value = _uiState.value.copy(
-            earnings = calcEarnings(
-                _uiState.value.dailyPaymentDuration,
-                _uiState.value.hourlyPaymentDuration,
-                user
-            )
-        )
+        launchCatching {
+            val dTrips = tripsMap["d"]
+            val dailyTrips = if (dTrips.isNullOrEmpty()) null else dTrips
+            val hTrips = tripsMap["h"]
+            val hourlyTrips = if (hTrips.isNullOrEmpty()) null else hTrips
+
+            dailyTrips?.let { trips ->
+                result += "${context.getString(R.string.payment_per_day)}:\n"
+
+                trips.forEach { trip ->
+                    duration += trip.second ?: Duration.ZERO
+
+                    result += "${dateAsString(trip.first.startTime, pattern)} " +
+                            timeAsString(trip.first.startTime) +
+                            " - ${dateAsString(trip.first.endTime, pattern)} " +
+                            timeAsString(trip.first.endTime) +
+                            "  ${durationAsString(trip.second, context)}\n"
+                }
+
+                result += "${context.getString(R.string.summary)}: " + durationAsString(duration, context) +
+                        hourlyTrips?.let { "\n" }
+                duration = Duration.ZERO
+            }
+
+            hourlyTrips?.let { trips ->
+                result += "${context.getString(R.string.payment_per_hour)}:\n"
+
+                trips.forEach { trip ->
+                    duration += trip.second ?: Duration.ZERO
+
+                    result += "${dateAsString(trip.first.startTime, pattern)} " +
+                            timeAsString(trip.first.startTime) +
+                            " - ${dateAsString(trip.first.endTime, pattern)} " +
+                            timeAsString(trip.first.endTime) +
+                            "  ${durationAsString(trip.second, context)}\n"
+                }
+
+                result += "${context.getString(R.string.summary)}: " + durationAsString(duration, context)
+                duration = Duration.ZERO
+            }
+
+            if (result.isNotEmpty()) {
+                snackbarChannel.send(
+                    UiText.StringResource(R.string.data_copied_to_clipboard)
+                )
+            }
+        }
+
+        return result
     }
 
     fun getMappedTrips(
@@ -129,63 +154,6 @@ class TripsReportViewModel @Inject constructor(
         return mapOf("d" to daily, "h" to hourly)
     }
 
-    private fun calcEarnings(daysDuration: Duration, hoursDuration: Duration, user: User): Double {
-        return hoursDuration.toHours() * user.paymentPerHour +
-                daysDuration.toHours() * user.paymentPerDay / 24
-    }
-
-    fun copyDataToClipboard(
-        tripsMap: Map<String, List<Pair<Trip, Duration?>>>,
-        context: Context
-    ): String {
-        var result = ""
-        var duration = Duration.ZERO
-
-        launchCatching {
-            val dailyTrips = tripsMap["d"]
-            val hourlyTrips = tripsMap["h"]
-
-            dailyTrips?.let { trips ->
-                result += "${context.getString(R.string.payment_per_day)}:\n"
-
-                trips.forEach { trip ->
-                    duration += trip.second ?: Duration.ZERO
-
-                    result += "${dateAsString(trip.first.startTime)} " +
-                            timeAsString(trip.first.startTime) +
-                            " - ${dateAsString(trip.first.endTime)} " +
-                            timeAsString(trip.first.endTime) +
-                            "  ${durationAsString(trip.second, context)}\n"
-                }
-            }
-
-            hourlyTrips?.let { trips ->
-                result += "${context.getString(R.string.payment_per_hour)}:\n"
-
-                trips.forEach { trip ->
-                    duration += trip.second ?: Duration.ZERO
-
-                    result += "${dateAsString(trip.first.startTime)} " +
-                            timeAsString(trip.first.startTime) +
-                            " - ${dateAsString(trip.first.endTime)} " +
-                            timeAsString(trip.first.endTime) +
-                            "  ${durationAsString(trip.second, context)}\n"
-                }
-            }
-
-            if (result.isNotEmpty()) {
-                result += "${context.getString(R.string.summary)}: " +
-                        durationAsString(duration, context)
-
-                snackbarChannel.send(
-                    UiText.StringResource(R.string.data_copied_to_clipboard)
-                )
-            }
-        }
-
-        return result
-    }
-
     private fun launchCatching(block: suspend CoroutineScope.() -> Unit) {
         viewModelScope.launch(
             CoroutineExceptionHandler{ _, throwable ->
@@ -199,4 +167,43 @@ class TripsReportViewModel @Inject constructor(
             block = block
         )
     }
+
+    fun showDateRangePicker(value: Boolean) {
+        _uiState.value = _uiState.value.copy(showDateRangePicker = value)
+    }
+
+    fun updateDailyPayData(trips: List<Pair<Trip, Duration?>>, user: User) {
+        _uiState.value = _uiState.value.copy(
+            dailyPaymentDuration = {
+                var duration = Duration.ZERO
+                trips.forEach { trip -> trip.second?.let { duration += it } }
+                duration
+            }.invoke()
+        )
+        _uiState.value = _uiState.value.copy(
+            earnings = calcEarnings(
+                _uiState.value.dailyPaymentDuration,
+                _uiState.value.hourlyPaymentDuration,
+                user
+            )
+        )
+    }
+
+    fun updateHourlyPayData(trips: List<Pair<Trip, Duration?>>, user: User) {
+        _uiState.value = _uiState.value.copy(
+            hourlyPaymentDuration = {
+                var duration = Duration.ZERO
+                trips.forEach { trip -> trip.second?.let { duration += it } }
+                duration
+            }.invoke()
+        )
+        _uiState.value = _uiState.value.copy(
+            earnings = calcEarnings(
+                _uiState.value.dailyPaymentDuration,
+                _uiState.value.hourlyPaymentDuration,
+                user
+            )
+        )
+    }
+
 }
