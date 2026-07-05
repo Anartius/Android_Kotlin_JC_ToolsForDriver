@@ -89,6 +89,7 @@
     <string name="trips_report_date_format">Формат даты для отчёта о поездках</string>
     <string name="sign_out">Выйти из системы</string>
     <string name="update_user_profile_photo">Обновить фото профиля</string>
+    <string name="whole_hour_after">Целый час после</string>
 
     <!-- Trip -->
     <string name="add_trip">Добавить поездку</string>

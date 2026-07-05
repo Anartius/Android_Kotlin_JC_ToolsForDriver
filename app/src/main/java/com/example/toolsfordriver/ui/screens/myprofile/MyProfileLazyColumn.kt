@@ -185,7 +185,7 @@ fun MyProfileLazyColumn(localeOptions: Map<Locale, String>) {
                 Spacer(modifier = Modifier.height(itemSpacerHeight))
 
                 DigitalInputWithTitle(
-                    title = "Whole hour after",
+                    title = stringResource(R.string.whole_hour_after),
                     valueState = minMinutesToWholeHourState,
                     placeholder = "0 " + stringResource(R.string.min),
                     suffix = " " + stringResource(id = R.string.min),

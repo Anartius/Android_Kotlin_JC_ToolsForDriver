@@ -88,6 +88,7 @@
     <string name="sign_out">Sign out</string>
     <string name="trips_report_date_format">Trips report date format</string>
     <string name="update_user_profile_photo">Update user profile photo</string>
+    <string name="whole_hour_after">Whole hour after</string>
 
     <!-- Trip -->
     <string name="add_trip">Add trip</string>

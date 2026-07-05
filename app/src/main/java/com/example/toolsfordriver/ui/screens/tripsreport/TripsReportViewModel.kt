@@ -73,8 +73,8 @@ class TripsReportViewModel @Inject constructor(
                             "  ${durationAsString(trip.second, context)}\n"
                 }
 
-                result += "${context.getString(R.string.summary)}: " + durationAsString(duration, context) +
-                        hourlyTrips?.let { "\n" }
+                result += "${context.getString(R.string.summary)}: " + durationAsString(duration, context)
+                hourlyTrips?.let { result += "\n" }
                 duration = Duration.ZERO
             }
 
