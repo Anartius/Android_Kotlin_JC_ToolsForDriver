@@ -72,7 +72,7 @@ fun TFDAppBar(
                     }
                 }
             },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.Transparent)
+            colors = TopAppBarDefaults.topAppBarColors(Color.Transparent)
         )
     }
 }

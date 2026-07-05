@@ -86,8 +86,8 @@ fun MyProfileScreen(
                         .fillMaxSize()
                 ) {
                     val localeOptions = mapOf(
-                        Locale("en") to stringResource(R.string.english),
-                        Locale("ru") to stringResource(R.string.russian)
+                        Locale.forLanguageTag("en") to stringResource(R.string.english),
+                        Locale.forLanguageTag("ru") to stringResource(R.string.russian)
                     )
 
                     MyProfileLazyColumn(localeOptions = localeOptions)

@@ -23,7 +23,7 @@ fun SplashScreen(
     onNavigateToAuthScreen: () -> Unit,
     onNavigateToHomeScreen: () -> Unit
 ) {
-    val viewModel: AuthScreenViewModel = hiltViewModel()
+    val viewModel = hiltViewModel<AuthScreenViewModel>()
 
     LaunchedEffect(key1 = true) {
         delay(700L)

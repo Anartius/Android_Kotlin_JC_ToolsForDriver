@@ -42,8 +42,9 @@ object TFDLocaleManager {
         }
 
         return try {
-            Locale(sharedPreferences.getString(
-                "language", Locales.LOCALE_EN.locale.language)!!)
+            val languageCode = sharedPreferences.getString(
+                "language", Locales.LOCALE_EN.locale.language)!!
+            Locale.forLanguageTag(languageCode)
         } catch (e: Exception) {
             Log.e("Locale", e.message.toString())
             Locales.LOCALE_EN.locale
